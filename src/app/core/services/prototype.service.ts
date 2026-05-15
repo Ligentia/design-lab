@@ -139,7 +139,7 @@ export class PrototypeService {
       `   - **Description**: was "${p.description || '(none)'}" — update to reflect what changed`,
       `   - **Creator**: was ${p.creator} — change to whoever is uploading this version`,
       `   - **Tags**: were [${p.tags.join(', ') || 'none'}] — add or remove tags to match the current state`,
-      `   - **Folder**: was \`${p.folder}\` — keep the same to overwrite, or use a new path to save as a separate prototype`,
+      `   - **Folder**: was \`${p.folder}\` — if the title, description, creator, or tags have changed, always use a NEW folder path (this is a new prototype). Only keep the same path for minor bug fixes where nothing else has changed.`,
     ].join('\n');
   }
 }
