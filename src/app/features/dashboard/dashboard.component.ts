@@ -78,9 +78,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     .toolbar { display: flex; flex-direction: column; gap: var(--space-4); }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--space-5);
     }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
     .state-msg {
       display: flex; align-items: center; gap: var(--space-3);
       font-size: var(--text-sm); color: var(--color-text-secondary);
