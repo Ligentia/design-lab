@@ -52,28 +52,54 @@ import { PrototypeService } from '../../core/services/prototype.service';
       </div>
 
       <div class="actions" (click)="$event.stopPropagation()">
-        <button class="action-btn" title="Copy link" (click)="copyLink()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-          </svg>
-          {{ copied ? 'Copied!' : 'Copy link' }}
-        </button>
-        <button class="action-btn" *ngIf="!showPlaceholder()" title="Download ZIP" (click)="download(); $event.stopPropagation()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          Download
-        </button>
-        <button class="action-btn" title="Edit" (click)="edit.emit(prototype)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          Edit
-        </button>
+        <ng-container *ngIf="!isArchived">
+          <button class="action-btn" title="Copy link" (click)="copyLink()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+            </svg>
+            {{ copied ? 'Copied!' : 'Copy link' }}
+          </button>
+          <button class="action-btn" *ngIf="!showPlaceholder()" title="Download ZIP" (click)="download()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Download
+          </button>
+          <button class="action-btn" title="Archive" (click)="archive.emit(prototype)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="21 8 21 21 3 21 3 8"/>
+              <rect x="1" y="3" width="22" height="5"/>
+              <line x1="10" y1="12" x2="14" y2="12"/>
+            </svg>
+            Archive
+          </button>
+          <button class="action-btn" title="Edit" (click)="edit.emit(prototype)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </button>
+        </ng-container>
+        <ng-container *ngIf="isArchived">
+          <button class="action-btn action-btn--restore" title="Restore" (click)="restore.emit(prototype)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+            </svg>
+            Restore
+          </button>
+          <button class="action-btn" title="Edit" (click)="edit.emit(prototype)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </button>
+        </ng-container>
       </div>
     </article>
   `,
@@ -189,11 +215,16 @@ import { PrototypeService } from '../../core/services/prototype.service';
       font-family: var(--font-sans);
     }
     .action-btn:hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
+    .action-btn--restore { color: var(--color-accent); }
+    .action-btn--restore:hover { background: var(--color-accent-subtle, rgba(99,102,241,.08)); color: var(--color-accent); }
   `]
 })
 export class PrototypeCardComponent implements AfterViewInit, OnDestroy {
   @Input({ required: true }) prototype!: Prototype;
+  @Input() isArchived = false;
   @Output() edit = new EventEmitter<Prototype>();
+  @Output() archive = new EventEmitter<Prototype>();
+  @Output() restore = new EventEmitter<Prototype>();
   @ViewChild('thumbnail') thumbnailEl!: ElementRef<HTMLDivElement>;
 
   private router = inject(Router);

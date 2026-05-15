@@ -7,6 +7,7 @@ export interface Prototype {
   description: string;
   folder: string;
   thumbnail?: string;
+  archived?: boolean;
 }
 
 export const CREATORS = ['Craig', 'Chuka', 'Adrian'] as const;

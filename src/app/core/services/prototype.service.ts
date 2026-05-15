@@ -36,6 +36,7 @@ export class PrototypeService {
     const active = this._activeTags();
     return this._prototypes()
       .filter((p) => {
+        if (p.archived) return false;
         const matchesSearch =
           !q || p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
         const matchesTags =
@@ -44,6 +45,10 @@ export class PrototypeService {
       })
       .sort((a, b) => b.date.localeCompare(a.date));
   });
+
+  readonly archivedPrototypes = computed(() =>
+    this._prototypes().filter(p => p.archived)
+  );
 
   load() {
     this._loading.set(true);
@@ -94,13 +99,22 @@ export class PrototypeService {
     const list = this._prototypes().map((p) => (p.id === updated.id ? updated : p));
     return new Promise<void>((resolve, reject) => {
       this.github.savePrototypes(list, this._sha(), pat).subscribe({
-        next: () => {
+        next: (res: any) => {
           this._prototypes.set(list);
+          if (res?.content?.sha) this._sha.set(res.content.sha);
           resolve();
         },
         error: reject,
       });
     });
+  }
+
+  archivePrototype(prototype: Prototype, pat: string) {
+    return this.updatePrototype({ ...prototype, archived: true }, pat);
+  }
+
+  restorePrototype(prototype: Prototype, pat: string) {
+    return this.updatePrototype({ ...prototype, archived: false }, pat);
   }
 
   async downloadAsZip(prototype: Prototype) {
