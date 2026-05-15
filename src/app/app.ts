@@ -27,9 +27,12 @@ import { UiStateService } from './core/services/ui-state.service';
           <a class="tab" routerLink="/assets" routerLinkActive="active">
             Assets
           </a>
+          <a class="tab" routerLink="/archived" routerLinkActive="active">
+            Archived
+          </a>
         </nav>
 
-        <button class="add-btn" (click)="ui.triggerAdd()">
+        <button class="add-btn" *ngIf="!isArchivedRoute()" (click)="ui.triggerAdd()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 5v14M5 12h14"/>
           </svg>
@@ -64,5 +67,9 @@ export class AppComponent {
 
   isAssetsRoute(): boolean {
     return this.router.url.startsWith('/assets');
+  }
+
+  isArchivedRoute(): boolean {
+    return this.router.url.startsWith('/archived');
   }
 }

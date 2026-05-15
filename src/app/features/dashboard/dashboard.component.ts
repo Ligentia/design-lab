@@ -63,27 +63,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         <button class="clear-link" (click)="svc.clearFilters()">Clear filters</button>
       </div>
 
-      <!-- Archived section -->
-      <div *ngIf="!svc.loading() && !svc.error() && svc.archivedPrototypes().length > 0" class="archived-section">
-        <button class="archived-toggle" (click)="toggleArchived()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            [style.transform]="showArchived() ? 'rotate(90deg)' : 'rotate(0)'"
-            style="transition: transform .2s ease; flex-shrink:0">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-          Archived
-          <span class="archived-count">{{ svc.archivedPrototypes().length }}</span>
-        </button>
-        <div *ngIf="showArchived()" class="grid archived-grid">
-          <dl-prototype-card
-            *ngFor="let p of svc.archivedPrototypes()"
-            [prototype]="p"
-            [isArchived]="true"
-            (edit)="openEdit($event)"
-            (restore)="onRestore($event)"
-          />
-        </div>
-      </div>
     </div>
 
     <!-- Modal -->
@@ -134,23 +113,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       background: none; border: none; cursor: pointer;
       font-family: var(--font-sans); text-decoration: underline;
     }
-    .archived-section { display: flex; flex-direction: column; gap: var(--space-4); }
-    .archived-toggle {
-      display: flex; align-items: center; gap: var(--space-2);
-      font-size: var(--text-sm); font-weight: var(--weight-medium);
-      color: var(--color-text-secondary); background: none; border: none;
-      cursor: pointer; padding: 0; font-family: var(--font-sans);
-      width: fit-content;
-    }
-    .archived-toggle:hover { color: var(--color-text-primary); }
-    .archived-count {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 20px; height: 20px; padding: 0 6px;
-      font-size: var(--text-xs); font-weight: var(--weight-medium);
-      color: var(--color-text-tertiary); background: var(--color-surface-subtle);
-      border: 1px solid var(--color-border); border-radius: var(--radius-full);
-    }
-    .archived-grid { opacity: .7; }
   `]
 })
 export class DashboardComponent implements OnInit {
@@ -158,7 +120,6 @@ export class DashboardComponent implements OnInit {
   private ui = inject(UiStateService);
   showModal = signal(false);
   editingPrototype = signal<Prototype | null>(null);
-  showArchived = signal(false);
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -169,7 +130,6 @@ export class DashboardComponent implements OnInit {
   openAdd() { this.editingPrototype.set(null); this.showModal.set(true); }
   openEdit(p: Prototype) { this.editingPrototype.set(p); this.showModal.set(true); }
   closeModal() { this.showModal.set(false); this.editingPrototype.set(null); }
-  toggleArchived() { this.showArchived.update(v => !v); }
 
   async onSaved({ prototype, pat, files }: { prototype: Prototype; pat: string; files?: { name: string; content: string }[] }) {
     try {
@@ -188,11 +148,5 @@ export class DashboardComponent implements OnInit {
     const pat = sessionStorage.getItem('dl_github_pat') ?? '';
     if (!pat) { alert('Enter your GitHub PAT first by opening the "Add prototype" modal.'); return; }
     try { await this.svc.archivePrototype(p, pat); } catch (err) { console.error('Archive failed', err); }
-  }
-
-  async onRestore(p: Prototype) {
-    const pat = sessionStorage.getItem('dl_github_pat') ?? '';
-    if (!pat) { alert('Enter your GitHub PAT first by opening the "Add prototype" modal.'); return; }
-    try { await this.svc.restorePrototype(p, pat); } catch (err) { console.error('Restore failed', err); }
   }
 }
