@@ -1,5 +1,17 @@
 [
   {
+    "id": "dropdown-prototype",
+    "title": "Dropdown prototype",
+    "description": "",
+    "creator": "Craig",
+    "date": "2026-05-18",
+    "tags": [
+      "dropdown",
+      "input"
+    ],
+    "folder": "prototypes/dropdown-prototype"
+  },
+  {
     "id": "dm-client-settings-exploration-1",
     "title": "DM Client settings exploration 1",
     "description": "Initial explorations of DM client settings",
