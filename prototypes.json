@@ -1,5 +1,16 @@
 [
   {
+    "id": "sa-settings-exploration-1",
+    "title": "SA settings exploration 1",
+    "description": "",
+    "creator": "Dennis",
+    "date": "2026-05-19",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/sa-settings-exploration-1"
+  },
+  {
     "id": "dropdown-prototype",
     "title": "Dropdown prototype",
     "description": "",
