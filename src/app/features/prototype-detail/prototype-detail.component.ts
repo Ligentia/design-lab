@@ -37,14 +37,22 @@ import { environment } from '../../../environments/environment';
           <div class="preview-pane">
             <div class="preview-header">
               <span class="preview-label">Preview</span>
-              <a class="gh-link" [href]="githubFolderUrl(p)" target="_blank" rel="noopener">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/>
-                  <line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-                Open on GitHub
-              </a>
+              <div class="preview-actions">
+                <a *ngIf="!iframeError" class="gh-link" [href]="prototypeUrl(p)" target="_blank" rel="noopener">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                  Open in new tab
+                </a>
+                <a class="gh-link" [href]="githubFolderUrl(p)" target="_blank" rel="noopener">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+                  </svg>
+                  GitHub
+                </a>
+              </div>
             </div>
             <div class="iframe-wrap">
               <iframe
@@ -122,6 +130,7 @@ import { environment } from '../../../environments/environment';
       background: var(--color-surface-subtle);
     }
     .preview-label { font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .06em; }
+    .preview-actions { display: flex; align-items: center; gap: var(--space-4); }
     .gh-link { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--color-text-secondary); text-decoration: none; transition: color var(--transition-fast); }
     .gh-link:hover { color: var(--color-accent); }
     .iframe-wrap { aspect-ratio: 16/10; background: var(--color-surface-subtle); }
@@ -184,6 +193,10 @@ export class PrototypeDetailComponent implements OnInit {
         }
       }, 100);
     }
+  }
+
+  prototypeUrl(p: Prototype): string {
+    return `${window.location.origin}/${p.folder}/index.html`;
   }
 
   githubFolderUrl(p: Prototype): string {

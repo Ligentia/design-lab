@@ -60,6 +60,15 @@ import { PrototypeService } from '../../core/services/prototype.service';
             </svg>
             {{ copied ? 'Copied!' : 'Copy link' }}
           </button>
+          <a *ngIf="!showPlaceholder()" class="action-btn" title="Open in new tab"
+            [href]="prototypeUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Open
+          </a>
           <button class="action-btn" *ngIf="!showPlaceholder()" title="Download ZIP" (click)="download()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
@@ -213,6 +222,7 @@ import { PrototypeService } from '../../core/services/prototype.service';
       cursor: pointer;
       transition: background var(--transition-fast), color var(--transition-fast);
       font-family: var(--font-sans);
+      text-decoration: none;
     }
     .action-btn:hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
     .action-btn--restore { color: var(--color-accent); }
@@ -238,6 +248,10 @@ export class PrototypeCardComponent implements AfterViewInit, OnDestroy {
 
   private _safeUrl: SafeResourceUrl | null = null;
   private ro?: ResizeObserver;
+
+  get prototypeUrl(): string {
+    return `${window.location.origin}/${this.prototype.folder}/index.html`;
+  }
 
   get safeUrl(): SafeResourceUrl {
     if (!this._safeUrl) {

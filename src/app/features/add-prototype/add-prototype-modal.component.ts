@@ -469,7 +469,8 @@ export class AddPrototypeModalComponent implements OnInit {
     } else {
       const result: { name: string; content: string }[] = [];
       for (const file of files) {
-        result.push({ name: file.name, content: await this.toBase64(file) });
+        const name = file.name.endsWith('.html') ? 'index.html' : file.name;
+        result.push({ name, content: await this.toBase64(file) });
       }
       this.uploadedFiles = result;
     }
