@@ -1,5 +1,16 @@
 [
   {
+    "id": "ligentia-design-overview",
+    "title": "Ligentia Design Overview",
+    "description": "A page that highlights active and roadmap design tasks with an option to submit requests.",
+    "creator": "Craig",
+    "date": "2026-05-20",
+    "tags": [
+      "internal tools"
+    ],
+    "folder": "prototypes/ligentia-design-overview"
+  },
+  {
     "id": "ligentix-notifications-prototype-41",
     "title": "ligentix-notifications-prototype_41",
     "description": "",
