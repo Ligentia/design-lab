@@ -462,8 +462,9 @@ export class AddPrototypeModalComponent implements OnInit {
       const zip = await JSZip.loadAsync(files[0]);
       const result: { name: string; content: string }[] = [];
       for (const [name, entry] of Object.entries(zip.files)) {
-        if (entry.dir || name.startsWith('__MACOSX')) continue;
-        result.push({ name, content: await entry.async('base64') });
+        if (entry.dir || name.includes('__MACOSX') || name.startsWith('.')) continue;
+        const basename = name.split('/').filter(s => s.length > 0).pop()!;
+        result.push({ name: basename, content: await entry.async('base64') });
       }
       this.uploadedFiles = result;
     } else {
