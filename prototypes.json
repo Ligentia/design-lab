@@ -1,5 +1,17 @@
 [
   {
+    "id": "dm-customer-settings-handoff",
+    "title": "dm customer settings handoff",
+    "description": "This file covers hand-off for customers, and delivery routing.",
+    "creator": "Chuka",
+    "date": "2026-05-21",
+    "tags": [
+      "prototype",
+      "hand-off"
+    ],
+    "folder": "prototypes/dm-customer-settings-handoff"
+  },
+  {
     "id": "ligentia-design-overview",
     "title": "Ligentia Design Overview",
     "description": "A page that highlights active and roadmap design tasks with an option to submit requests.",
