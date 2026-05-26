@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map, switchMap, forkJoin, of } from 'rxjs';
+import { Observable, map, switchMap, forkJoin, of, catchError } from 'rxjs';
 import { Prototype } from '../models/prototype.model';
 import { Asset } from '../models/asset.model';
 import { environment } from '../../../environments/environment';
@@ -60,10 +60,18 @@ export class GithubService {
 
   uploadFile(path: string, base64Content: string, pat: string): Observable<unknown> {
     const headers = new HttpHeaders({ Authorization: `token ${pat}` });
-    return this.http.put(
-      `${this.base}/${path}`,
-      { message: `Upload ${path} via Design Lab`, content: base64Content, branch: environment.githubBranch },
-      { headers }
+    return this.http.get<{ sha: string }>(`${this.base}/${path}`, { headers }).pipe(
+      map(res => res.sha),
+      catchError(() => of(undefined)),
+      switchMap(sha => {
+        const body: Record<string, unknown> = {
+          message: `Upload ${path} via Design Lab`,
+          content: base64Content,
+          branch: environment.githubBranch,
+        };
+        if (sha) body['sha'] = sha;
+        return this.http.put(`${this.base}/${path}`, body, { headers });
+      })
     );
   }
 

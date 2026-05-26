@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrototypeService } from '../../core/services/prototype.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -120,6 +120,7 @@ export class DashboardComponent implements OnInit {
   private ui = inject(UiStateService);
   showModal = signal(false);
   editingPrototype = signal<Prototype | null>(null);
+  @ViewChild('addModal') addModal?: AddPrototypeModalComponent;
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -142,6 +143,7 @@ export class DashboardComponent implements OnInit {
       this.closeModal();
     } catch (err: unknown) {
       console.error('Save failed', err);
+      this.addModal?.onSaveError('Upload failed. Check your GitHub PAT and try again.');
     }
   }
 
