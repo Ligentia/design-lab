@@ -82,6 +82,14 @@ export class PrototypeService {
     this._activeTags.set(new Set());
   }
 
+  async uploadFiles(prototype: Prototype, pat: string, files: { name: string; content: string }[]) {
+    for (const file of files) {
+      await firstValueFrom(
+        this.github.uploadFile(`${prototype.folder}/${file.name}`, file.content, pat)
+      );
+    }
+  }
+
   async addPrototype(prototype: Prototype, pat: string, files?: { name: string; content: string }[]) {
     if (files?.length) {
       for (const file of files) {

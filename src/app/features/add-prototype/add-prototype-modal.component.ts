@@ -30,10 +30,10 @@ const PAT_KEY = 'dl_github_pat';
           </div>
 
           <!-- File upload (new prototypes only) -->
-          <div class="field" *ngIf="!editMode">
+          <div class="field">
             <label class="label">
-              Exploration files
-              <span class="optional">(ZIP or individual files)</span>
+              {{ editMode ? 'Replace files' : 'Exploration files' }}
+              <span class="optional">{{ editMode ? '(optional — leave empty to keep existing)' : '(ZIP or individual files)' }}</span>
             </label>
             <div
               class="drop-zone"
