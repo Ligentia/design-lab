@@ -1,0 +1,3971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings – Ligentix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      color: #323a45;
+      background: #ffffff;
+      min-height: 100vh;
+    }
+
+    /* ── TOP HEADER ───────────────────────────────────────── */
+    .header {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1.5px solid #eaecf0;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header__burger {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      border-right: 1.5px solid #eaecf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .header__burger-icon {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .header__burger-icon span {
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      background: #14141f;
+      border-radius: 2px;
+    }
+
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 20px;
+    }
+    .header__logo {
+      display: block;
+      width: 107px;
+      height: 32px;
+    }
+    .header__tag {
+      background: #fe7e6d;
+      color: #fff8f8;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      line-height: 16px;
+    }
+
+    .header__actions {
+      margin-left: auto;
+      padding-right: 32px;
+      display: flex;
+      align-items: center;
+    }
+    .header__avatar {
+      width: 40px;
+      height: 40px;
+      background: #043347;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .header__avatar svg {
+      color: #f9fafb;
+    }
+
+    /* ── PAGE WRAPPER ─────────────────────────────────────── */
+    .page {
+      padding: 24px 32px 48px;
+    }
+
+    /* ── PAGE TITLE ───────────────────────────────────────── */
+    .page-title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 40px;
+      letter-spacing: -0.672px;
+      color: #14141f;
+      margin-bottom: 0;
+    }
+
+    /* ── TOP-LEVEL TABS (Settings sections) ───────────────── */
+    .section-tabs {
+      display: flex;
+      border-bottom: 1.5px solid #eaecf0;
+      margin-top: 16px;
+    }
+    .section-tab {
+      padding: 10px 16px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #b4bdca;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1.5px;
+      white-space: nowrap;
+      transition: color 0.15s;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+    }
+    .section-tab:hover { color: #546072; }
+    .section-tab--active {
+      color: #323a45;
+      font-weight: 500;
+      border-bottom-color: #14141f;
+    }
+
+    /* ── SIP TITLE ROW ────────────────────────────────────── */
+    .sip-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
+      margin-top: 24px;
+    }
+    .sip-title-row__left {
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      letter-spacing: -0.084px;
+    }
+    .sip-title-row__controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Hide inactive toggle */
+    .hide-inactive {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #323a45;
+      letter-spacing: -0.084px;
+    }
+    .toggle-pill {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle-pill input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-pill__track {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: #14141f;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-pill__track::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    }
+    .toggle-pill input:checked + .toggle-pill__track { background: #14141f; }
+    .toggle-pill input:checked + .toggle-pill__track::after { transform: translateX(16px); }
+    .toggle-pill input:not(:checked) + .toggle-pill__track { background: #d0d5dd; }
+    .hide-inactive--disabled { opacity: 0.5; pointer-events: none; }
+    .hide-inactive--disabled .toggle-pill__track { background: #d0d5dd; cursor: not-allowed; }
+
+    /* Customer select dropdown */
+    .customer-select {
+      height: 40px;
+      width: 288px;
+      padding: 0 32px 0 12px;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237f8c9f'/%3E%3C/svg%3E") no-repeat right 12px center;
+      appearance: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #323a45;
+      cursor: pointer;
+      outline: none;
+      letter-spacing: -0.084px;
+    }
+    .customer-select:focus { border-color: #2872e9; box-shadow: 0 0 0 3px rgba(40,114,233,0.12); }
+    .customer-select.placeholder { color: #b4bdca; }
+
+    /* ── SUB-TABS (Booking rules / Delivery routing / etc.) ── */
+    .sub-tabs {
+      display: flex;
+      align-items: flex-end;
+      border-bottom: 1.5px solid #eaecf0;
+      margin-top: 8px;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .sub-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #546072;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1.5px;
+      white-space: nowrap;
+      transition: color 0.15s;
+      letter-spacing: -0.084px;
+      line-height: 18px;
+    }
+    .sub-tab:hover { color: #323a45; }
+    .sub-tab--active {
+      color: #323a45;
+      border-bottom-color: #14141f;
+    }
+    .sub-tab--muted { color: #b4bdca; cursor: default; }
+    .sub-tab--muted:hover { color: #b4bdca; }
+
+    .chip-soon {
+      font-size: 12px;
+      font-weight: 500;
+      background: #cdd1fb;
+      color: #48447f;
+      padding: 2px 8px;
+      border-radius: 100px;
+      line-height: 16px;
+      letter-spacing: 0;
+    }
+
+    /* ── DESCRIPTION + CTA ────────────────────────────────── */
+    .rules-section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 32px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    .rules-section__body {
+      flex: 1;
+      min-width: 0;
+    }
+    .rules-section__body p {
+      font-size: 14px;
+      font-weight: 400;
+      color: #546072;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+      margin-bottom: 8px;
+    }
+    .rules-section__body strong {
+      font-weight: 600;
+      color: #323a45;
+    }
+    .rules-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .rules-list li {
+      font-size: 14px;
+      font-weight: 400;
+      color: #546072;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .rules-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #b4bdca;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 12px;
+      background: #2872e9;
+      border: 1.5px solid #2872e9;
+      border-radius: 4px;
+      color: #edf6fa;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.084px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #1e5fd4; border-color: #1e5fd4; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      color: #323a45;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.084px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-outline:hover { background: #f3f4f6; border-color: #d0d5dd; }
+
+    /* ── TABLE ────────────────────────────────────────────── */
+    .table-wrap {
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      overflow-x: auto;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      white-space: nowrap;
+    }
+
+    thead tr {
+      border-bottom: 1.5px solid #eaecf0;
+    }
+    th {
+      padding: 12px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      text-align: left;
+      background: #ffffff;
+      user-select: none;
+      letter-spacing: -0.084px;
+      line-height: 18px;
+      vertical-align: bottom;
+    }
+    th:first-child { padding-left: 16px; width: 48px; }
+    th:nth-child(2) { padding-left: 16px; min-width: 130px; }
+
+    .th-inner {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .th-sub {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: #546072;
+      line-height: 18px;
+      margin-top: 1px;
+    }
+    .sort-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      color: #b4bdca;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    tbody tr {
+      border-top: 1.5px solid #eaecf0;
+    }
+    tbody tr:first-child { border-top: none; }
+    tbody tr:hover { background: #f9fafb; cursor: pointer; }
+    td {
+      padding: 12px 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #323a45;
+      vertical-align: middle;
+      letter-spacing: -0.084px;
+      line-height: 18px;
+      height: 64px;
+    }
+    td:first-child { padding-left: 16px; width: 48px; }
+    td:nth-child(2) { padding-left: 16px; }
+
+    .edit-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      background: #fefefe;
+      cursor: pointer;
+      color: #7f8c9f;
+      transition: background 0.12s, color 0.12s;
+    }
+    .edit-btn:hover { background: #f3f4f6; color: #323a45; }
+
+    /* Status chips */
+    .chip-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+    }
+    .chip-status--active {
+      background: #a8ede4;
+      color: #0e6156;
+    }
+    .chip-status--inactive {
+      background: #f3f4f6;
+      color: #546072;
+    }
+    .chip-status__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .chip-status--active .chip-status__dot { background: #12786b; }
+    .chip-status--inactive .chip-status__dot { background: #9ca3af; }
+
+    /* Active row (SIP open for this row) */
+    tr.row--active,
+    tr.row--active td { background: #edf6fa !important; }
+    tr.row--active td:first-child { border-left: 3px solid #2872e9; padding-left: 13px; }
+
+    /* Duplicated row highlight */
+    tr.row--duplicate,
+    tr.row--duplicate td { background: hsla(198, 89%, 15%, 1) !important; color: #ffffff !important; }
+    tr.row--duplicate .chip-status { background: rgba(255,255,255,0.15) !important; color: #ffffff !important; }
+    tr.row--duplicate .chip-status__dot { background: #ffffff !important; }
+    tr.row--duplicate .td-sub { color: rgba(255,255,255,0.7) !important; }
+    tr.row--duplicate .edit-btn { border-color: rgba(255,255,255,0.3); color: #ffffff; background: rgba(255,255,255,0.1); }
+
+    /* ── CONTEXT MENU ──────────────────────────────────────── */
+    .ctx-menu {
+      position: fixed;
+      background: #ffffff;
+      border: 1.5px solid #eaecf0;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+      z-index: 500;
+      min-width: 192px;
+      padding: 4px;
+      display: none;
+    }
+    .ctx-menu.is-open { display: block; }
+    .ctx-menu__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #323a45;
+      letter-spacing: -0.084px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .ctx-menu__item:hover { background: #f3f4f6; }
+    .ctx-menu__item--danger { color: #dc2626; }
+    .ctx-menu__item--danger:hover { background: #fef2f2; }
+    .ctx-menu__item svg { flex-shrink: 0; color: #7f8c9f; }
+    .ctx-menu__item--danger svg { color: #dc2626; }
+    .ctx-menu__divider { height: 1px; background: #eaecf0; margin: 4px 0; }
+
+    /* ── TOAST ─────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #14141f;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.084px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+    .toast.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast__icon { color: #a8ede4; flex-shrink: 0; }
+
+    /* Cut-off sub-label (timezone) */
+    .td-sub {
+      display: block;
+      font-size: 12px;
+      color: #67768c;
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    /* ── PAGINATION ────────────────────────────────────────── */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 32px;
+      border-top: 1.5px solid #eaecf0;
+      background: #ffffff;
+    }
+    .pg-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      background: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      transition: background 0.1s;
+    }
+    .pg-btn:hover { background: #f3f4f6; }
+    .pg-btn--active {
+      background: #2872e9;
+      border-color: #2872e9;
+      color: #edf6fa;
+    }
+    .pg-btn--active:hover { background: #1e5fd4; }
+    .pg-btn--nav { color: #546072; }
+    .pg-dots {
+      font-size: 14px;
+      color: #b4bdca;
+      padding: 0 2px;
+    }
+
+    .show-entries {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #424c5a;
+      letter-spacing: -0.084px;
+    }
+    .show-select {
+      height: 40px;
+      width: 64px;
+      padding: 0 28px 0 12px;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237f8c9f'/%3E%3C/svg%3E") no-repeat right 10px center;
+      appearance: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #323a45;
+      cursor: pointer;
+      outline: none;
+      letter-spacing: -0.084px;
+    }
+    .show-select:focus { border-color: #2872e9; }
+
+    /* ── SIP BACKDROP (no overlay — SIP slides over page) ──── */
+    .sip-backdrop { display: none; }
+
+    /* ── SIP PANEL ─────────────────────────────────────────── */
+    .sip {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 910px;
+      display: flex;
+      z-index: 300;
+      transform: translateX(100%);
+      transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sip.is-open { transform: translateX(0); }
+
+    /* Vertical hide button on the left edge */
+    .sip__hide-btn {
+      width: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-start;
+      padding-top: 80px;
+    }
+    .sip__hide-btn button {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #67768c;
+      border: 1.5px solid #67768c;
+      border-radius: 0 0 4px 4px;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.084px;
+      padding: 12px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .sip__hide-btn button:hover { background: #546072; border-color: #546072; }
+
+    /* Main scrollable panel */
+    .sip__panel {
+      flex: 1;
+      background: #ffffff;
+      border-left: 1.5px solid #eaecf0;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.1), -2px 0 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sip__scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 32px 24px;
+    }
+
+    /* Title row */
+    .sip__title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .sip__title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 36px;
+      letter-spacing: -0.532px;
+      color: #14141f;
+      flex: 1;
+      min-width: 0;
+    }
+    .sip__copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 12px;
+      background: #eaecf0;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      cursor: pointer;
+      white-space: nowrap;
+      letter-spacing: -0.084px;
+      flex-shrink: 0;
+    }
+    .sip__copy-btn:hover { background: #d8dce2; border-color: #d8dce2; }
+    .sip__copy-btn svg { color: #67768c; }
+
+    .sip__trash-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #df8e99;
+      flex-shrink: 0;
+    }
+    .sip__trash-btn:hover { color: #c0566a; }
+
+    .sip__close-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #323a45;
+      flex-shrink: 0;
+    }
+    .sip__close-btn:hover { background: #f3f4f6; }
+
+    /* Section panels */
+    .sip-section {
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .sip-section__header {
+      background: #043347;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f9fafb;
+      line-height: 24px;
+      letter-spacing: -0.176px;
+    }
+    .sip-section__body {
+      background: #edf6fa;
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    /* Email-method sub-groups in routing cards — match the parent body gap */
+    .rsip-email-fields,
+    .rsip-pin-required-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Rule card (collapsible variant of sip-section) */
+    .sip-rule-card { border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+    .sip-rule-card__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #043347;
+      padding: 10px 14px;
+      color: #f9fafb;
+    }
+    .sip-rule-card__title {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 24px;
+      letter-spacing: -0.176px;
+    }
+    .sip-rule-card__delete,
+    .sip-rule-card__toggle {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #f9fafb;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .sip-rule-card__delete:hover { background: rgba(255,255,255,0.12); color: #fe7e6d; }
+    .sip-rule-card__toggle:hover { background: rgba(255,255,255,0.12); }
+    .sip-rule-card__toggle svg { transition: transform 0.2s; }
+    .sip-rule-card--collapsed .sip-rule-card__toggle svg { transform: rotate(-90deg); }
+    .sip-rule-card--collapsed .sip-section__body { display: none; }
+
+    /* Add another rule button */
+    .sip-add-rule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 14px;
+      margin: 4px 0 16px;
+      background: #ffffff;
+      border: 1.5px dashed #b4bdca;
+      border-radius: 4px;
+      color: #2872e9;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .sip-add-rule-btn:hover { background: #edf6fa; border-color: #2872e9; }
+
+    /* Inline label rows (label text + input on same line or stacked) */
+    .sip-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sip-field__label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #546072;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+    }
+    .sip-field__label em {
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    /* Dropdowns */
+    .sip-select {
+      width: 100%;
+      height: 40px;
+      padding: 0 32px 0 12px;
+      background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237f8c9f'/%3E%3C/svg%3E") no-repeat right 12px center;
+      border: 1.5px solid #d0d5dd;
+      border-radius: 4px;
+      appearance: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: #323a45;
+      outline: none;
+      letter-spacing: -0.084px;
+      cursor: pointer;
+    }
+    .sip-select:focus { border-color: #2872e9; box-shadow: 0 0 0 3px rgba(40,114,233,0.12); }
+    .sip-select.placeholder { color: #b4bdca; }
+
+    /* Inline row: static text + stepper */
+    .sip-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sip-inline__text {
+      font-size: 14px;
+      font-weight: 400;
+      color: #546072;
+      line-height: 18px;
+      letter-spacing: -0.084px;
+    }
+
+    /* Stepper */
+    .sip-stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 40px;
+      width: 112px;
+      padding: 0 8px;
+      background: #ffffff;
+      border: 1.5px solid #d0d5dd;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .sip-stepper__btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #c8d4f3;
+      border-radius: 4px;
+      background: transparent;
+      color: #8da3de;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .sip-stepper__btn:hover { background: #eef2fc; }
+    .sip-stepper__val {
+      flex: 1;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      color: #323a45;
+      letter-spacing: -0.084px;
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 40px;
+    }
+
+    /* Toggle button groups */
+    .sip-toggle-group {
+      display: flex;
+      gap: 8px;
+    }
+    .sip-toggle-btn {
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #d0d5dd;
+      border-radius: 4px;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      white-space: nowrap;
+    }
+    .sip-toggle-btn:hover { background: #d4f4f0; border-color: #6fd9cc; color: #0e6156; }
+    .sip-toggle-btn--selected {
+      background: #a8ede4;
+      border-color: #6fd9cc;
+      color: #0e6156;
+    }
+
+    /* Copy existing rule dropdown */
+    .sip__copy-wrap { position: relative; flex-shrink: 0; }
+    .copy-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #eaecf0;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      z-index: 400;
+      width: 380px;
+      overflow: hidden;
+      display: none;
+    }
+    .copy-dropdown.is-open { display: block; }
+    .copy-dropdown__header {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #7f8c9f;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #eaecf0;
+      background: #f9fafb;
+    }
+    .copy-dropdown__item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 11px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.1s;
+    }
+    .copy-dropdown__item:last-child { border-bottom: none; }
+    .copy-dropdown__item:hover { background: #edf6fa; }
+    .copy-dropdown__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      letter-spacing: -0.084px;
+    }
+    .copy-dropdown__meta {
+      font-size: 12px;
+      color: #546072;
+      display: flex;
+      gap: 8px;
+    }
+    .copy-dropdown__meta span::before { content: '·'; margin-right: 8px; color: #b4bdca; }
+    .copy-dropdown__meta span:first-child::before { content: ''; margin-right: 0; }
+    .copy-dropdown__search-wrap {
+      padding: 10px 12px;
+      border-bottom: 1.5px solid #eaecf0;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .copy-dropdown__search {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px 0 32px;
+      border: 1.5px solid #eaecf0;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: #323a45;
+      background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%237f8c9f' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='6' cy='6' r='4'/%3E%3Cpath d='M10 10l3 3'/%3E%3C/svg%3E") no-repeat 10px center;
+      outline: none;
+    }
+    .copy-dropdown__search:focus { border-color: #2872e9; background-color: #fff; }
+    .copy-dropdown__search::placeholder { color: #b4bdca; }
+    .copy-dropdown__list {
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .copy-dropdown__empty {
+      padding: 16px;
+      font-size: 13px;
+      color: #7f8c9f;
+      text-align: center;
+    }
+
+    /* SIP tabs */
+    .sip__tabs {
+      display: flex;
+      border-bottom: 1.5px solid #eaecf0;
+      margin-bottom: 24px;
+    }
+    .sip__tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #323a45;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1.5px;
+      letter-spacing: -0.084px;
+    }
+    .sip__tab--active {
+      border-bottom-color: #14141f;
+      font-weight: 600;
+    }
+    .sip__log-empty {
+      padding: 32px;
+      text-align: center;
+      font-size: 14px;
+      color: #7f8c9f;
+    }
+
+    /* SIP footer */
+    .sip__footer {
+      padding: 16px 32px 24px;
+      border-top: 1.5px solid #eaecf0;
+      background: #ffffff;
+    }
+    .sip__footer--split {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .sip__footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sip__create-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      background: #2872e9;
+      border: 1.5px solid #2872e9;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #edf6fa;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      transition: background 0.15s;
+    }
+    .sip__create-btn:hover { background: #1e5fd4; border-color: #1e5fd4; }
+    .sip__create-btn:disabled {
+      background: #d0d5dd;
+      border-color: #d0d5dd;
+      color: #ffffff;
+      cursor: not-allowed;
+    }
+    .sip__create-btn:disabled:hover { background: #d0d5dd; border-color: #d0d5dd; }
+    .sip__delete-btn {
+      display: inline-flex;
+      align-items: center;
+      height: 40px;
+      padding: 0 16px;
+      background: #ffffff;
+      border: 1.5px solid #fe7e6d;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #c0566a;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sip__delete-btn:hover { background: #fff8f8; }
+    .sip__deactivate { color: #323a45; }
+
+    /* Hide tabs / Delete / Deactivate when creating a new rule */
+    .sip:not(.sip--editing) .sip__tabs,
+    .sip:not(.sip--editing) .sip__delete-btn,
+    .sip:not(.sip--editing) .sip__deactivate { display: none; }
+    /* Hide "+ Add Customer" when editing an existing rule */
+    .sip.sip--editing .rsip-add-manually-btn { display: none; }
+    /* Routing edit mode: hide Add-another-rule button + per-card delete (footer's Delete handles row delete) */
+    #routing-sip.sip--editing #rsip-add-rule-btn,
+    #routing-sip.sip--editing .sip-rule-card__delete { display: none; }
+
+    /* Routing footer: show create-mode buttons in create, edit-mode buttons in edit */
+    #routing-sip.sip--editing .rsip-add-customer-btn,
+    #routing-sip.sip--editing .rsip-create-rule-btn { display: none; }
+    #routing-sip:not(.sip--editing) .sip__footer-left,
+    #routing-sip:not(.sip--editing) .sip__deactivate { display: none; }
+
+    /* ── ROUTING TABLE OVERRIDES ─────────────────────────── */
+    #routingTable th:first-child { padding-left: 24px; width: auto; }
+    #routingTable th:nth-child(2) { padding-left: 24px; min-width: auto; }
+    #routingTable td:first-child { padding-left: 24px; width: auto; }
+    #routingTable td:nth-child(2) { padding-left: 24px; }
+
+    .consignee-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+    .chip-consignee {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      background: #eaecf0;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #323a45;
+      letter-spacing: -0.084px;
+      white-space: nowrap;
+    }
+    .chip-consignee--overflow {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      background: #d0d5dd;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #546072;
+      letter-spacing: -0.084px;
+      white-space: nowrap;
+    }
+    .chip-method {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.084px;
+      white-space: nowrap;
+    }
+    .chip-method--email {
+      border: 1.5px solid #67768c;
+      color: #67768c;
+      background: transparent;
+    }
+    .chip-method--tops {
+      background: #043347;
+      color: #ffffff;
+      border: 1.5px solid #043347;
+    }
+    .chip-routing-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 8px 0 6px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.084px;
+      white-space: nowrap;
+    }
+    .chip-routing-status--active   { background: #a8ede4; color: #0e6156; }
+    .chip-pin {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.084px;
+      white-space: nowrap;
+    }
+    .chip-pin--required { background: #a8ede4; color: #0e6156; }
+    .chip-routing-status--inactive { background: #f3f4f6; color: #546072; }
+
+    /* ── ROUTING SIP ALERT ────────────────────────────────── */
+    .sip-alert-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #e8eefb;
+      border: 1.5px solid #c8d4f3;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2e57c2;
+      letter-spacing: -0.084px;
+      line-height: 18px;
+    }
+    .sip-alert-info svg { flex-shrink: 0; color: #2e57c2; }
+
+    .rsip-footer {
+      padding: 24px 0 8px;
+    }
+
+    /* ── Field label + action link row ───────────────────────── */
+    .sip-field__label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sip-field__link {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2872e9;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      letter-spacing: -0.084px;
+      line-height: 18px;
+      white-space: nowrap;
+    }
+    .sip-field__link:hover { text-decoration: underline; color: #1e5fd4; }
+
+    /* ── Field hint text ──────────────────────────────────────── */
+    .sip-field__hint {
+      font-size: 12px;
+      color: #7f8c9f;
+      line-height: 18px;
+      letter-spacing: -0.06px;
+      margin-top: 2px;
+    }
+
+    /* ── Step progress bar ────────────────────────────────────── */
+    .sip-step-bar {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 20px;
+    }
+    .sip-step-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 0;
+      position: relative;
+      cursor: default;
+    }
+    .sip-step-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      right: -50%;
+      width: 100%;
+      height: 1.5px;
+      background: #eaecf0;
+      z-index: 0;
+    }
+    .sip-step-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid #eaecf0;
+      background: #ffffff;
+      color: #b4bdca;
+      position: relative;
+      z-index: 1;
+    }
+    .sip-step-circle--active {
+      background: #2872e9;
+      border-color: #2872e9;
+      color: #ffffff;
+    }
+    .sip-step-circle--done {
+      background: #a8ede4;
+      border-color: #6fd9cc;
+      color: #0e6156;
+    }
+    .sip-step-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #b4bdca;
+      letter-spacing: -0.06px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .sip-step-label--active {
+      color: #2872e9;
+      font-weight: 600;
+    }
+    .sip-step-label--done {
+      color: #546072;
+      font-weight: 500;
+    }
+
+    /* ── Clients SIP search row (input + button inline) ──────── */
+    .sip-search-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .sip-search-row .sip-select {
+      flex: 1;
+      background-image: none; /* no dropdown arrow on text input */
+      padding-right: 12px;
+    }
+    .btn-search {
+      height: 40px;
+      padding: 0 16px;
+      background: #ffffff;
+      border: 1.5px solid #2872e9;
+      border-radius: 4px;
+      color: #2872e9;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: -0.084px;
+    }
+    .btn-search:hover { background: #eef4fd; }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 80px 24px;
+      color: #7f8c9f;
+    }
+    .empty-state__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b4bdca;
+    }
+    .empty-state__message {
+      font-size: 15px;
+      font-weight: 500;
+      color: #7f8c9f;
+      letter-spacing: -0.084px;
+    }
+
+    /* ── Clients table column widths ─────────────────────────── */
+    #clientsTable th:first-child  { padding-left: 24px; width: 25%; }
+    #clientsTable td:first-child  { padding-left: 24px; }
+    #clientsTable th:nth-child(2) { padding-left: 8px; width: 17%; }
+    #clientsTable th:nth-child(3) { padding-left: 8px; width: 17%; }
+    #clientsTable th:nth-child(4) { padding-left: 8px; width: 21%; }
+    #clientsTable th:nth-child(5) { padding-left: 8px; width: 20%; }
+    #clientsTable th svg { vertical-align: middle; margin-left: 4px; }
+
+    /* ── Modal overlay ────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 15, 28, 0.55);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: #ffffff;
+      border-radius: 6px;
+      width: 520px;
+      max-width: calc(100vw - 40px);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal__header {
+      background: #043347;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal__title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f9fafb;
+      letter-spacing: -0.2px;
+      font-family: 'Manrope', sans-serif;
+    }
+    .modal__close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 4px;
+      cursor: pointer;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    .modal__close:hover { background: rgba(255,255,255,0.1); }
+    .modal__body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    /* ── Add customer SIP footer ──────────────────────────────── */
+    .acsip-footer {
+      padding: 24px 0 8px;
+    }
+    .acsip-footer--split {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── Add customer search results ──────────────────────────── */
+    .acsip-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .acsip-result-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px 0;
+      border-radius: 4px;
+    }
+    .acsip-result-row:hover .chip-search { opacity: 0.8; }
+    .chip-search {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      background: #a8ede4;
+      color: #0e6156;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.06px;
+      white-space: nowrap;
+    }
+    .chip-search--code {
+      background: #c3f4ee;
+      font-weight: 500;
+    }
+
+    /* Customers SIP — grouped search results */
+    .csip-results-count {
+      font-size: 13px;
+      font-weight: 500;
+      color: #546072;
+      margin: 8px 0 4px;
+    }
+    .csip-result-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0;
+      padding: 2px 0;
+    }
+    .csip-result-row .csip-result-chip + .csip-result-chip { margin-left: -1.5px; }
+    .csip-result-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1.5px solid #b4bdca;
+      color: #323a45;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.06px;
+      white-space: nowrap;
+    }
+    .csip-result-table {
+      width: 100%;
+      table-layout: fixed;
+      background: #ffffff;
+      border: 1px solid #d0d5dd;
+      border-radius: 4px;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .csip-result-table th {
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
+      color: #323a45;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eaecf0;
+      letter-spacing: -0.084px;
+    }
+    .csip-result-table td {
+      font-size: 14px;
+      font-weight: 400;
+      color: #323a45;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eaecf0;
+      letter-spacing: -0.084px;
+    }
+    .csip-result-table tr:last-child td { border-bottom: none; }
+    /* Override the global tbody tr hover/border rules so result rows aren't interactive */
+    .csip-result-table tbody tr,
+    .csip-result-table tbody tr:first-child,
+    .csip-result-table tbody tr:hover {
+      background: #ffffff;
+      cursor: default;
+      border-top: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__burger" aria-label="Open navigation">
+      <div class="header__burger-icon">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="header__brand">
+      <img class="header__logo" src="./ligentix-logo.svg" width="107" height="32" alt="Ligentix" />
+      <span class="header__tag">Delivery</span>
+    </div>
+
+    <div class="header__actions">
+      <div class="header__avatar" aria-label="User account">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── PAGE ────────────────────────────────────────────── -->
+  <main class="page">
+
+    <h1 class="page-title">Settings</h1>
+
+    <!-- Top-level section tabs -->
+    <div class="section-tabs">
+      <div class="section-tab section-tab--active">Delivery</div>
+      <div class="section-tab">Shipment Approval <span class="chip-soon">Coming soon</span></div>
+    </div>
+
+    <!-- SIP title row: label + controls -->
+    <div class="sip-title-row">
+      <span class="sip-title-row__left">Delivery</span>
+      <div class="sip-title-row__controls">
+        <label class="hide-inactive hide-inactive--disabled">
+          <label class="toggle-pill">
+            <input type="checkbox" checked disabled />
+            <span class="toggle-pill__track"></span>
+          </label>
+          Hide inactive
+        </label>
+
+        <select class="customer-select placeholder" aria-label="Select customer">
+          <option value="">Select customer</option>
+          <option value="howdens">Howdens</option>
+          <option value="apollo">Apollo Houseware LTD</option>
+          <option value="ikea">IKEA</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Sub-tabs -->
+    <div class="sub-tabs">
+      <div class="sub-tab sub-tab--active" data-tab="clients">Customers</div>
+      <div class="sub-tab" data-tab="routing">Delivery routing</div>
+      <div class="sub-tab" data-tab="booking">Booking rules</div>
+      <div class="sub-tab" data-tab="notifications">Notification alerts</div>
+      <div class="sub-tab" data-tab="warehouse">Warehouse management</div>
+      <div class="sub-tab sub-tab--muted">
+        PO &amp; Warehouse mapping <span class="chip-soon">Coming soon</span>
+      </div>
+    </div>
+
+    <!-- ── CLIENTS CONTENT ──────────────────────────────── -->
+    <div id="clients-content">
+
+      <div class="rules-section">
+        <div class="rules-section__body">
+          <p>Manage your customer accounts and their associated entities.</p>
+        </div>
+        <button class="btn-primary" id="addClientBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Add customer
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="clientsTable">
+          <thead>
+            <tr>
+              <th>Customer <svg width="10" height="12" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 1v12M1 9l4 4 4-4M1 5l4-4 4 4" stroke="#b4bdca" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></th>
+              <th>Customer code <svg width="10" height="12" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 1v12M1 9l4 4 4-4M1 5l4-4 4 4" stroke="#b4bdca" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></th>
+              <th>Ligentix customer id <svg width="10" height="12" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 1v12M1 9l4 4 4-4M1 5l4-4 4 4" stroke="#b4bdca" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></th>
+              <th>Legal entity name <svg width="10" height="12" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 1v12M1 9l4 4 4-4M1 5l4-4 4 4" stroke="#b4bdca" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></th>
+              <th>Cargowise code <svg width="10" height="12" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 1v12M1 9l4 4 4-4M1 5l4-4 4 4" stroke="#b4bdca" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></th>
+            </tr>
+          </thead>
+          <tbody id="clientsTableBody"></tbody>
+        </table>
+        <div class="pagination-bar">
+          <button class="pg-btn pg-btn--nav" aria-label="First page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 2L5 7l5 5M3 2v10"/></svg>
+          </button>
+          <button class="pg-btn pg-btn--nav" aria-label="Previous page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
+          </button>
+          <button class="pg-btn">1</button>
+          <button class="pg-btn pg-btn--active">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">4</button>
+          <button class="pg-btn">5</button>
+          <span class="pg-dots">…</span>
+          <button class="pg-btn">12</button>
+          <button class="pg-btn pg-btn--nav" aria-label="Next page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg>
+          </button>
+          <button class="pg-btn pg-btn--nav" aria-label="Last page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 2l5 5-5 5M11 2v10"/></svg>
+          </button>
+          <div class="show-entries">
+            Show
+            <select class="show-select">
+              <option>10</option>
+              <option>25</option>
+              <option selected>50</option>
+              <option>100</option>
+            </select>
+            entries
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end #clients-content -->
+
+    <!-- ── BOOKING RULES CONTENT ─────────────────────────── -->
+    <div id="booking-content" style="display:none">
+
+    <!-- Description + CTA -->
+    <div class="rules-section">
+      <div class="rules-section__body">
+        <p>Configure how delivery bookings are routed based on consignee and transport mode.</p>
+        <p><strong>How Delivery Booking Rules work:</strong></p>
+        <ul class="rules-list">
+          <li>This rule is for FCL deliveries only.</li>
+          <li>Customers choose suitable booking dates.</li>
+          <li>Ligentia users see a warning but can select any date.</li>
+          <li><strong>"Minimum Book (Days)"</strong>: Earliest date for customer selection from today, allowing haulier booking.</li>
+          <li><strong>"Book From"</strong>: Earliest date after ETA for delivery selection, considering unloading, customs, and transportation.</li>
+          <li>Each rule defines when TOPS auto-booking or email routing applies for a given customer, lane and load type.</li>
+          <li>Cut-off times apply to amendments and cancellations, not booking creation.</li>
+          <li>Rules are matched by specificity: Country → Port → MOT → Carrier → Load. The most specific matching rule wins. If no rule matches, the booking is held and a System Alert is raised.</li>
+        </ul>
+      </div>
+      <button class="btn-primary" id="createRuleBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Create new rule
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>
+              <div class="th-inner">Customer
+                <span class="sort-btn">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg>
+                </span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Country
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Port
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Carrier
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Haulier
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">MOT
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Load
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Booking control
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+              <span class="th-sub">(Day · Weeks)</span>
+            </th>
+            <th>
+              <div class="th-inner">Book from
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+              <span class="th-sub">(Min · ETA+days)</span>
+            </th>
+            <th>
+              <div class="th-inner">Cut off
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+              <span class="th-sub">(Day · Time)</span>
+            </th>
+            <th>
+              <div class="th-inner">Rent start
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Status
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">Last updated
+                <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <button class="pg-btn pg-btn--nav" aria-label="First page">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 2L5 7l5 5M3 2v10"/></svg>
+        </button>
+        <button class="pg-btn pg-btn--nav" aria-label="Previous page">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
+        </button>
+        <button class="pg-btn">1</button>
+        <button class="pg-btn pg-btn--active">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">4</button>
+        <button class="pg-btn">5</button>
+        <span class="pg-dots">…</span>
+        <button class="pg-btn">12</button>
+        <button class="pg-btn pg-btn--nav" aria-label="Next page">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg>
+        </button>
+        <button class="pg-btn pg-btn--nav" aria-label="Last page">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 2l5 5-5 5M11 2v10"/></svg>
+        </button>
+        <div class="show-entries">
+          Show
+          <select class="show-select">
+            <option>10</option>
+            <option>25</option>
+            <option selected>50</option>
+            <option>100</option>
+          </select>
+          entries
+        </div>
+      </div>
+    </div>
+
+    </div><!-- end #booking-content -->
+
+    <!-- ── DELIVERY ROUTING CONTENT ──────────────────────── -->
+    <div id="routing-content" style="display:none">
+
+      <!-- Description + CTA -->
+      <div class="rules-section">
+        <div class="rules-section__body">
+          <p>Configure how delivery bookings are routed based on consignee and transport mode.</p>
+          <p><strong>How Delivery Booking Rules work:</strong></p>
+          <ul class="rules-list">
+            <li><strong>Routing:</strong> Consignments are matched against rules from most specific (POD + Mode) to most general. Rules are processed in sequence. If a shipment matches multiple criteria, the most specific port-level rule will take precedence. Choosing Email as the method allows you to specify a custom list of internal and external stakeholders who will receive a delivery booking notification each time a new booking is created in the Delivery Module.</li>
+            <li><strong>TOPS Integration:</strong> Automated system-to-system booking. Only available for supported UK ports and FCL mode.</li>
+            <li><strong>Email Fallback:</strong> For manual handling. Multiple email addresses can be added (separated by commas).</li>
+          </ul>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn-primary" id="createRoutingRuleBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Create new rule
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table id="routingTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>
+                <div class="th-inner">Customer
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Customer code
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">CargoWise code
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Country
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Destination POD
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">MOT
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Load
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Method
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Notification email(s)
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Pin/Badge
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Alert days
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Pin/Badge email(s)
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Status
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+              <th>
+                <div class="th-inner">Date created
+                  <span class="sort-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 1v10M3 4l3-3 3 3M3 8l3 3 3-3"/></svg></span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="routingTableBody"></tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination-bar">
+          <button class="pg-btn pg-btn--nav" aria-label="First page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 2L5 7l5 5M3 2v10"/></svg>
+          </button>
+          <button class="pg-btn pg-btn--nav" aria-label="Previous page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
+          </button>
+          <button class="pg-btn">1</button>
+          <button class="pg-btn pg-btn--active">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">4</button>
+          <button class="pg-btn">5</button>
+          <span class="pg-dots">…</span>
+          <button class="pg-btn">12</button>
+          <button class="pg-btn pg-btn--nav" aria-label="Next page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg>
+          </button>
+          <button class="pg-btn pg-btn--nav" aria-label="Last page">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 2l5 5-5 5M11 2v10"/></svg>
+          </button>
+          <div class="show-entries">
+            Show
+            <select class="show-select">
+              <option>10</option>
+              <option>25</option>
+              <option selected>50</option>
+              <option>100</option>
+            </select>
+            entries
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end #routing-content -->
+
+    <!-- ── NOTIFICATION ALERTS CONTENT ───────────────────────── -->
+    <div id="notifications-content" style="display:none">
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <span class="empty-state__message">Select a customer</span>
+      </div>
+    </div><!-- end #notifications-content -->
+
+    <!-- ── WAREHOUSE MANAGEMENT CONTENT ─────────────────────── -->
+    <div id="warehouse-content" style="display:none">
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <span class="empty-state__message">Select a customer</span>
+      </div>
+    </div><!-- end #warehouse-content -->
+
+  </main>
+
+
+  <!-- ── CONTEXT MENU ────────────────────────────────────── -->
+  <div class="ctx-menu" id="ctxMenu">
+    <div class="ctx-menu__item" id="ctx-duplicate">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2"/>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+      </svg>
+      Duplicate rule
+    </div>
+    <div class="ctx-menu__divider"></div>
+    <div class="ctx-menu__item" id="ctx-deactivate">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+      </svg>
+      Deactivate rule
+    </div>
+    <div class="ctx-menu__item ctx-menu__item--danger" id="ctx-delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+        <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+      </svg>
+      Delete rule
+    </div>
+  </div>
+
+  <!-- ── TOAST ───────────────────────────────────────────── -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast__icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </span>
+    <span id="toast-message">Rule duplicated</span>
+  </div>
+
+  <!-- ── SIP BACKDROP ─────────────────────────────────────── -->
+  <div class="sip-backdrop" id="sipBackdrop"></div>
+
+  <!-- ── SLIDE-IN PANEL ──────────────────────────────────── -->
+  <aside class="sip" id="sip" role="dialog" aria-modal="true" aria-label="Create new rule">
+
+    <!-- Vertical hide button -->
+    <div class="sip__hide-btn">
+      <button id="sipHideBtn" aria-label="Hide panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        Hide
+      </button>
+    </div>
+
+    <!-- Main panel -->
+    <div class="sip__panel">
+      <div class="sip__scroll">
+
+        <!-- Title row -->
+        <div class="sip__title-row">
+          <h2 class="sip__title">Create your new rule</h2>
+          <button class="sip__close-btn" id="sipCloseBtn" aria-label="Close panel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="sip__tabs">
+          <div class="sip__tab sip__tab--active" data-panel="amend">Amend rule</div>
+          <div class="sip__tab" data-panel="log">Log</div>
+        </div>
+
+        <!-- Amend rule panel -->
+        <div class="sip__tab-panel" data-panel="amend">
+
+        <!-- ── Section 1: Book from ──────────────────────── -->
+        <div class="sip-section">
+          <div class="sip-section__header">Book from</div>
+          <div class="sip-section__body">
+
+            <div class="sip-field">
+              <span class="sip-field__label">If</span>
+              <select id="sip-customer" class="sip-select placeholder">
+                <option value="">Select customer</option>
+                <option value="Howdens">Howdens</option>
+                <option value="Apollo Houseware LTD">Apollo Houseware LTD</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">consignment(s) arrives at</span>
+              <select id="sip-port" class="sip-select placeholder">
+                <option value="">Select port</option>
+                <option value="All">All</option>
+                <option value="GBSOU">GBSOU – Southampton</option>
+                <option value="GBFXT">GBFXT – Felixstowe</option>
+                <option value="EGLL">EGLL – London Gateway</option>
+                <option value="GBLOP">GBLOP – London Port</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">In</span>
+              <select id="sip-country" class="sip-select placeholder">
+                <option value="">Select country</option>
+                <option value="GB">GB – United Kingdom</option>
+                <option value="NL">NL – Netherlands</option>
+                <option value="US">US – United States</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">Timezone</span>
+              <select class="sip-select">
+                <option selected>Europe/London (GMT/BST)</option>
+                <option>Europe/Amsterdam (CET/CEST)</option>
+                <option>America/New_York (EST/EDT)</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">with</span>
+              <select id="sip-carrier" class="sip-select placeholder">
+                <option value="">Select carrier</option>
+                <option value="All">All</option>
+                <option value="Maersk">Maersk</option>
+                <option value="Hapag-L.">Hapag-Lloyd</option>
+                <option value="MSC">MSC</option>
+                <option value="CMA CGM">CMA CGM</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">by <em>(optional)</em></span>
+              <select id="sip-mot" class="sip-select placeholder">
+                <option value="">Select mode of transport</option>
+                <option value="Sea">Sea</option>
+                <option value="Air">Air</option>
+                <option value="Road">Road</option>
+                <option value="Rail">Rail</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">where load is <em>(optional)</em></span>
+              <select id="sip-load" class="sip-select placeholder">
+                <option value="">Select load</option>
+                <option value="FCL">FCL</option>
+                <option value="LCL">LCL</option>
+              </select>
+            </div>
+
+            <div class="sip-inline">
+              <span class="sip-inline__text">the earliest date a delivery can occur will be (min book)</span>
+              <div class="sip-stepper">
+                <button class="sip-stepper__btn sip-stepper__btn--minus" type="button">−</button>
+                <input id="sip-minbook" class="sip-stepper__val" type="number" value="3" min="0" />
+                <button class="sip-stepper__btn sip-stepper__btn--plus" type="button">+</button>
+              </div>
+            </div>
+
+            <div class="sip-inline">
+              <span class="sip-inline__text">days from the date the booking is created (book from), and</span>
+              <div class="sip-stepper">
+                <button class="sip-stepper__btn sip-stepper__btn--minus" type="button">−</button>
+                <input id="sip-bookfrom" class="sip-stepper__val" type="number" value="3" min="0" />
+                <button class="sip-stepper__btn sip-stepper__btn--plus" type="button">+</button>
+              </div>
+            </div>
+
+            <span class="sip-inline__text">days from the date the vessel arrives at port.</span>
+
+          </div>
+        </div>
+
+        <!-- ── Section 2: Rent start ─────────────────────── -->
+        <div class="sip-section">
+          <div class="sip-section__header">Rent start</div>
+          <div class="sip-section__body">
+            <div class="sip-inline">
+              <span class="sip-inline__text">allow</span>
+              <div class="sip-stepper">
+                <button class="sip-stepper__btn sip-stepper__btn--minus" type="button">−</button>
+                <input id="sip-rentstart" class="sip-stepper__val" type="number" value="5" min="0" />
+                <button class="sip-stepper__btn sip-stepper__btn--plus" type="button">+</button>
+              </div>
+              <span class="sip-inline__text">days before charges start to accrue.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section 3: Cut off times ──────────────────── -->
+        <div class="sip-section">
+          <div class="sip-section__header">Cut off times</div>
+          <div class="sip-section__body">
+
+            <div class="sip-field">
+              <span class="sip-field__label">The amendment/cancellation deadline (cut off time) is</span>
+              <select id="sip-cutoff-time" class="sip-select placeholder">
+                <option value="">Select time</option>
+                <option value="08:00">08:00</option>
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="12:00">12:00</option>
+                <option value="14:00">14:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+              </select>
+            </div>
+
+            <div class="sip-inline">
+              <span class="sip-inline__text">and</span>
+              <div class="sip-stepper">
+                <button class="sip-stepper__btn sip-stepper__btn--minus" type="button">−</button>
+                <input id="sip-cutoff-days" class="sip-stepper__val" type="number" value="2" min="0" />
+                <button class="sip-stepper__btn sip-stepper__btn--plus" type="button">+</button>
+              </div>
+              <span class="sip-inline__text">working day(s) before delivery.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Section 4: Booking control ───────────────── -->
+        <div class="sip-section">
+          <div class="sip-section__header">Booking control</div>
+          <div class="sip-section__body">
+
+            <div class="sip-field">
+              <span class="sip-field__label">Booking can only be created on</span>
+              <div class="sip-toggle-group">
+                <button class="sip-toggle-btn sip-toggle-btn--selected" type="button">Mon</button>
+                <button class="sip-toggle-btn" type="button">Tue</button>
+                <button class="sip-toggle-btn" type="button">Wed</button>
+                <button class="sip-toggle-btn" type="button">Thu</button>
+                <button class="sip-toggle-btn" type="button">Fri</button>
+                <button class="sip-toggle-btn" type="button">Sat</button>
+                <button class="sip-toggle-btn" type="button">Sun</button>
+              </div>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">where the earliest delivery date that can be selected is</span>
+              <div class="sip-toggle-group">
+                <button class="sip-toggle-btn sip-toggle-btn--selected" type="button">one week</button>
+                <button class="sip-toggle-btn" type="button">two weeks</button>
+                <button class="sip-toggle-btn" type="button">three weeks</button>
+              </div>
+            </div>
+
+            <span class="sip-inline__text">from the following Monday.</span>
+
+          </div>
+        </div>
+
+        </div><!-- end .sip__tab-panel data-panel=amend -->
+
+        <!-- Log panel -->
+        <div class="sip__tab-panel" data-panel="log" style="display:none">
+          <div class="sip__log-empty">No activity yet for this rule.</div>
+        </div>
+
+      </div><!-- end .sip__scroll -->
+
+      <!-- Footer -->
+      <div class="sip__footer sip__footer--split">
+        <div class="sip__footer-left">
+          <button class="sip__create-btn" type="button">Amend rule</button>
+          <button class="sip__delete-btn" type="button">Delete rule</button>
+        </div>
+        <label class="hide-inactive sip__deactivate">
+          <label class="toggle-pill">
+            <input type="checkbox" id="sipDeactivateToggle" />
+            <span class="toggle-pill__track"></span>
+          </label>
+          Deactivate rule
+        </label>
+      </div>
+
+    </div><!-- end .sip__panel -->
+  </aside>
+
+  <!-- ── ADD CLIENT MODAL ─────────────────────────────────── -->
+  <div class="modal-overlay" id="addClientModal" style="display:none" role="dialog" aria-modal="true" aria-label="Add customer">
+    <div class="modal">
+      <div class="modal__header">
+        <span class="modal__title">Add customer</span>
+        <button class="modal__close" id="addClientModalClose" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="sip-field">
+          <span class="sip-field__label">Cargowise code or Ligentix ID <strong>(Code/ID must be a strict match)</strong></span>
+          <p class="sip-field__hint">Accepts: CW org code (e.g. RIVUK01), Ligentix ID (e.g. LIG00155), or a legal entity CW code (e.g. PEUK01)</p>
+          <div class="sip-search-row">
+            <input
+              id="modal-cw-code"
+              type="text"
+              class="sip-select"
+              placeholder="e.g. RIVUK01, LIG00155, PEUK01"
+              style="height:40px;"
+              autocomplete="off"
+            />
+            <button class="btn-search" type="button" id="modal-search-btn">Search</button>
+          </div>
+          <div class="modal-results" id="modal-results" style="display:none"></div>
+        </div>
+        <div class="sip-alert-info csip-search-hint" id="modal-search-hint" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          To add this customer, you're going to need to set up at least one routing rule.
+        </div>
+        <button class="btn-primary" type="button" id="modal-add-btn" style="width:100%;justify-content:center;">Add customer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADD CUSTOMER / CREATE RULE WIZARD SIP ────────────── -->
+  <aside class="sip" id="add-customer-sip" role="dialog" aria-modal="true" aria-label="Add customer">
+
+    <!-- Vertical hide button -->
+    <div class="sip__hide-btn">
+      <button id="addCustomerSipHideBtn" aria-label="Hide panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        Hide panel
+      </button>
+    </div>
+
+    <!-- Main panel -->
+    <div class="sip__panel">
+      <div class="sip__scroll">
+
+        <!-- Title row -->
+        <div class="sip__title-row">
+          <h2 class="sip__title">Delivery routing</h2>
+          <button class="sip__close-btn" id="addCustomerSipCloseBtn" aria-label="Close panel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Step bar -->
+        <div class="sip-step-bar">
+          <div class="sip-step-item">
+            <div class="sip-step-circle sip-step-circle--active" id="acsip-circle-1">1</div>
+            <span class="sip-step-label sip-step-label--active" id="acsip-label-1">Add customer</span>
+          </div>
+          <div class="sip-step-item">
+            <div class="sip-step-circle" id="acsip-circle-2">2</div>
+            <span class="sip-step-label" id="acsip-label-2">Create new rule</span>
+          </div>
+        </div>
+
+        <!-- ── STEP 1: Add customer ── -->
+        <div id="acsip-step1">
+          <div class="sip-section">
+            <div class="sip-section__header">Add customer</div>
+            <div class="sip-section__body">
+              <div class="sip-field">
+                <span class="sip-field__label">CW code or Ligentix ID</span>
+                <p class="sip-field__hint">Accepts: CW org code (e.g. RIVUK01), Ligentix ID (e.g. LIG00155), or a legal entity CW code (e.g. PEUK01)</p>
+                <input
+                  id="acsip-cw-code"
+                  type="text"
+                  class="sip-select"
+                  placeholder="e.g. RIVUK01, LIG00155, PEUK01"
+                  style="height:40px;"
+                  autocomplete="off"
+                />
+                <div class="acsip-results" id="acsip-results" style="display:none"></div>
+              </div>
+            </div>
+          </div>
+          <div class="acsip-footer">
+            <button class="sip__create-btn" type="button" id="acsip-next-btn">Next - create a rule</button>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: Create new rule ── -->
+        <div id="acsip-step2" style="display:none">
+          <div class="sip-section">
+            <div class="sip-section__header">Create new rule</div>
+            <div class="sip-section__body">
+
+              <div class="sip-field">
+                <span class="sip-field__label">When</span>
+                <select id="acsip-consignee" class="sip-select">
+                  <option value="">Select cargowise consignee</option>
+                  <option value="Cath Kidston">Cath Kidston</option>
+                  <option value="Apollo Houseware Ltd">Apollo Houseware Ltd</option>
+                  <option value="Riverford Organic Ltd">Riverford Organic Ltd</option>
+                  <option value="Pearson Education Ltd">Pearson Education Ltd</option>
+                </select>
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">ships to</span>
+                <select id="acsip-country" class="sip-select placeholder">
+                  <option value="">Select country</option>
+                  <option value="GB">GB – United Kingdom</option>
+                  <option value="NL">NL – Netherlands</option>
+                  <option value="US">US – United States</option>
+                </select>
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">with destination <em>(optional)</em></span>
+                <select id="acsip-destination" class="sip-select placeholder">
+                  <option value="">Select destination</option>
+                  <option value="All">All</option>
+                  <option value="GBSOU">GBSOU – Southampton</option>
+                  <option value="GBFXT">GBFXT – Felixstowe</option>
+                  <option value="EGLL">EGLL – London Gateway</option>
+                  <option value="GBLOP">GBLOP – London Port</option>
+                </select>
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">by <em>(optional)</em></span>
+                <select id="acsip-mot" class="sip-select placeholder">
+                  <option value="">Select mode of transport</option>
+                  <option value="Sea">Sea</option>
+                  <option value="Air">Air</option>
+                  <option value="Road">Road</option>
+                  <option value="Rail">Rail</option>
+                </select>
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">where load is <em>(optional)</em></span>
+                <select id="acsip-load" class="sip-select placeholder">
+                  <option value="">Select load</option>
+                  <option value="FCL">FCL</option>
+                  <option value="LCL">LCL</option>
+                </select>
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">booking method is</span>
+                <div class="sip-toggle-group" id="acsip-method-group">
+                  <button class="sip-toggle-btn sip-toggle-btn--selected" type="button" data-method="tops">TOPS</button>
+                  <button class="sip-toggle-btn" type="button" data-method="email">Email</button>
+                </div>
+              </div>
+
+              <div class="sip-alert-info" id="acsip-tops-alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                shipment will be automatically booked
+              </div>
+
+              <div id="acsip-email-fields" style="display:none">
+                <div class="sip-field">
+                  <span class="sip-field__label">Notification email(s)</span>
+                  <input id="acsip-emails" type="text" class="sip-select" placeholder="e.g. freight@logistics.com, ops@logistics.com" style="height:40px;" />
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="acsip-footer acsip-footer--split">
+            <button class="btn-outline" type="button" id="acsip-back-btn">Back</button>
+            <button class="sip__create-btn" type="button" id="acsip-create-btn">Create rule</button>
+          </div>
+        </div>
+
+      </div><!-- end .sip__scroll -->
+    </div><!-- end .sip__panel -->
+  </aside>
+
+  <!-- ── ROUTING SLIDE-IN PANEL ────────────────────────────── -->
+  <aside class="sip" id="routing-sip" role="dialog" aria-modal="true" aria-label="Create delivery routing rule">
+
+    <!-- Vertical hide button -->
+    <div class="sip__hide-btn">
+      <button id="routingSipHideBtn" aria-label="Hide panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        Hide panel
+      </button>
+    </div>
+
+    <!-- Main panel -->
+    <div class="sip__panel">
+      <div class="sip__scroll">
+
+        <!-- Title row -->
+        <div class="sip__title-row">
+          <h2 class="sip__title">Delivery routing</h2>
+          <button class="sip__close-btn" id="routingSipCloseBtn" aria-label="Close panel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="sip__tabs">
+          <div class="sip__tab sip__tab--active" data-panel="amend">Amend rule</div>
+          <div class="sip__tab" data-panel="log">Log</div>
+        </div>
+
+        <!-- Amend rule panel -->
+        <div class="sip__tab-panel" data-panel="amend">
+
+        <div id="rsip-rules-container"></div>
+
+        <button class="sip-add-rule-btn" type="button" id="rsip-add-rule-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Add another rule
+        </button>
+
+        </div><!-- end .sip__tab-panel data-panel=amend -->
+
+        <!-- Log panel -->
+        <div class="sip__tab-panel" data-panel="log" style="display:none">
+          <div class="sip__log-empty">No activity yet for this rule.</div>
+        </div>
+
+      </div><!-- end .sip__scroll -->
+
+      <!-- Footer -->
+      <div class="sip__footer sip__footer--split">
+        <!-- Create mode -->
+        <button class="btn-outline rsip-add-customer-btn" type="button" id="rsipAddCustomerBtn">+ Add Customer</button>
+        <button class="sip__create-btn rsip-create-rule-btn" type="button" id="rsipCreateRuleBtn">Create rule</button>
+
+        <!-- Edit mode -->
+        <div class="sip__footer-left">
+          <button class="sip__create-btn" type="button" id="routingPrimaryBtn">Amend rule</button>
+          <button class="sip__delete-btn" type="button">Delete rule</button>
+        </div>
+        <label class="hide-inactive sip__deactivate">
+          <label class="toggle-pill">
+            <input type="checkbox" id="routingDeactivateToggle" />
+            <span class="toggle-pill__track"></span>
+          </label>
+          Deactivate rule
+        </label>
+      </div>
+
+    </div><!-- end .sip__panel -->
+  </aside>
+
+  <!-- ── CLIENTS ADD CLIENT SIP ───────────────────────────── -->
+  <aside class="sip" id="clients-sip" role="dialog" aria-modal="true" aria-label="Add customer">
+
+    <div class="sip__hide-btn">
+      <button id="clientsSipHideBtn" aria-label="Hide panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        Hide panel
+      </button>
+    </div>
+
+    <div class="sip__panel">
+      <div class="sip__scroll">
+
+        <div class="sip__title-row">
+          <h2 class="sip__title">Customers</h2>
+          <button class="sip__close-btn" id="clientsSipCloseBtn" aria-label="Close panel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Step bar -->
+        <div class="sip-step-bar">
+          <div class="sip-step-item">
+            <div class="sip-step-circle sip-step-circle--active" id="csip-circle-1">1</div>
+            <span class="sip-step-label sip-step-label--active" id="csip-label-1">Add customer</span>
+          </div>
+          <div class="sip-step-item">
+            <div class="sip-step-circle" id="csip-circle-2">2</div>
+            <span class="sip-step-label" id="csip-label-2">Create new rule</span>
+          </div>
+        </div>
+
+        <!-- ── STEP 1: Add customer ── -->
+        <div id="csip-step1">
+          <div class="sip-section">
+            <div class="sip-section__header">Add customer</div>
+            <div class="sip-section__body">
+
+              <div class="sip-field">
+                <span class="sip-field__label">Cargowise code or Ligentix ID <strong>(Code/ID must be a strict match)</strong></span>
+                <p class="sip-field__hint">Accepts: CW org code (e.g. RIVUK01), Ligentix ID (e.g. LIG00155), or a legal entity CW code (e.g. PEUK01)</p>
+                <div class="sip-search-row">
+                  <input
+                    id="csip-cw-code"
+                    type="text"
+                    class="sip-select"
+                    placeholder="e.g. RIVUK01, LIG00155, PEUK01"
+                    style="height:40px;"
+                    autocomplete="off"
+                  />
+                  <button class="btn-search" type="button" id="csip-search-btn">Search</button>
+                </div>
+                <div class="acsip-results" id="csip-results" style="display:none"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="sip-alert-info csip-search-hint" id="csip-search-hint" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            To add this customer, you're going to need to set up at least one routing rule.
+          </div>
+
+          <div class="rsip-footer">
+            <button class="sip__create-btn" type="button" id="csip-add-btn" disabled>Next - create rule</button>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: Create new rule ── -->
+        <div id="csip-step2" style="display:none">
+          <div id="csip-rules-container"></div>
+
+          <button class="sip-add-rule-btn" type="button" id="csip-add-rule-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Add another rule
+          </button>
+
+          <div class="acsip-footer acsip-footer--split">
+            <button class="btn-outline" type="button" id="csip-back-btn">Back</button>
+            <button class="sip__create-btn" type="button" id="csip-create-btn">Create rule</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    // ── Routing table data ───────────────────────────────────
+    const routingRows = [
+      { customer:'Apollo housewares LTD', legalEntity:'',            customerCode:'APOHOUGBFAR', cargowiseCode:'',            country:'GB', pod:'All',   mot:'Sea', load:'FCL',   method:'email', emails:'uk-lcl@logistics-portal.com, freight@logistics-portal.com', pinBadge:'required',    alertDays:'2 days', pinEmails:'uk-lcl@logistics-portal.com, freight@logistics-portal.com', status:'active', created:'14/06/23' },
+      { customer:'Apollo housewares LTD', legalEntity:'',            customerCode:'APOHOUGBFAR', cargowiseCode:'',            country:'GB', pod:'',      mot:'Air', load:'Loose', method:'email', emails:'uk-lcl@logistics-portal.com, freight@logistics-portal.com', pinBadge:'notRequired', alertDays:'',       pinEmails:'',                                                            status:'active', created:'14/06/23' },
+      { customer:'TFG',                   legalEntity:'Hobbs',       customerCode:'TFGGBWLF',    cargowiseCode:'HOBBSGBLON',  country:'GB', pod:'GBSOU', mot:'Sea', load:'FCL',   method:'tops',  emails:'Auto-Book',                                                  pinBadge:'notRequired', alertDays:'',       pinEmails:'',                                                            status:'active', created:'14/06/23' },
+      { customer:'TFG',                   legalEntity:'Whistle',     customerCode:'TFGGBWLF',    cargowiseCode:'WHISTLGBLHR', country:'GB', pod:'GBSOU', mot:'Sea', load:'FCL',   method:'tops',  emails:'Auto-Book',                                                  pinBadge:'notRequired', alertDays:'',       pinEmails:'',                                                            status:'active', created:'14/06/23' },
+      { customer:'TFG',                   legalEntity:'Phase Eight', customerCode:'TFGGBWLF',    cargowiseCode:'PHAEIGGBFLM', country:'GB', pod:'GBSOU', mot:'Sea', load:'FCL',   method:'tops',  emails:'Auto-Book',                                                  pinBadge:'notRequired', alertDays:'',       pinEmails:'',                                                            status:'active', created:'14/06/23' },
+    ];
+
+    function renderRoutingTable() {
+      const checkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      const xIcon     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+      document.getElementById('routingTableBody').innerHTML = routingRows.map(r => {
+        const customerDisplay = r.legalEntity ? `${r.customer} - ${r.legalEntity}` : r.customer;
+
+        const methodChip = r.method === 'tops'
+          ? `<span class="chip-method chip-method--tops">TOPS</span>`
+          : `<span class="chip-method chip-method--email">Email</span>`;
+
+        const pinBadgeCell = r.pinBadge === 'required'
+          ? `<span class="chip-pin chip-pin--required">Required</span>`
+          : `Not required`;
+
+        const statusChip = r.status === 'active'
+          ? `<span class="chip-routing-status chip-routing-status--active">${checkIcon} Active</span>`
+          : `<span class="chip-routing-status chip-routing-status--inactive">${xIcon} Inactive</span>`;
+
+        return `<tr onclick="handleRoutingRowClick(event, this)">
+          <td>${editIcon}</td>
+          <td>${customerDisplay}</td>
+          <td>${r.customerCode}</td>
+          <td>${r.cargowiseCode}</td>
+          <td>${r.country}</td>
+          <td>${r.pod}</td>
+          <td>${r.mot}</td>
+          <td>${r.load}</td>
+          <td>${methodChip}</td>
+          <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.emails}</td>
+          <td>${pinBadgeCell}</td>
+          <td>${r.alertDays}</td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.pinEmails}</td>
+          <td>${statusChip}</td>
+          <td>${r.created}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── Table data ───────────────────────────────────────────
+    const rows = [
+      { customer:'Howdens', country:'GB', port:'All',   carrier:'All',      haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'GB', port:'GBSOU', carrier:'Hapag-L.', haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'GB', port:'GBFXT', carrier:'Maersk',   haulier:'Turnerma', mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'GMT', rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'GB', port:'EGLL',  carrier:'Maersk',   haulier:'Turnerma', mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'inactive', updated:'14/09/23' },
+      { customer:'Howdens', country:'NL', port:'All',   carrier:'All',      haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'GB', port:'GBLOP', carrier:'Maersk',   haulier:'Turnerma', mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'GB', port:'All',   carrier:'All',      haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'NL', port:'GBSOU', carrier:'All',      haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'active',   updated:'14/09/23' },
+      { customer:'Howdens', country:'US', port:'GBSOU', carrier:'All',      haulier:'All',      mot:'Sea', load:'FCL', bookingControl:'Wednesday: 1 wk', bookFrom:'3d: ETA+2', cutOff:'2d: 16:00', cutOffSub:'',    rentStart:'3d', status:'inactive', updated:'14/09/23' },
+    ];
+
+    const editIcon = `<button class="edit-btn" aria-label="Duplicate rule">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2"/>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+      </svg>
+    </button>`;
+
+    document.getElementById('tableBody').innerHTML = rows.map(r => {
+      const statusChip = r.status === 'active'
+        ? `<span class="chip-status chip-status--active"><span class="chip-status__dot"></span>Active</span>`
+        : `<span class="chip-status chip-status--inactive"><span class="chip-status__dot"></span>Inactive</span>`;
+      const cutOffCell = r.cutOffSub
+        ? `${r.cutOff}<span class="td-sub">${r.cutOffSub}</span>`
+        : r.cutOff;
+      return `<tr onclick="handleRowClick(event, this)">
+        <td>${editIcon}</td>
+        <td>${r.customer}</td><td>${r.country}</td><td>${r.port}</td>
+        <td>${r.carrier}</td><td>${r.haulier}</td><td>${r.mot}</td><td>${r.load}</td>
+        <td>${r.bookingControl}</td><td>${r.bookFrom}</td>
+        <td>${cutOffCell}</td><td>${r.rentStart}</td>
+        <td>${statusChip}</td><td>${r.updated}</td>
+      </tr>`;
+    }).join('');
+
+    // ── SIP state ────────────────────────────────────────────
+    let activeRow = null;
+
+    function openSip(row) {
+      closeRoutingSip();
+      const sipEl = document.getElementById('sip');
+      sipEl.classList.add('is-open');
+      sipEl.classList.toggle('sip--editing', !!row);
+      document.getElementById('sipBackdrop').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      if (activeRow) activeRow.classList.remove('row--active');
+      activeRow = row || null;
+      if (activeRow) activeRow.classList.add('row--active');
+
+      // Primary button label: "Amend rule" when editing, "Create rule" when new
+      sipEl.querySelector('.sip__create-btn').textContent = row ? 'Amend rule' : 'Create rule';
+
+      // Reset to the Amend rule tab on every open
+      sipEl.querySelectorAll('.sip__tab').forEach(t => t.classList.toggle('sip__tab--active', t.dataset.panel === 'amend'));
+      sipEl.querySelectorAll('.sip__tab-panel').forEach(p => { p.style.display = p.dataset.panel === 'amend' ? '' : 'none'; });
+    }
+
+    function closeSip() {
+      document.getElementById('sip').classList.remove('is-open');
+      document.getElementById('sipBackdrop').classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (activeRow) { activeRow.classList.remove('row--active'); activeRow = null; }
+    }
+
+    // ── SIP tabs (Amend rule / Log) ──────────────────────────
+    document.querySelectorAll('.sip .sip__tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const sipEl  = tab.closest('.sip');
+        const target = tab.dataset.panel;
+        sipEl.querySelectorAll('.sip__tab').forEach(t => t.classList.remove('sip__tab--active'));
+        tab.classList.add('sip__tab--active');
+        sipEl.querySelectorAll('.sip__tab-panel').forEach(p => {
+          p.style.display = p.dataset.panel === target ? '' : 'none';
+        });
+      });
+    });
+
+    // ── Clients SIP ──────────────────────────────────────────
+    function openClientsSip() {
+      closeSip();
+      closeRoutingSip();
+      closeAddCustomerSip();
+      const inp = document.getElementById('csip-cw-code');
+      const res = document.getElementById('csip-results');
+      const btn = document.getElementById('csip-add-btn');
+      if (inp) inp.value = '';
+      if (res) { res.style.display = 'none'; res.innerHTML = ''; }
+      if (btn) btn.disabled = true;
+      if (typeof csipGoToStep1 === 'function') csipGoToStep1();
+      document.getElementById('clients-sip').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeClientsSip() {
+      document.getElementById('clients-sip').classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // ── Add Customer SIP wizard ──────────────────────────────
+    let acsipFromModal = false;
+    let reopenModal = null; // set by the modal IIFE
+
+    function resetAddCustomerSip() {
+      // Reset to step 1
+      document.getElementById('acsip-step1').style.display = '';
+      document.getElementById('acsip-step2').style.display = 'none';
+      const c1 = document.getElementById('acsip-circle-1');
+      const l1 = document.getElementById('acsip-label-1');
+      const c2 = document.getElementById('acsip-circle-2');
+      const l2 = document.getElementById('acsip-label-2');
+      c1.className = 'sip-step-circle sip-step-circle--active'; c1.innerHTML = '1';
+      l1.className = 'sip-step-label sip-step-label--active';
+      c2.className = 'sip-step-circle'; c2.innerHTML = '2';
+      l2.className = 'sip-step-label';
+      // Clear step 1 input
+      const inp = document.getElementById('acsip-cw-code');
+      if (inp) { inp.value = ''; }
+      const res = document.getElementById('acsip-results');
+      if (res) { res.style.display = 'none'; res.innerHTML = ''; }
+    }
+
+    function openAddCustomerSip() {
+      acsipFromModal = false;
+      closeSip();
+      closeRoutingSip();
+      closeClientsSip();
+      resetAddCustomerSip();
+      document.getElementById('add-customer-sip').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function openAddCustomerSipStep2(customerName) {
+      acsipFromModal = true;
+      closeSip();
+      closeRoutingSip();
+      resetAddCustomerSip();
+      document.getElementById('add-customer-sip').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      // Pre-fill the CW code so the next-btn transition picks it up
+      if (customerName) {
+        const cwInput = document.getElementById('acsip-cw-code');
+        if (cwInput) cwInput.value = customerName;
+      }
+      // Transition to step 2
+      document.getElementById('acsip-next-btn').click();
+      // Ensure the "When" field reflects the right name (the next-btn logic handles this,
+      // but force it in case there's no exact match)
+      if (customerName) {
+        const sel = document.getElementById('acsip-consignee');
+        let found = Array.from(sel.options).find(o =>
+          o.value.toLowerCase() === customerName.toLowerCase() ||
+          o.text.toLowerCase().includes(customerName.toLowerCase())
+        );
+        if (!found) {
+          const opt = new Option(customerName, customerName);
+          sel.add(opt);
+          found = opt;
+        }
+        sel.value = found.value;
+        sel.classList.remove('placeholder');
+      }
+    }
+
+    function closeAddCustomerSip() {
+      document.getElementById('add-customer-sip').classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // ── Routing SIP state ────────────────────────────────────
+    let activeRoutingRow = null;
+
+    function openRoutingSip(row) {
+      closeAddCustomerSip();
+      closeClientsSip();
+      closeSip();
+      const sipEl = document.getElementById('routing-sip');
+      sipEl.classList.add('is-open');
+      sipEl.classList.toggle('sip--editing', !!row);
+      document.body.style.overflow = 'hidden';
+      if (activeRoutingRow) activeRoutingRow.classList.remove('row--active');
+      activeRoutingRow = row || null;
+      if (activeRoutingRow) activeRoutingRow.classList.add('row--active');
+
+      // Reset to the Amend rule tab on every open
+      sipEl.querySelectorAll('.sip__tab').forEach(t => t.classList.toggle('sip__tab--active', t.dataset.panel === 'amend'));
+      sipEl.querySelectorAll('.sip__tab-panel').forEach(p => { p.style.display = p.dataset.panel === 'amend' ? '' : 'none'; });
+
+      // Reset rules container to a single empty card on every open
+      if (typeof rsipResetRules === 'function') rsipResetRules();
+    }
+
+    function closeRoutingSip() {
+      document.getElementById('routing-sip').classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (activeRoutingRow) { activeRoutingRow.classList.remove('row--active'); activeRoutingRow = null; }
+    }
+
+    // ── Toast ────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = msg || 'Rule duplicated';
+      toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3000);
+    }
+
+    // ── Table interactions ───────────────────────────────────
+    function handleRowClick(e, row) {
+      if (e.target.closest('.edit-btn')) {
+        // Copy/duplicate
+        document.querySelectorAll('#tableBody tr.row--duplicate').forEach(r => r.classList.remove('row--duplicate'));
+        const clone = row.cloneNode(true);
+        clone.classList.remove('row--active');
+        clone.classList.add('row--duplicate');
+        clone.setAttribute('onclick', 'handleRowClick(event, this)');
+        row.after(clone);
+        showToast();
+        openSip(null);
+      } else {
+        // Regular row click
+        openSip(row);
+      }
+    }
+
+    function handleRoutingRowClick(e, row) {
+      if (e.target.closest('.edit-btn')) {
+        document.querySelectorAll('#routingTableBody tr.row--duplicate').forEach(r => r.classList.remove('row--duplicate'));
+        const clone = row.cloneNode(true);
+        clone.classList.remove('row--active');
+        clone.classList.add('row--duplicate');
+        clone.setAttribute('onclick', 'handleRoutingRowClick(event, this)');
+        row.after(clone);
+        showToast();
+        openRoutingSip(null);
+      } else {
+        openRoutingSip(row);
+      }
+    }
+
+    // ── Hide inactive toggle ─────────────────────────────────
+    const hideInactiveToggle = document.querySelector('.toggle-pill input');
+    function applyHideInactive() {
+      document.querySelectorAll('#tableBody tr').forEach(row => {
+        const inactive = row.querySelector('.chip-status--inactive');
+        row.style.display = (hideInactiveToggle.checked && inactive) ? 'none' : '';
+      });
+      document.querySelectorAll('#routingTableBody tr').forEach(row => {
+        const inactive = row.querySelector('.chip-routing-status--inactive');
+        row.style.display = (hideInactiveToggle.checked && inactive) ? 'none' : '';
+      });
+    }
+    hideInactiveToggle.addEventListener('change', applyHideInactive);
+    renderRoutingTable();
+    applyHideInactive();
+
+    // ── SIP close triggers ───────────────────────────────────
+    document.getElementById('sipCloseBtn').addEventListener('click', closeSip);
+    document.getElementById('sipHideBtn').addEventListener('click', closeSip);
+    document.getElementById('createRuleBtn').addEventListener('click', () => openSip(null));
+    document.getElementById('createRoutingRuleBtn').addEventListener('click', () => openRoutingSip(null));
+    document.getElementById('addClientBtn').addEventListener('click', openClientsSip);
+
+    // ── Clients SIP close / hide ──────────────────────────────
+    document.getElementById('clientsSipCloseBtn').addEventListener('click', closeClientsSip);
+    document.getElementById('clientsSipHideBtn').addEventListener('click', closeClientsSip);
+
+    // ── Clients SIP: step 1 → step 2 ─────────────────────────
+    function csipGoToStep2() {
+      if (!csipLastResults.length) return;
+
+      const c1 = document.getElementById('csip-circle-1');
+      const l1 = document.getElementById('csip-label-1');
+      const c2 = document.getElementById('csip-circle-2');
+      const l2 = document.getElementById('csip-label-2');
+      c1.className = 'sip-step-circle sip-step-circle--done';
+      c1.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      l1.className = 'sip-step-label sip-step-label--done';
+      c2.className = 'sip-step-circle sip-step-circle--active'; c2.innerHTML = '2';
+      l2.className = 'sip-step-label sip-step-label--active';
+
+      document.getElementById('csip-step1').style.display = 'none';
+      document.getElementById('csip-step2').style.display = '';
+
+      // Render one card per search result, each pre-filled with its own entity label
+      const labels = csipLastResults.map(csipDisplayLabel);
+      const container = document.getElementById('csip-rules-container');
+      container.innerHTML = '';
+      csipLastResults.forEach(r => csipAddRuleCard(labels, csipDisplayLabel(r)));
+    }
+    function csipGoToStep1() {
+      const c1 = document.getElementById('csip-circle-1');
+      const l1 = document.getElementById('csip-label-1');
+      const c2 = document.getElementById('csip-circle-2');
+      const l2 = document.getElementById('csip-label-2');
+      c1.className = 'sip-step-circle sip-step-circle--active'; c1.innerHTML = '1';
+      l1.className = 'sip-step-label sip-step-label--active';
+      c2.className = 'sip-step-circle'; c2.innerHTML = '2';
+      l2.className = 'sip-step-label';
+
+      document.getElementById('csip-step2').style.display = 'none';
+      document.getElementById('csip-step1').style.display = '';
+    }
+
+    // ── Clients SIP step 2: rule card template ───────────────
+    let csipRuleCounter = 0;
+    function csipBuildRuleCardHTML(ruleId, dropdownLabels, selectedLabel, isDeletable) {
+      const labels      = (dropdownLabels && dropdownLabels.length) ? dropdownLabels : (selectedLabel ? [selectedLabel] : []);
+      const customerOpts = labels.map(c => `<option value="${c}"${c === selectedLabel ? ' selected' : ''}>${c}</option>`).join('');
+      const deleteBtn = isDeletable ? `
+            <button class="sip-rule-card__delete" type="button" aria-label="Delete rule">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+              </svg>
+            </button>` : '';
+      return `
+        <div class="sip-section sip-rule-card" data-rule-id="${ruleId}">
+          <div class="sip-rule-card__header">
+            ${deleteBtn}
+            <span class="sip-rule-card__title">Create rule</span>
+            <button class="sip-rule-card__toggle" type="button" aria-label="Toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="sip-section__body">
+
+            <div class="sip-field">
+              <span class="sip-field__label">When</span>
+              <select class="sip-select cs2-consignee">
+                <option value="">Select customer</option>
+                ${customerOpts}
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">ships to</span>
+              <select class="sip-select placeholder cs2-country">
+                <option value="">Select country</option>
+                <option value="GB">GB – United Kingdom</option>
+                <option value="NL">NL – Netherlands</option>
+                <option value="US">US – United States</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">with destination <em>(optional)</em></span>
+              <select class="sip-select placeholder cs2-destination">
+                <option value="">Select destination</option>
+                <option value="All">All</option>
+                <option value="GBSOU">GBSOU – Southampton</option>
+                <option value="GBFXT">GBFXT – Felixstowe</option>
+                <option value="EGLL">EGLL – London Gateway</option>
+                <option value="GBLOP">GBLOP – London Port</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">by <em>(optional)</em></span>
+              <select class="sip-select placeholder cs2-mot">
+                <option value="">Select mode of transport</option>
+                <option value="Sea">Sea</option>
+                <option value="Air">Air</option>
+                <option value="Road">Road</option>
+                <option value="Rail">Rail</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">where load is <em>(optional)</em></span>
+              <select class="sip-select placeholder cs2-load">
+                <option value="">Select load</option>
+                <option value="FCL">FCL</option>
+                <option value="LCL">LCL</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">booking method is</span>
+              <div class="sip-toggle-group cs2-method-group">
+                <button class="sip-toggle-btn sip-toggle-btn--selected" type="button" data-method="tops">TOPS</button>
+                <button class="sip-toggle-btn" type="button" data-method="email">Email</button>
+              </div>
+            </div>
+
+            <div class="sip-alert-info cs2-tops-alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              shipment will be automatically booked
+            </div>
+
+            <div class="cs2-email-fields" style="display:none">
+              <div class="sip-field">
+                <span class="sip-field__label">Notification email(s)</span>
+                <input type="text" class="sip-select cs2-emails" placeholder="e.g. freight@logistics.com, ops@logistics.com" style="height:40px;" />
+              </div>
+            </div>
+
+          </div>
+        </div>`;
+    }
+    function csipAddRuleCard(dropdownLabels, selectedLabel, isDeletable) {
+      const container = document.getElementById('csip-rules-container');
+      const id = ++csipRuleCounter;
+      container.insertAdjacentHTML('beforeend', csipBuildRuleCardHTML(id, dropdownLabels || [], selectedLabel || '', !!isDeletable));
+      const card = container.querySelector(`[data-rule-id="${id}"]`);
+      // Initialise placeholder colour state for the new card's selects
+      card.querySelectorAll('select.sip-select').forEach(s => s.classList.toggle('placeholder', s.value === ''));
+    }
+
+    document.getElementById('csip-add-btn').addEventListener('click', csipGoToStep2);
+    document.getElementById('csip-back-btn').addEventListener('click', csipGoToStep1);
+
+    document.getElementById('csip-add-rule-btn').addEventListener('click', () => {
+      const labels = csipLastResults.map(csipDisplayLabel);
+      // Single result → pre-select; multiple → empty selection but full dropdown of related entities
+      const selected = labels.length === 1 ? labels[0] : '';
+      csipAddRuleCard(labels, selected, true);
+    });
+
+    // Delegated handlers on the rules container
+    document.getElementById('csip-rules-container').addEventListener('click', e => {
+      const card = e.target.closest('.sip-rule-card');
+      if (!card) return;
+
+      // Delete
+      if (e.target.closest('.sip-rule-card__delete')) {
+        const all = document.querySelectorAll('#csip-rules-container .sip-rule-card');
+        if (all.length <= 1) return; // keep at least one card
+        card.remove();
+        return;
+      }
+
+      // Toggle collapse — chevron OR any non-interactive click on the header
+      if (e.target.closest('.sip-rule-card__toggle') ||
+          (e.target.closest('.sip-rule-card__header') && !e.target.closest('button, input, select'))) {
+        card.classList.toggle('sip-rule-card--collapsed');
+        return;
+      }
+
+      // Method toggle (TOPS / Email)
+      const methodBtn = e.target.closest('.cs2-method-group [data-method]');
+      if (methodBtn) {
+        const group  = methodBtn.parentElement;
+        const method = methodBtn.dataset.method;
+        group.querySelectorAll('.sip-toggle-btn').forEach(b => b.classList.remove('sip-toggle-btn--selected'));
+        methodBtn.classList.add('sip-toggle-btn--selected');
+        card.querySelector('.cs2-tops-alert').style.display   = method === 'tops'  ? '' : 'none';
+        card.querySelector('.cs2-email-fields').style.display = method === 'email' ? '' : 'none';
+      }
+    });
+
+    // Delegated placeholder-colour update on selects
+    document.getElementById('csip-rules-container').addEventListener('change', e => {
+      const sel = e.target.closest('select.sip-select');
+      if (sel) sel.classList.toggle('placeholder', sel.value === '');
+    });
+
+    // ── Clients SIP step 2: Create rule ──────────────────────
+    document.getElementById('csip-create-btn').addEventListener('click', () => {
+      const customer = document.getElementById('csip-cw-code').value.trim();
+      if (!customer) return;
+
+      closeClientsSip();
+      showToast(`${customer} added, and routing rule(s) created successfully. Please go to Delivery routing to see your routing rules.`);
+
+      // Add to the top-bar "Select customer(s)" dropdown if not already present
+      const dropdown = document.querySelector('.customer-select');
+      const exists = Array.from(dropdown.options).some(o => o.value === customer);
+      if (!exists) {
+        const opt = new Option(customer, customer);
+        dropdown.add(opt);
+      }
+    });
+
+    // ── Customer select placeholder colour ────────────────────
+    (function() {
+      const sel = document.querySelector('.customer-select');
+      if (!sel) return;
+      sel.addEventListener('change', () => {
+        sel.classList.toggle('placeholder', sel.value === '');
+      });
+    })();
+
+    // ── Shared customer data + helpers (used by the Customers SIP search + the modal) ──
+    const csipCustomers = [
+      { customer: 'Apollo housewares LTD',        customerCode: 'APOHOUGBFAR',  ligentixId: '101943', legalEntity: '',            cargowiseCode: ''            },
+      { customer: 'Hobbycraft Group LTD',         customerCode: 'HOBBYCGBCCH',  ligentixId: '6793',   legalEntity: '',            cargowiseCode: ''            },
+      { customer: 'River Island Clothing Co LTD', customerCode: 'RIVISLGBLON3', ligentixId: '99845',  legalEntity: '',            cargowiseCode: ''            },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',     ligentixId: '105767', legalEntity: 'Hobbs',       cargowiseCode: 'HOBBSGBLON'  },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',     ligentixId: '105767', legalEntity: 'Whistles',    cargowiseCode: 'WHISTLGBLHR' },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',     ligentixId: '105767', legalEntity: 'Phase Eight', cargowiseCode: 'PHAEIGGBFLM' },
+      { customer: 'The Works',                    customerCode: 'WORSTOGBBHX',  ligentixId: '44032',  legalEntity: '',            cargowiseCode: ''            },
+      { customer: 'White Stuff',                  customerCode: 'WHISTUGBLON',  ligentixId: '23677',  legalEntity: '',            cargowiseCode: ''            },
+    ];
+    function csipDisplayLabel(r) {
+      return r.legalEntity ? `${r.customer} - ${r.legalEntity}` : r.customer;
+    }
+    function csipSearchCustomers(q) {
+      const qLower = q.trim().toLowerCase();
+      if (!qLower) return [];
+      const direct = csipCustomers.filter(c =>
+        c.customerCode.toLowerCase()  === qLower ||
+        c.ligentixId.toLowerCase()    === qLower ||
+        c.cargowiseCode.toLowerCase() === qLower ||
+        c.customer.toLowerCase().includes(qLower) ||
+        (c.legalEntity && c.legalEntity.toLowerCase().includes(qLower))
+      );
+      const ids = new Set(direct.map(c => c.ligentixId));
+      return csipCustomers.filter(c => ids.has(c.ligentixId));
+    }
+    function csipRenderResultsHTML(rows) {
+      if (!rows.length) return '';
+      const hasLegalEntity = rows.some(r => r.legalEntity);
+      const colCount = hasLegalEntity ? 3 : 2;
+      const colWidth = (100 / colCount) + '%';
+      const colgroup = '<colgroup>' + Array(colCount).fill(`<col style="width:${colWidth}">`).join('') + '</colgroup>';
+      const headers = hasLegalEntity
+        ? '<tr><th>Legal entity</th><th>Cargowise code</th><th>Ligentix client id</th></tr>'
+        : '<tr><th>Customer name</th><th>Cargowise code</th></tr>';
+      const bodyRows = rows.map(r => hasLegalEntity
+        ? `<tr><td>${r.legalEntity || '--'}</td><td>${r.cargowiseCode || '--'}</td><td>${r.ligentixId}</td></tr>`
+        : `<tr><td>${r.customer}</td><td>${r.customerCode}</td></tr>`
+      ).join('');
+      return `
+        <div class="csip-results-count">${rows.length} result${rows.length === 1 ? '' : 's'} found</div>
+        <table class="csip-result-table">
+          ${colgroup}
+          <thead>${headers}</thead>
+          <tbody>${bodyRows}</tbody>
+        </table>`;
+    }
+
+    // ── Clients SIP search interaction ────────────────────────
+    let csipLastResults = []; // last search's expanded results (used by step 2)
+    (function() {
+      const input   = document.getElementById('csip-cw-code');
+      const results = document.getElementById('csip-results');
+      const addBtn  = document.getElementById('csip-add-btn');
+
+      const hint = document.getElementById('csip-search-hint');
+
+      function clearResults() {
+        results.style.display = 'none';
+        results.innerHTML     = '';
+        addBtn.disabled       = true;
+        csipLastResults       = [];
+        hint.style.display    = 'none';
+      }
+
+      function runSearch() {
+        const q = input.value.trim();
+        if (!q) { clearResults(); return; }
+
+        const expanded = csipSearchCustomers(q);
+
+        if (!expanded.length) {
+          results.innerHTML = '<div class="csip-results-count">No matches found</div>';
+          results.style.display = 'flex';
+          addBtn.disabled = true;
+          csipLastResults = [];
+          hint.style.display = 'none';
+          return;
+        }
+
+        csipLastResults = expanded;
+        results.innerHTML = csipRenderResultsHTML(expanded);
+        results.style.display = 'flex';
+        addBtn.disabled = false;
+        hint.style.display = 'flex';
+      }
+
+      document.getElementById('csip-search-btn').addEventListener('click', runSearch);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runSearch(); } });
+      // Editing the query invalidates the current results
+      input.addEventListener('input', clearResults);
+    })();
+
+    // ── Add Customer SIP close / hide ────────────────────────
+    document.getElementById('addCustomerSipCloseBtn').addEventListener('click', closeAddCustomerSip);
+    document.getElementById('addCustomerSipHideBtn').addEventListener('click', closeAddCustomerSip);
+
+    // ── Add Customer SIP: step 1 → step 2 ────────────────────
+    document.getElementById('acsip-next-btn').addEventListener('click', () => {
+      // Mark step 1 done, activate step 2
+      const c1 = document.getElementById('acsip-circle-1');
+      const l1 = document.getElementById('acsip-label-1');
+      const c2 = document.getElementById('acsip-circle-2');
+      const l2 = document.getElementById('acsip-label-2');
+      c1.className = 'sip-step-circle sip-step-circle--done';
+      c1.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      l1.className = 'sip-step-label sip-step-label--done';
+      c2.className = 'sip-step-circle sip-step-circle--active'; c2.innerHTML = '2';
+      l2.className = 'sip-step-label sip-step-label--active';
+
+      // Pre-fill the customer in step 2 "When" dropdown from typed/selected value
+      const cwInput = document.getElementById('acsip-cw-code');
+      const consigneeSelect = document.getElementById('acsip-consignee');
+      const typedVal = cwInput ? cwInput.value.trim() : '';
+      // Try matching by code or name
+      let matched = false;
+      Array.from(consigneeSelect.options).forEach(opt => {
+        if (opt.value.toLowerCase() === typedVal.toLowerCase() ||
+            opt.text.toLowerCase().includes(typedVal.toLowerCase())) {
+          consigneeSelect.value = opt.value;
+          matched = true;
+        }
+      });
+      if (!matched && typedVal) {
+        const newOpt = new Option(typedVal, typedVal);
+        consigneeSelect.add(newOpt);
+        consigneeSelect.value = typedVal;
+      }
+      consigneeSelect.classList.remove('placeholder');
+
+      // Show step 2
+      document.getElementById('acsip-step1').style.display = 'none';
+      document.getElementById('acsip-step2').style.display = '';
+
+      // Reset selects placeholder state
+      document.querySelectorAll('#acsip-step2 select.sip-select').forEach(sel => {
+        sel.classList.toggle('placeholder', sel.value === '');
+      });
+    });
+
+    // ── Add Customer SIP: back ───────────────────────────────
+    document.getElementById('acsip-back-btn').addEventListener('click', () => {
+      if (acsipFromModal && reopenModal) {
+        closeAddCustomerSip();
+        reopenModal();
+      } else {
+        resetAddCustomerSip();
+      }
+    });
+
+    // ── Add Customer SIP: method toggle ──────────────────────
+    document.getElementById('acsip-method-group').addEventListener('click', e => {
+      const btn = e.target.closest('[data-method]');
+      if (!btn) return;
+      const method = btn.dataset.method;
+      document.querySelectorAll('#acsip-method-group .sip-toggle-btn').forEach(b => b.classList.remove('sip-toggle-btn--selected'));
+      btn.classList.add('sip-toggle-btn--selected');
+      document.getElementById('acsip-tops-alert').style.display   = method === 'tops'  ? '' : 'none';
+      document.getElementById('acsip-email-fields').style.display = method === 'email' ? '' : 'none';
+    });
+
+    // ── Routing SIP close / hide triggers ────────────────────
+    document.getElementById('routingSipCloseBtn').addEventListener('click', closeRoutingSip);
+    document.getElementById('routingSipHideBtn').addEventListener('click', closeRoutingSip);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAddCustomerSip(); closeRoutingSip(); } });
+
+    // ── Routing SIP: rule card template + multi-card handling ─
+    let rsipRuleCounter = 0;
+    function rsipBuildRuleCardHTML(ruleId, isFirst, isDeletable) {
+      const customerInfo = isFirst ? `
+            <div class="sip-alert-info rsip-customer-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              If you can't find a customer, you can add them to DM by using the "Add Customer" button below.
+            </div>` : '';
+      const deleteBtn = isDeletable ? `
+            <button class="sip-rule-card__delete" type="button" aria-label="Delete rule">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+              </svg>
+            </button>` : '';
+      return `
+        <div class="sip-section sip-rule-card" data-rule-id="${ruleId}">
+          <div class="sip-rule-card__header">
+            ${deleteBtn}
+            <span class="sip-rule-card__title">Create rule</span>
+            <button class="sip-rule-card__toggle" type="button" aria-label="Toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="sip-section__body">
+
+            <div class="sip-field">
+              <span class="sip-field__label">When</span>
+              <select class="sip-select placeholder rsip-consignee">
+                <option value="">Select cargowise consignee</option>
+                <option value="APL-UK-01">APL-UK-01</option>
+                <option value="APL-UK-02">APL-UK-02</option>
+                <option value="APL-UK-03">APL-UK-03</option>
+              </select>
+            </div>
+            ${customerInfo}
+
+            <div class="sip-field">
+              <span class="sip-field__label">ships to</span>
+              <select class="sip-select placeholder rsip-country">
+                <option value="">Select country</option>
+                <option value="GB">GB – United Kingdom</option>
+                <option value="NL">NL – Netherlands</option>
+                <option value="US">US – United States</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">with destination <em>(optional)</em></span>
+              <select class="sip-select placeholder rsip-destination">
+                <option value="">Select destination</option>
+                <option value="All">All</option>
+                <option value="GBSOU">GBSOU – Southampton</option>
+                <option value="GBFXT">GBFXT – Felixstowe</option>
+                <option value="EGLL">EGLL – London Gateway</option>
+                <option value="GBLOP">GBLOP – London Port</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">by <em>(optional)</em></span>
+              <select class="sip-select placeholder rsip-mot">
+                <option value="">Select mode of transport</option>
+                <option value="Sea">Sea</option>
+                <option value="Air">Air</option>
+                <option value="Road">Road</option>
+                <option value="Rail">Rail</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">where load is <em>(optional)</em></span>
+              <select class="sip-select placeholder rsip-load">
+                <option value="">Select load</option>
+                <option value="FCL">FCL</option>
+                <option value="LCL">LCL</option>
+              </select>
+            </div>
+
+            <div class="sip-field">
+              <span class="sip-field__label">booking method is</span>
+              <div class="sip-toggle-group rsip-method-group">
+                <button class="sip-toggle-btn sip-toggle-btn--selected" type="button" data-method="tops">TOPS</button>
+                <button class="sip-toggle-btn" type="button" data-method="email">Email</button>
+              </div>
+            </div>
+
+            <div class="sip-alert-info rsip-tops-alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              shipment will be automatically booked
+            </div>
+
+            <div class="rsip-email-fields" style="display:none">
+              <div class="sip-field">
+                <span class="sip-field__label">notifications will be sent to</span>
+                <p class="sip-field__hint">Separate multiple emails by a comma</p>
+                <input type="text" class="sip-select rsip-emails" placeholder="Enter email(s)" style="height:40px;" />
+              </div>
+
+              <div class="sip-field">
+                <span class="sip-field__label">and Pin/Badge release is</span>
+                <div class="sip-toggle-group rsip-pin-group">
+                  <button class="sip-toggle-btn sip-toggle-btn--selected" type="button" data-pin="required">Required</button>
+                  <button class="sip-toggle-btn" type="button" data-pin="notRequired">not required</button>
+                </div>
+              </div>
+
+              <div class="rsip-pin-required-fields">
+                <div class="sip-field">
+                  <span class="sip-field__label">alert will be sent</span>
+                  <div class="sip-stepper">
+                    <button class="sip-stepper__btn sip-stepper__btn--minus" type="button">−</button>
+                    <input class="sip-stepper__val rsip-alert-days" type="number" value="2" min="0" />
+                    <button class="sip-stepper__btn sip-stepper__btn--plus" type="button">+</button>
+                  </div>
+                  <p class="sip-field__hint">working day(s) before ETA.</p>
+                </div>
+
+                <div class="sip-field">
+                  <span class="sip-field__label">to</span>
+                  <p class="sip-field__hint">Separate multiple emails by a comma</p>
+                  <input type="text" class="sip-select rsip-alert-emails" placeholder="Enter email(s)" style="height:40px;" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>`;
+    }
+    function rsipAddRuleCard(isFirst, isDeletable) {
+      const container = document.getElementById('rsip-rules-container');
+      const id = ++rsipRuleCounter;
+      container.insertAdjacentHTML('beforeend', rsipBuildRuleCardHTML(id, !!isFirst, !!isDeletable));
+      const card = container.querySelector(`[data-rule-id="${id}"]`);
+
+      // Inherit the customer from the first card's "When" field (if any) for additional cards
+      if (!isFirst) {
+        const firstCard = container.querySelector('.sip-rule-card');
+        const firstVal  = firstCard && firstCard !== card ? firstCard.querySelector('.rsip-consignee').value : '';
+        if (firstVal) {
+          const sel = card.querySelector('.rsip-consignee');
+          let opt = Array.from(sel.options).find(o => o.value === firstVal);
+          if (!opt) {
+            opt = new Option(firstVal, firstVal);
+            sel.add(opt);
+          }
+          sel.value = firstVal;
+        }
+      }
+
+      card.querySelectorAll('select.sip-select').forEach(s => s.classList.toggle('placeholder', s.value === ''));
+    }
+    function rsipResetRules() {
+      const container = document.getElementById('rsip-rules-container');
+      container.innerHTML = '';
+      rsipAddRuleCard(true);
+    }
+
+    document.getElementById('rsip-add-rule-btn').addEventListener('click', () => rsipAddRuleCard(false, true));
+
+    // Footer "+ Add Customer" → open the Add client modal + hide the per-card info banner
+    document.getElementById('rsipAddCustomerBtn').addEventListener('click', () => {
+      document.querySelectorAll('.rsip-customer-info').forEach(el => el.remove());
+      if (typeof reopenModal === 'function') reopenModal();
+    });
+
+    // Footer "Create rule" → close routing SIP + toast
+    document.getElementById('rsipCreateRuleBtn').addEventListener('click', () => {
+      closeRoutingSip();
+      showToast('Routing rule(s) created successfully');
+    });
+
+    // Delegated click handler on the rules container
+    document.getElementById('rsip-rules-container').addEventListener('click', e => {
+      const card = e.target.closest('.sip-rule-card');
+      if (!card) return;
+
+      // Delete card
+      if (e.target.closest('.sip-rule-card__delete')) {
+        const all = document.querySelectorAll('#rsip-rules-container .sip-rule-card');
+        if (all.length <= 1) return;
+        card.remove();
+        return;
+      }
+
+      // Toggle collapse
+      if (e.target.closest('.sip-rule-card__toggle') ||
+          (e.target.closest('.sip-rule-card__header') && !e.target.closest('button, input, select'))) {
+        card.classList.toggle('sip-rule-card--collapsed');
+        return;
+      }
+
+      // Method toggle (TOPS / Email)
+      const methodBtn = e.target.closest('.rsip-method-group [data-method]');
+      if (methodBtn) {
+        const group  = methodBtn.parentElement;
+        const method = methodBtn.dataset.method;
+        group.querySelectorAll('.sip-toggle-btn').forEach(b => b.classList.remove('sip-toggle-btn--selected'));
+        methodBtn.classList.add('sip-toggle-btn--selected');
+        card.querySelector('.rsip-tops-alert').style.display   = method === 'tops'  ? '' : 'none';
+        card.querySelector('.rsip-email-fields').style.display = method === 'email' ? '' : 'none';
+        return;
+      }
+
+      // Pin/Badge release toggle (Required / not required)
+      const pinBtn = e.target.closest('.rsip-pin-group [data-pin]');
+      if (pinBtn) {
+        const group = pinBtn.parentElement;
+        const pin   = pinBtn.dataset.pin;
+        group.querySelectorAll('.sip-toggle-btn').forEach(b => b.classList.remove('sip-toggle-btn--selected'));
+        pinBtn.classList.add('sip-toggle-btn--selected');
+        const requiredFields = card.querySelector('.rsip-pin-required-fields');
+        if (requiredFields) requiredFields.style.display = pin === 'required' ? '' : 'none';
+        return;
+      }
+
+      // Stepper +/- buttons inside any rule card
+      const stepperBtn = e.target.closest('.sip-stepper__btn');
+      if (stepperBtn) {
+        const val = stepperBtn.parentElement.querySelector('.sip-stepper__val');
+        const n   = parseInt(val.value, 10) || 0;
+        if (stepperBtn.classList.contains('sip-stepper__btn--minus')) {
+          if (n > 0) val.value = n - 1;
+        } else {
+          val.value = n + 1;
+        }
+      }
+    });
+
+    // Delegated select-change for placeholder colour
+    document.getElementById('rsip-rules-container').addEventListener('change', e => {
+      const sel = e.target.closest('select.sip-select');
+      if (sel) sel.classList.toggle('placeholder', sel.value === '');
+    });
+
+    // ── Shared customer data ─────────────────────────────────
+    const customerData = [
+      { name: 'Cath Kidston Ltd',       code: 'CKL001' },
+      { name: 'Cath Kidston Ltd',       code: 'CKL002' },
+      { name: 'Cath Kidston Ltd',       code: 'CKL003' },
+      { name: 'Apollo Houseware Ltd',   code: 'APL-001' },
+      { name: 'Apollo Houseware Ltd',   code: 'APL-002' },
+      { name: 'Riverford Organic Ltd',  code: 'RIVUK01' },
+      { name: 'Pearson Education Ltd',  code: 'PEUK01' },
+      { name: 'Ligentix Demo Customer',   code: 'LIG00044' },
+      { name: 'Ligentix Test Customer',   code: 'LIG00155' },
+      { name: 'Ligentix Customer Three',  code: 'LIG00199' },
+    ];
+
+    function buildSearchResults(container, rowClass, query, onSelect) {
+      if (!query) { container.style.display = 'none'; container.innerHTML = ''; return; }
+      const matches = customerData.filter(c =>
+        c.name.toLowerCase().includes(query) || c.code.toLowerCase().includes(query)
+      );
+      if (!matches.length) { container.style.display = 'none'; container.innerHTML = ''; return; }
+      container.innerHTML = matches.map((c, i) =>
+        `<div class="${rowClass}" data-name="${c.name}" data-code="${c.code}">
+           <span class="chip-search">${c.name}</span>
+           <span class="chip-search chip-search--code">${c.code}</span>
+         </div>`
+      ).join('');
+      container.style.display = 'flex';
+      container.querySelectorAll(`.${rowClass}`).forEach(row => {
+        row.addEventListener('click', () => onSelect(row.dataset.name, row.dataset.code));
+      });
+    }
+
+    // ── Add Customer SIP: live search ───────────────────────
+    (function() {
+      const input   = document.getElementById('acsip-cw-code');
+      const results = document.getElementById('acsip-results');
+
+      input.addEventListener('input', () => {
+        buildSearchResults(results, 'acsip-result-row', input.value.trim().toLowerCase(), (name, code) => {
+          input.value = code;
+          results.style.display = 'none';
+          results.innerHTML = '';
+        });
+      });
+    })();
+
+    // ── Add Customer Modal ───────────────────────────────────
+    (function() {
+      const overlay = document.getElementById('addClientModal');
+      const input   = document.getElementById('modal-cw-code');
+      const results = document.getElementById('modal-results');
+      const addBtn  = document.getElementById('modal-add-btn');
+      const hint    = document.getElementById('modal-search-hint');
+      let modalLastResults = [];
+
+      function clearResults() {
+        results.style.display = 'none';
+        results.innerHTML     = '';
+        addBtn.disabled       = true;
+        modalLastResults      = [];
+        hint.style.display    = 'none';
+      }
+
+      function openModal() {
+        input.value = '';
+        clearResults();
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => input.focus(), 50);
+      }
+      function closeModal() {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      reopenModal = openModal;
+      document.getElementById('addClientModalClose').addEventListener('click', closeModal);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.style.display !== 'none') closeModal(); });
+
+      function runSearch() {
+        const q = input.value.trim();
+        if (!q) { clearResults(); return; }
+
+        const expanded = csipSearchCustomers(q);
+        if (!expanded.length) {
+          results.innerHTML = '<div class="csip-results-count">No matches found</div>';
+          results.style.display = 'flex';
+          addBtn.disabled  = true;
+          modalLastResults = [];
+          hint.style.display = 'none';
+          return;
+        }
+
+        modalLastResults = expanded;
+        results.innerHTML = csipRenderResultsHTML(expanded);
+        results.style.display = 'flex';
+        addBtn.disabled = false;
+        hint.style.display = 'flex';
+      }
+
+      document.getElementById('modal-search-btn').addEventListener('click', runSearch);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runSearch(); } });
+      // Typing invalidates the current results — must search again
+      input.addEventListener('input', clearResults);
+
+      addBtn.addEventListener('click', () => {
+        if (!modalLastResults.length) return;
+        closeModal();
+
+        const container = document.getElementById('rsip-rules-container');
+        const labels    = modalLastResults.map(csipDisplayLabel);
+
+        modalLastResults.forEach((r, idx) => {
+          // First result reuses the existing first card (the default blank one);
+          // subsequent results each append a new card.
+          let card;
+          if (idx === 0 && container.querySelector('.sip-rule-card')) {
+            card = container.querySelector('.sip-rule-card');
+          } else {
+            rsipAddRuleCard(false);
+            const all = container.querySelectorAll('.sip-rule-card');
+            card = all[all.length - 1];
+          }
+
+          const sel   = card.querySelector('.rsip-consignee');
+          const label = csipDisplayLabel(r);
+          sel.innerHTML = '<option value="">Select cargowise consignee</option>' +
+            labels.map(l => `<option value="${l}"${l === label ? ' selected' : ''}>${l}</option>`).join('');
+          sel.value = label;
+          sel.classList.remove('placeholder');
+        });
+
+        const customerNames = [...new Set(modalLastResults.map(r => r.customer))].join(', ');
+        showToast(`${customerNames} added successfully`);
+      });
+    })();
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSip(); });
+
+    // ── Context menu ─────────────────────────────────────────
+    const ctxMenu = document.getElementById('ctxMenu');
+    let ctxTargetRow = null;
+
+    function isRoutingRow(row) {
+      return row.parentElement && row.parentElement.id === 'routingTableBody';
+    }
+
+    function showCtxMenu(e, row) {
+      e.preventDefault();
+      ctxTargetRow = row;
+
+      // Update "Deactivate" label based on current status (works for either chip class system)
+      const isActive = row.querySelector('.chip-status--active, .chip-routing-status--active');
+      const deactivateItem = document.getElementById('ctx-deactivate');
+      deactivateItem.childNodes[deactivateItem.childNodes.length - 1].textContent = isActive ? ' Deactivate rule' : ' Activate rule';
+
+      // Position near cursor, but keep within viewport
+      const x = Math.min(e.clientX, window.innerWidth  - 210);
+      const y = Math.min(e.clientY, window.innerHeight - 140);
+      ctxMenu.style.left = x + 'px';
+      ctxMenu.style.top  = y + 'px';
+      ctxMenu.classList.add('is-open');
+    }
+
+    function closeCtxMenu() {
+      ctxMenu.classList.remove('is-open');
+      ctxTargetRow = null;
+    }
+
+    // Right-click on rows (booking + routing)
+    ['tableBody', 'routingTableBody'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('contextmenu', e => {
+        const row = e.target.closest('tr');
+        if (row) showCtxMenu(e, row);
+      });
+    });
+
+    // Duplicate
+    document.getElementById('ctx-duplicate').addEventListener('click', () => {
+      if (!ctxTargetRow) return;
+      const routing = isRoutingRow(ctxTargetRow);
+      const tbodySelector = routing ? '#routingTableBody' : '#tableBody';
+      const onclickAttr   = routing ? 'handleRoutingRowClick(event, this)' : 'handleRowClick(event, this)';
+      document.querySelectorAll(`${tbodySelector} tr.row--duplicate`).forEach(r => r.classList.remove('row--duplicate'));
+      const clone = ctxTargetRow.cloneNode(true);
+      clone.classList.remove('row--active');
+      clone.classList.add('row--duplicate');
+      clone.setAttribute('onclick', onclickAttr);
+      ctxTargetRow.after(clone);
+      showToast();
+      (routing ? openRoutingSip : openSip)(null);
+      closeCtxMenu();
+    });
+
+    // Deactivate / Activate (handles both chip class systems)
+    document.getElementById('ctx-deactivate').addEventListener('click', () => {
+      if (!ctxTargetRow) return;
+      const routing = isRoutingRow(ctxTargetRow);
+      if (routing) {
+        const activeChip   = ctxTargetRow.querySelector('.chip-routing-status--active');
+        const inactiveChip = ctxTargetRow.querySelector('.chip-routing-status--inactive');
+        const checkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const xIcon     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+        if (activeChip) {
+          activeChip.outerHTML = `<span class="chip-routing-status chip-routing-status--inactive">${xIcon} Inactive</span>`;
+        } else if (inactiveChip) {
+          inactiveChip.outerHTML = `<span class="chip-routing-status chip-routing-status--active">${checkIcon} Active</span>`;
+        }
+      } else {
+        const activeChip   = ctxTargetRow.querySelector('.chip-status--active');
+        const inactiveChip = ctxTargetRow.querySelector('.chip-status--inactive');
+        if (activeChip) {
+          activeChip.outerHTML = '<span class="chip-status chip-status--inactive"><span class="chip-status__dot"></span>Inactive</span>';
+        } else if (inactiveChip) {
+          inactiveChip.outerHTML = '<span class="chip-status chip-status--active"><span class="chip-status__dot"></span>Active</span>';
+        }
+      }
+      applyHideInactive();
+      closeCtxMenu();
+    });
+
+    // Delete
+    document.getElementById('ctx-delete').addEventListener('click', () => {
+      if (!ctxTargetRow) return;
+      const routing = isRoutingRow(ctxTargetRow);
+      if (routing) {
+        if (ctxTargetRow === activeRoutingRow) closeRoutingSip();
+      } else {
+        if (ctxTargetRow === activeRow) closeSip();
+      }
+      ctxTargetRow.remove();
+      closeCtxMenu();
+    });
+
+    // Close on any outside click or Escape
+    document.addEventListener('click', closeCtxMenu);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCtxMenu(); });
+
+    // ── Section tabs ─────────────────────────────────────────
+    document.querySelectorAll('.section-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('section-tab--active'));
+        tab.classList.add('section-tab--active');
+      });
+    });
+
+    // ── Clients table data ───────────────────────────────────
+    const clientRows = [
+      { customer: 'Apollo housewares LTD',        customerCode: 'APOHOUGBFAR', ligentixId: 101943, legalEntity: '--',          cargowiseCode: '--'          },
+      { customer: 'Hobbycraft Group LTD',         customerCode: 'HOBBYCGBCCH', ligentixId: 6793,   legalEntity: '--',          cargowiseCode: '--'          },
+      { customer: 'River Island Clothing Co LTD', customerCode: 'RIVISLGBLON3',ligentixId: 99845,  legalEntity: '--',          cargowiseCode: '--'          },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',    ligentixId: 105767, legalEntity: 'Hobbs',       cargowiseCode: 'HOBBSGBLON'  },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',    ligentixId: 105767, legalEntity: 'Whistles',    cargowiseCode: 'WHISTLGBLHR' },
+      { customer: 'TFG',                          customerCode: 'TFGGBWLF',    ligentixId: 105767, legalEntity: 'Phase Eight', cargowiseCode: 'PHAEIGGBFLM' },
+      { customer: 'The Works',                    customerCode: 'WORSTOGBBHX', ligentixId: 44032,  legalEntity: '--',          cargowiseCode: '--'          },
+      { customer: 'White Stuff',                  customerCode: 'WHISTUGBLON', ligentixId: 23677,  legalEntity: '--',          cargowiseCode: '--'          },
+    ];
+
+    function renderClientsTable() {
+      document.getElementById('clientsTableBody').innerHTML = clientRows.map(r => `
+        <tr>
+          <td>${r.customer}</td>
+          <td>${r.customerCode}</td>
+          <td>${r.ligentixId}</td>
+          <td>${r.legalEntity}</td>
+          <td>${r.cargowiseCode}</td>
+        </tr>`).join('');
+    }
+    renderClientsTable();
+
+    // ── Sub-tabs ─────────────────────────────────────────────
+    const contentIds = ['clients', 'booking', 'routing', 'warehouse', 'notifications'];
+    document.querySelectorAll('.sub-tab:not(.sub-tab--muted)').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('sub-tab--active'));
+        tab.classList.add('sub-tab--active');
+        const target = tab.dataset.tab;
+        contentIds.forEach(id => {
+          const el = document.getElementById(`${id}-content`);
+          if (el) el.style.display = target === id ? '' : 'none';
+        });
+        const hideInactiveWrap = document.querySelector('.hide-inactive');
+        const hideInactiveInput = hideInactiveWrap.querySelector('input');
+        const disable = target === 'clients';
+        hideInactiveWrap.classList.toggle('hide-inactive--disabled', disable);
+        hideInactiveInput.disabled = disable;
+      });
+    });
+
+    // ── SIP stepper buttons ──────────────────────────────────
+    document.querySelectorAll('.sip-stepper').forEach(stepper => {
+      const val = stepper.querySelector('.sip-stepper__val');
+      stepper.querySelector('.sip-stepper__btn--minus').addEventListener('click', () => {
+        const n = parseInt(val.value, 10);
+        if (n > 0) val.value = n - 1;
+      });
+      stepper.querySelector('.sip-stepper__btn--plus').addEventListener('click', () => {
+        val.value = parseInt(val.value, 10) + 1;
+      });
+    });
+
+    // ── SIP toggle button groups ─────────────────────────────
+    document.querySelectorAll('.sip-toggle-group').forEach(group => {
+      group.querySelectorAll('.sip-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.sip-toggle-btn').forEach(b => b.classList.remove('sip-toggle-btn--selected'));
+          btn.classList.add('sip-toggle-btn--selected');
+        });
+      });
+    });
+
+    // ── SIP select placeholder colour ────────────────────────
+    document.querySelectorAll('select.sip-select').forEach(sel => {
+      const update = () => sel.classList.toggle('placeholder', sel.value === '');
+      sel.addEventListener('change', update);
+      update();
+    });
+  </script>
+
+</body>
+</html>
