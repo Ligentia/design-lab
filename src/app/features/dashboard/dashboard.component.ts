@@ -143,7 +143,14 @@ export class DashboardComponent implements OnInit {
       this.closeModal();
     } catch (err: unknown) {
       console.error('Save failed', err);
-      this.modalError.set('Upload failed. Check your GitHub PAT and try again.');
+      const status = (err as any)?.status;
+      const msg = (err as any)?.error?.message ?? (err as any)?.message ?? 'Unknown error';
+      if (status === 401 || status === 403) {
+        this.modalError.set('GitHub rejected the request — your PAT may be expired or missing the "Contents: write" permission. Re-enter it below.');
+        this.svc.clearPat();
+      } else {
+        this.modalError.set(`Save failed (${status ?? 'network error'}): ${msg}`);
+      }
     }
   }
 
