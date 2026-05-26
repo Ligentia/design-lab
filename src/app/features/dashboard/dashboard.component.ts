@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrototypeService } from '../../core/services/prototype.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -70,9 +70,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       *ngIf="showModal()"
       [existingTags]="svc.allTags()"
       [editing]="editingPrototype()"
+      [externalError]="modalError()"
       (saved)="onSaved($event)"
       (cancel)="closeModal()"
-      #addModal
     />
   `,
   styles: [`
@@ -120,7 +120,7 @@ export class DashboardComponent implements OnInit {
   private ui = inject(UiStateService);
   showModal = signal(false);
   editingPrototype = signal<Prototype | null>(null);
-  @ViewChild('addModal') addModal?: AddPrototypeModalComponent;
+  modalError = signal('');
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -128,9 +128,9 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() { this.svc.load(); }
 
-  openAdd() { this.editingPrototype.set(null); this.showModal.set(true); }
-  openEdit(p: Prototype) { this.editingPrototype.set(p); this.showModal.set(true); }
-  closeModal() { this.showModal.set(false); this.editingPrototype.set(null); }
+  openAdd() { this.editingPrototype.set(null); this.modalError.set(''); this.showModal.set(true); }
+  openEdit(p: Prototype) { this.editingPrototype.set(p); this.modalError.set(''); this.showModal.set(true); }
+  closeModal() { this.showModal.set(false); this.editingPrototype.set(null); this.modalError.set(''); }
 
   async onSaved({ prototype, pat, files }: { prototype: Prototype; pat: string; files?: { name: string; content: string }[] }) {
     try {
@@ -143,7 +143,7 @@ export class DashboardComponent implements OnInit {
       this.closeModal();
     } catch (err: unknown) {
       console.error('Save failed', err);
-      this.addModal?.onSaveError('Upload failed. Check your GitHub PAT and try again.');
+      this.modalError.set('Upload failed. Check your GitHub PAT and try again.');
     }
   }
 

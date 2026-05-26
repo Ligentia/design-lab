@@ -99,8 +99,9 @@ export class PrototypeService {
       }
     }
     const updated = [prototype, ...this._prototypes()];
-    await firstValueFrom(this.github.savePrototypes(updated, this._sha(), pat));
+    const res: any = await firstValueFrom(this.github.savePrototypes(updated, this._sha(), pat));
     this._prototypes.set(updated);
+    if (res?.content?.sha) this._sha.set(res.content.sha);
   }
 
   updatePrototype(updated: Prototype, pat: string) {

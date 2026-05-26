@@ -316,6 +316,9 @@ const PAT_KEY = 'dl_github_pat';
 export class AddPrototypeModalComponent implements OnInit {
   @Input() existingTags: string[] = [];
   @Input() editing: Prototype | null = null;
+  @Input() set externalError(msg: string) {
+    if (msg) { this.saving = false; this.errorMsg = msg; }
+  }
   @Output() saved = new EventEmitter<{ prototype: Prototype; pat: string; files?: { name: string; content: string }[] }>();
   @Output() cancel = new EventEmitter<void>();
 
