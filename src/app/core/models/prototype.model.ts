@@ -4,6 +4,7 @@ export interface Prototype {
   tags: string[];
   creator: string;
   date: string;
+  updatedAt?: string;
   description: string;
   folder: string;
   thumbnail?: string;

@@ -135,6 +135,7 @@ export class DashboardComponent implements OnInit {
   async onSaved({ prototype, pat, files }: { prototype: Prototype; pat: string; files?: { name: string; content: string }[] }) {
     try {
       if (this.editingPrototype()) {
+        prototype.updatedAt = new Date().toISOString().slice(0, 10);
         if (files?.length) await this.svc.uploadFiles(prototype, pat, files);
         await this.svc.updatePrototype(prototype, pat);
       } else {
