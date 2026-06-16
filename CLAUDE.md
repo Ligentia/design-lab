@@ -94,8 +94,8 @@ Push triggers Vercel auto-deploy. Run push from the `design-lab` directory, not 
 Original PRD v0.2 is at `/Users/chukwukaezeoke/Downloads/Design_Lab_PRD_v0.2.docx`
 v0 and v1 are shipped. Remaining items tracked in the PRD.
 
-## Open items (as of May 2026)
-- Transfer repo to Ligentia GitHub org (update environment files after)
+## Open items (as of June 2026)
+- ~~Transfer repo to Ligentia GitHub org~~ DONE (2026-06-16): primary is `Ligentia/design-lab`, env files point at Ligentia, canonical site is design-lab-hazel. `dshyone` kept as a git push mirror (origin has both pushurls).
 - Creator filter (F-05) and sort controls (F-06) not yet built
 - Figma component reference (F-13) — depends on Figma MCP availability
 - Auth model for stakeholder sharing (F-15) — TBD
