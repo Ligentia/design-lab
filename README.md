@@ -121,13 +121,13 @@ Repo owner, repo name, and branch are set in `src/environments/environment.ts`:
 
 ```typescript
 export const environment = {
-  githubOwner: 'dshyone',
+  githubOwner: 'Ligentia',
   githubRepo: 'design-lab',
   githubBranch: 'main',
 };
 ```
 
-Update these when transferring to the Ligentia org.
+The backend repo is `github.com/Ligentia/design-lab`. The `dshyone/design-lab` repo is kept as a push mirror.
 
 ---
 

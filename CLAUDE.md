@@ -6,7 +6,7 @@ Internal tool for the Ligentix product design team (Craig Wetherall, Chuka Ezeok
 https://design-lab-rouge.vercel.app
 
 ## Repo
-https://github.com/dshyone/design-lab (currently under Chuka's personal account; will move to Ligentia org)
+https://github.com/Ligentia/design-lab (primary). `github.com/dshyone/design-lab` is kept as a push mirror.
 
 ## Stack
 - Angular 17+ standalone components, signals-based state
@@ -82,8 +82,8 @@ Current list in `src/app/core/models/prototype.model.ts`: Craig, Chuka, Adrian.
 The creator field in the modal is a combobox — new names can be added inline without editing the model, but they only persist for that session. To make a new creator permanent, add them to the `CREATORS` constant.
 
 ## GitHub config
-Owner: `dshyone` | Repo: `design-lab` | Branch: `main`
-Update `src/environments/environment.ts` and `environment.prod.ts` when transferring to Ligentia org.
+Owner: `Ligentia` | Repo: `design-lab` | Branch: `main`
+Set in `src/environments/environment.ts` and `environment.prod.ts`. The `origin` remote pushes to both `Ligentia` and `dshyone` (mirror).
 
 ## Deploying
 Build: `npx @angular/cli build` (from the `design-lab` directory, with `source ~/.zshrc` to load Node).
