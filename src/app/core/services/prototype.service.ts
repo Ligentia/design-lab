@@ -161,7 +161,7 @@ export class PrototypeService {
       '',
       '## Re-uploading to Design Lab',
       '1. Edit the prototype files as needed.',
-      '2. Go to https://design-lab-rouge.vercel.app and click "Add prototype".',
+      '2. Go to https://design-lab-hazel.vercel.app and click "Add prototype".',
       '3. Upload the edited HTML file.',
       '4. Review and update every field — they reflect the original version and may no longer be accurate:',
       `   - **Title**: was "${p.title}" — update if the exploration has changed significantly`,

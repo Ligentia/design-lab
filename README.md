@@ -2,7 +2,7 @@
 
 Internal tool for the Ligentix product design team to centralise, browse, and share UI prototypes and design explorations built with Claude Code.
 
-**Live:** https://design-lab-rouge.vercel.app
+**Live:** https://design-lab-hazel.vercel.app
 
 ---
 
@@ -57,7 +57,7 @@ design-lab/
 ## Adding a prototype
 
 ### Via the UI
-1. Go to https://design-lab-rouge.vercel.app
+1. Go to https://design-lab-hazel.vercel.app
 2. Click **Add prototype** in the header
 3. Enter your GitHub Personal Access Token when prompted (stored for the session)
 4. Fill in the fields:

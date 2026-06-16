@@ -3,7 +3,8 @@
 Internal tool for the Ligentix product design team (Craig Wetherall, Chuka Ezeoke) to browse, share, and manage UI prototypes and design explorations built with Claude Code.
 
 ## Live URL
-https://design-lab-rouge.vercel.app
+https://design-lab-hazel.vercel.app (canonical — builds from the Ligentia repo)
+`design-lab-rouge.vercel.app` builds from the `dshyone` mirror and is legacy/backup.
 
 ## Repo
 https://github.com/Ligentia/design-lab (primary). `github.com/dshyone/design-lab` is kept as a push mirror.
