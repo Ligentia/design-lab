@@ -9,7 +9,8 @@
       "prototype"
     ],
     "folder": "prototypes/boking",
-    "updatedAt": "2026-06-16"
+    "updatedAt": "2026-06-16",
+    "archived": true
   },
   {
     "id": "dm-customer-settings-handoff",
