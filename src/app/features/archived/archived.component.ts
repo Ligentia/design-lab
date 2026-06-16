@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrototypeService } from '../../core/services/prototype.service';
 import { PrototypeCardComponent } from '../prototype-card/prototype-card.component';
@@ -67,8 +67,10 @@ import { Prototype } from '../../core/models/prototype.model';
     .empty-sub { font-size: var(--text-sm); max-width: 320px; line-height: 1.5; }
   `]
 })
-export class ArchivedComponent {
+export class ArchivedComponent implements OnInit {
   svc = inject(PrototypeService);
+
+  ngOnInit() { this.svc.load(); }
 
   async onRestore(p: Prototype) {
     const pat = sessionStorage.getItem('dl_github_pat') ?? '';
