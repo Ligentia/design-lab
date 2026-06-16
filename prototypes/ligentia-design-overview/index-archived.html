@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ligentia Design Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f5f4f1;
+      --surface: #ffffff;
+      --border: #e2e0da;
+      --text-primary: #1a1916;
+      --text-secondary: #6b6860;
+      --accent: #1a1916;
+      --accent-hover: #3d3b35;
+      --nav-h: 52px;
+      --active-indicator: #1a1916;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 32px;
+      z-index: 100;
+    }
+
+    .nav-wordmark {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 6px 12px;
+      font-size: 13.5px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(0,0,0,0.04);
+    }
+
+    .nav-link.active {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      background: var(--active-indicator);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .nav-end {
+      margin-left: auto;
+    }
+
+    .btn-statuses {
+      padding: 6px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-statuses:hover {
+      color: var(--text-primary);
+      border-color: #c8c6c0;
+      background: rgba(0,0,0,0.03);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 19, 17, 0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      animation: modal-in 0.18s ease;
+    }
+
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+    }
+
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 18px;
+      line-height: 1;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(0,0,0,0.06);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 8px 0 16px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 24px;
+    }
+
+    .status-item + .status-item {
+      border-top: 1px solid #f0ede8;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .status-dot.requested   { background: transparent; border: 2px solid #9da3af; }
+    .status-dot.backlog     { background: #6b7fe8; }
+    .status-dot.in-progress { background: #34c07a; }
+    .status-dot.on-hold     { background: #f07a3c; }
+    .status-dot.review      { background: #f0c53c; }
+    .status-dot.handover    { background: #4aa8e8; }
+    .status-dot.roadmap      { background: #34c07a; opacity: 0.55; }
+    .status-dot.closed      { background: #34c07a; }
+
+    .status-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .status-desc {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .modal-section-label {
+      padding: 10px 24px 2px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #b0aca4;
+      font-family: 'DM Mono', monospace;
+    }
+
+
+    /* Modal tabs */
+    .modal-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .modal-tab {
+      position: relative;
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .modal-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-tab.active {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .modal-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--active-indicator);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .modal-tab-panel {
+      display: none;
+      padding: 8px 0 16px;
+    }
+
+    .modal-tab-panel.active {
+      display: block;
+    }
+
+    /* Other tab */
+    .other-section {
+      padding: 14px 24px;
+    }
+
+    .other-section + .other-section {
+      border-top: 1px solid #f0ede8;
+    }
+
+    .other-heading {
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .other-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .other-body p {
+      margin-bottom: 8px;
+    }
+
+    .other-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .other-body ul {
+      margin: 6px 0 10px 16px;
+    }
+
+    .other-body ul li {
+      margin-bottom: 4px;
+    }
+
+    /* Content */
+    .content {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-wordmark">Ligentia Design</span>
+    <div class="nav-divider"></div>
+    <div class="nav-links">
+      <div class="nav-link active" data-panel="roadmap" onclick="switchPanel(this, 'roadmap')">Active</div>
+      <div class="nav-link" data-panel="roadmap-view" onclick="switchPanel(this, 'roadmap-view')">Roadmap</div>
+      <div class="nav-link" data-panel="request" onclick="switchPanel(this, 'request')">Submit a request</div>
+    </div>
+    <div class="nav-end">
+      <button class="btn-statuses" onclick="openModal()">Info</button>
+    </div>
+  </nav>
+
+  <!-- Statuses modal -->
+  <div class="modal-backdrop" id="statusModal" onclick="handleBackdropClick(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">Info</span>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchModalTab(this, 'tab-statuses')">Statuses</button>
+        <button class="modal-tab" onclick="switchModalTab(this, 'tab-other')">Other</button>
+      </div>
+
+      <div class="modal-tab-panel active" id="tab-statuses">
+
+        <div class="status-item">
+          <div class="status-dot requested"></div>
+          <div>
+            <div class="status-label">Requested</div>
+            <div class="status-desc">A task raised by an internal stakeholder, or an idea for a product update that has been logged for consideration. <strong>Requested tasks should be moved to Backlog or Roadmap as soon as possible — Backlog for anything near-term (within the next month), Roadmap for anything realistically further away than that.</strong></div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot backlog"></div>
+          <div>
+            <div class="status-label">Backlog</div>
+            <div class="status-desc">A task that has been selected and is scheduled to be worked on in the near future.</div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot in-progress"></div>
+          <div>
+            <div class="status-label">In progress</div>
+            <div class="status-desc">A task that is currently being actively worked on by a designer.</div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot on-hold"></div>
+          <div>
+            <div class="status-label">On hold</div>
+            <div class="status-desc">A task that was in progress but has been paused, typically due to a dependency, change in priority, or awaiting input.</div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot review"></div>
+          <div>
+            <div class="status-label">Review</div>
+            <div class="status-desc">Design has reached a stage where internal conversations are needed before work can progress further.</div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot handover"></div>
+          <div>
+            <div class="status-label">Handover</div>
+            <div class="status-desc">Work has been approved and is in the process of being handed over to the engineering team for development to begin.</div>
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div class="status-dot roadmap"></div>
+          <div>
+            <div class="status-label">Roadmap</div>
+            <div class="status-desc">An idea that has been reviewed and considered worthwhile, but parked to be revisited at a later date rather than progressed now.</div>
+          </div>
+        </div>
+
+        <div class="modal-section-label">Closed</div>
+
+        <div class="status-item">
+          <div class="status-dot closed"></div>
+          <div>
+            <div class="status-label">Closed</div>
+            <div class="status-desc">Work has been completed and the task is closed.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-tab-panel" id="tab-other">
+
+        <div class="other-section">
+          <div class="other-heading">Why am I seeing ClickUp on screen?</div>
+          <div class="other-body">ClickUp is the platform we use to manage our tasks. The views embedded here pull directly from our live ClickUp workspace.</div>
+        </div>
+
+        <div class="other-section">
+          <div class="other-heading">Active</div>
+          <div class="other-body">
+            <p>The Active view shows tasks currently in progress or coming up soon. Each task can display up to three dates:</p>
+            <ul>
+              <li><strong>Start date</strong> — when work on the task begins.</li>
+              <li><strong>Review date</strong> — the point at which the work requires internal discussion before it can move forward.</li>
+              <li><strong>Due date</strong> — the target completion date.</li>
+            </ul>
+            <p>Design work is iterative and often requires multiple review sessions. For more complex tasks, a due date may not be set until a critical mass of agreement has been reached through those reviews. For more straightforward work, a review date may be less necessary, with a due date entered directly.</p>
+          </div>
+        </div>
+
+        <div class="other-section">
+          <div class="other-heading">Roadmap</div>
+          <div class="other-body">A list of ideas that are not currently considered a near-term priority and fall outside the coming month's scope of work. These are things worth keeping track of for the future.</div>
+        </div>
+
+        <div class="other-section">
+          <div class="other-heading">Submit a request</div>
+          <div class="other-body">A simple form that allows anyone to submit a design request directly to the design team.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="panel active" id="panel-roadmap">
+      <iframe
+        class="clickup-embed"
+        src="https://sharing.clickup.com/9005085057/gr/h/8cbxcc1-19012/e643d8a28ba0df9"
+        onwheel=""
+        width="100%" height="100%"
+        style="background: transparent; border: none;"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="panel" id="panel-roadmap-view">
+      <iframe
+        class="clickup-embed"
+        src="https://sharing.clickup.com/9005085057/gr/h/8cbxcc1-18972/5745c79ae9643e2"
+        onwheel=""
+        width="100%" height="100%"
+        style="background: transparent; border: none;"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="panel" id="panel-request">
+      <iframe
+        class="clickup-embed clickup-dynamic-height"
+        src="https://forms.clickup.com/9005085057/f/8cbxcc1-18992/MSW9IMDGP9KXXVB1R7"
+        onwheel=""
+        style="background: transparent;"
+        allowfullscreen>
+      </iframe>
+      <script async src="https://app-cdn.clickup.com/assets/js/forms-embed/v1.js"></script>
+    </div>
+
+  </div>
+
+  <script>
+    function switchPanel(linkEl, panelId) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      linkEl.classList.add('active');
+      document.getElementById('panel-' + panelId).classList.add('active');
+    }
+
+    function openModal() {
+      document.getElementById('statusModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('statusModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target === document.getElementById('statusModal')) closeModal();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    function switchModalTab(tabEl, panelId) {
+      tabEl.closest('.modal').querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      tabEl.closest('.modal').querySelectorAll('.modal-tab-panel').forEach(p => p.classList.remove('active'));
+      tabEl.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
