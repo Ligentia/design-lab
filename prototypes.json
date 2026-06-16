@@ -1,5 +1,16 @@
 [
   {
+    "id": "boking",
+    "title": "Boking",
+    "description": "",
+    "creator": "Chuka",
+    "date": "2026-06-16",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/boking"
+  },
+  {
     "id": "dm-customer-settings-handoff",
     "title": "dm customer settings handoff",
     "description": "This file covers hand-off for customers, and delivery routing.",
