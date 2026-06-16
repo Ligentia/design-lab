@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ligentix – Booking</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: #1a1a2e;
+      background: #f5f6fa;
+      min-height: 100vh;
+    }
+
+    /* ── SIDE NAV PANEL ─────────────────────────────────── */
+    .sidenav-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      opacity: 0; pointer-events: none;
+      transition: opacity 280ms ease;
+    }
+    .sidenav-backdrop.is-open {
+      opacity: 1; pointer-events: auto;
+    }
+
+    .sidenav {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 268px;
+      background: #043347;
+      border-right: 1.5px solid #7f8c9f;
+      z-index: 300;
+      display: flex; flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .sidenav.is-open {
+      transform: translateX(0);
+    }
+
+    /* Panel top bar */
+    .sidenav__topbar {
+      height: 64px; flex-shrink: 0;
+      border-bottom: 1.5px solid #67768c;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.1);
+      display: flex; align-items: center;
+      padding: 0 14px;
+      gap: 10px; position: relative;
+    }
+    .sidenav__close {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: transparent; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #add2f7; opacity: 0.8; flex-shrink: 0;
+    }
+    .sidenav__close:hover { background: rgba(255,255,255,0.08); opacity: 1; }
+    .sidenav__close svg { width: 16px; height: 16px; }
+
+    .sidenav__logo {
+      display: flex; align-items: center; gap: 6px;
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    }
+    .sidenav__logo-mark {
+      width: 28px; height: 28px; border-radius: 5px;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff; letter-spacing: -1px;
+    }
+    .sidenav__logo-text {
+      font-size: 16px; font-weight: 700; color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .sidenav__logo-text span { color: #6fffb6; }
+
+    /* Nav items */
+    .sidenav__item {
+      display: flex; align-items: center;
+      border-bottom: 1.5px solid #67768c;
+      height: 64px; flex-shrink: 0;
+      cursor: pointer; background: transparent;
+      width: 100%; border-left: none; border-top: none; border-right: none;
+      text-align: left; padding: 0; text-decoration: none;
+    }
+    .sidenav__item:hover { background: rgba(255,255,255,0.05); }
+
+    .sidenav__icon-cell {
+      width: 64px; height: 64px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .sidenav__icon-cell svg { width: 22px; height: 22px; }
+    .sidenav__icon--dim  { color: #787c8c; }
+    .sidenav__icon--lit  { color: #add2f7; }
+
+    .sidenav__badge {
+      position: absolute; top: 8px; right: 10px;
+      width: 20px; height: 20px; border-radius: 100px;
+      background: #cc4255;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; color: #fff; line-height: 1;
+    }
+
+    .sidenav__label {
+      flex: 1; min-width: 0;
+      font-size: 14px; font-weight: 600; color: #fff;
+      letter-spacing: -0.084px; line-height: 18px;
+    }
+
+    .sidenav__chevron {
+      width: 20px; height: 20px; flex-shrink: 0;
+      margin-right: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: #6fffb6;
+    }
+    .sidenav__chevron svg { width: 14px; height: 14px; }
+    .sidenav__item--trigger .sidenav__chevron {
+      transition: transform 260ms cubic-bezier(0.4,0,0.2,1);
+    }
+    .sidenav__item--trigger.is-open .sidenav__chevron { transform: rotate(180deg); }
+
+    .sidenav__group { display: flex; flex-direction: column; }
+    .sidenav__children {
+      max-height: 0; overflow: hidden;
+      transition: max-height 260ms cubic-bezier(0.4,0,0.2,1);
+      background: rgba(0,0,0,0.18);
+    }
+    .sidenav__children.is-open { max-height: 160px; }
+    .sidenav__child {
+      display: flex; align-items: center;
+      height: 48px; padding-left: 64px;
+      border-bottom: 1px solid rgba(103,118,140,0.45);
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none; cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .sidenav__child:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .sidenav__child--active { color: #6fffb6; font-weight: 600; }
+
+    /* ── TOP NAV ─────────────────────────────────────────── */
+    .topnav {
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav__hamburger {
+      width: 32px; height: 32px;
+      display: flex; flex-direction: column;
+      justify-content: center; gap: 5px;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .topnav__hamburger span {
+      display: block; height: 2px; width: 20px;
+      background: #374151; border-radius: 2px; margin: 0 auto;
+    }
+
+    .topnav__logo {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .topnav__logo-mark {
+      width: 34px; height: 34px; border-radius: 6px;
+      background: #0e1a4a;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; color: #fff; letter-spacing: -1px;
+    }
+    .topnav__logo-name {
+      font-weight: 700; font-size: 17px; color: #0e1a4a; letter-spacing: -0.3px;
+    }
+    .badge-delivery {
+      background: #22c55e; color: #fff;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+    }
+
+    .topnav__divider { width: 1px; height: 24px; background: #e5e7eb; flex-shrink: 0; }
+
+    /* Search area */
+    .topnav__search {
+      display: flex; align-items: center; gap: 0; flex: 0 1 460px;
+    }
+    .search-type {
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 12px; height: 36px;
+      border: 1px solid #d1d5db; border-right: none;
+      border-radius: 6px 0 0 6px;
+      background: #f9fafb; cursor: pointer;
+      font-size: 13px; color: #374151; white-space: nowrap;
+    }
+    .search-type svg { width: 12px; height: 12px; fill: #9ca3af; }
+    .search-filter-icon { width: 14px; height: 14px; color: #6366f1; }
+    .search-input-wrap {
+      flex: 1; display: flex; align-items: center;
+      border: 1px solid #d1d5db; border-left: none; border-right: none;
+      background: #fff; height: 36px; padding: 0 10px; gap: 6px;
+    }
+    .search-input-wrap svg { width: 14px; height: 14px; color: #9ca3af; flex-shrink: 0; }
+    .search-input-wrap input {
+      border: none; outline: none; font-size: 13px; color: #374151;
+      width: 100%; background: transparent;
+    }
+    .search-clear {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #9ca3af; color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+    }
+    .btn-search {
+      height: 36px; padding: 0 18px;
+      background: #fff; border: 1px solid #d1d5db; border-left: none;
+      border-radius: 0 6px 6px 0; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: #374151;
+      white-space: nowrap;
+    }
+    .btn-search:hover { background: #f3f4f6; }
+
+    .topnav__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .btn-export {
+      height: 34px; display: flex; align-items: center; gap: 6px;
+      padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; cursor: pointer; font-size: 13px; color: #374151;
+      white-space: nowrap;
+    }
+    .btn-export:hover { background: #f3f4f6; }
+    .excel-icon {
+      width: 18px; height: 18px; background: #22863a; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 9px; font-weight: 700;
+    }
+    .btn-export .caret {
+      width: 1px; height: 16px; background: #d1d5db; margin: 0 4px;
+    }
+    .btn-export .caret-arrow {
+      width: 0; height: 0;
+      border-left: 4px solid transparent; border-right: 4px solid transparent;
+      border-top: 5px solid #9ca3af;
+    }
+
+    .btn-basket {
+      height: 34px; display: flex; align-items: center; gap: 6px;
+      padding: 0 14px; border: none; border-radius: 6px;
+      background: #3b82f6; cursor: pointer; font-size: 13px;
+      font-weight: 500; color: #fff; white-space: nowrap;
+    }
+    .btn-basket:hover { background: #2563eb; }
+    .basket-count {
+      background: #bfdbfe; color: #1d4ed8;
+      font-size: 11px; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px;
+    }
+
+    .btn-icon {
+      width: 34px; height: 34px; border: 1px solid #e5e7eb;
+      border-radius: 6px; background: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #6b7280;
+    }
+    .btn-icon:hover { background: #f3f4f6; }
+    .btn-icon svg { width: 16px; height: 16px; }
+
+    .avatar {
+      width: 34px; height: 34px; border-radius: 6px;
+      background: #0e1a4a; display: flex; align-items: center;
+      justify-content: center; color: #fff; font-weight: 600;
+      font-size: 14px; cursor: pointer; flex-shrink: 0;
+    }
+
+    /* ── PAGE LAYOUT ─────────────────────────────────────── */
+    .page {
+      padding: 24px 28px;
+      max-width: 1440px;
+    }
+
+    /* Page header */
+    .page-header {
+      display: flex; align-items: center; margin-bottom: 18px;
+    }
+    .page-title { font-size: 22px; font-weight: 700; color: #0e1a4a; }
+
+    .page-header__controls {
+      margin-left: auto; display: flex; align-items: center; gap: 8px;
+    }
+
+    .btn-filter {
+      height: 32px; display: flex; align-items: center; gap: 6px;
+      padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; cursor: pointer; font-size: 12px; color: #374151;
+    }
+    .btn-filter:hover { background: #f3f4f6; }
+    .filter-icon { font-size: 12px; }
+    .filter-badge {
+      background: #ede9fe; color: #7c3aed;
+      font-size: 11px; font-weight: 600;
+      padding: 1px 5px; border-radius: 8px;
+    }
+    .filter-x {
+      font-size: 11px; color: #9ca3af; cursor: pointer;
+    }
+
+    .btn-views {
+      height: 32px; display: flex; align-items: center; gap: 6px;
+      padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; cursor: pointer; font-size: 12px; color: #374151;
+    }
+    .views-bars {
+      display: flex; align-items: flex-end; gap: 2px;
+    }
+    .views-bars span {
+      display: block; width: 3px; background: #9ca3af; border-radius: 1px;
+    }
+
+    .view-toggle {
+      display: flex; border: 1px solid #d1d5db; border-radius: 6px;
+      overflow: hidden; height: 32px;
+    }
+    .view-toggle__btn {
+      padding: 0 14px; border: none; background: #fff; cursor: pointer;
+      font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 5px;
+    }
+    .view-toggle__btn--active {
+      background: #dcfce7; color: #166534; font-weight: 600;
+    }
+    .view-toggle__btn:not(:last-child) { border-right: 1px solid #d1d5db; }
+    .view-toggle__btn .checkmark { color: #16a34a; font-size: 12px; }
+
+    /* ── TABLE ───────────────────────────────────────────── */
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; white-space: nowrap;
+    }
+
+    /* Group header row */
+    thead tr.group-row th {
+      background: #fff;
+      padding: 10px 12px 0;
+      font-size: 11px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: none; text-align: left;
+    }
+    thead tr.group-row th.group-label {
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 4px;
+    }
+
+    /* Column header row */
+    thead tr.col-row th {
+      background: #fff;
+      padding: 8px 12px;
+      font-size: 12px; font-weight: 600; color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left; cursor: pointer;
+      user-select: none;
+    }
+    thead tr.col-row th:hover { background: #f9fafb; }
+
+    .col-sort {
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .sort-icon { font-size: 10px; color: #9ca3af; }
+
+    /* Body rows */
+    tbody tr { border-bottom: 1px solid #f3f4f6; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f9fafb; }
+
+    tbody td {
+      padding: 10px 12px;
+      font-size: 13px; color: #374151;
+      vertical-align: middle;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 12px;
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+    }
+    .badge-icon { font-size: 11px; }
+
+    .badge--acknowledged { background: #f3f4f6; color: #374151; }
+    .badge--awaiting    { background: #dbeafe; color: #1d4ed8; }
+    .badge--error       { background: #fee2e2; color: #dc2626; }
+    .badge--planned     { background: #f3f4f6; color: #6b7280; }
+    .badge--submitted   { background: #e0f2fe; color: #0369a1; }
+    .badge--multi       { background: #f3e8ff; color: #7c3aed; }
+    .badge--confirmed   { background: #dcfce7; color: #16a34a; }
+    .badge--cancelled   { background: #fef9c3; color: #a16207; }
+    .badge--delivered   { background: #f3f4f6; color: #6b7280; }
+
+    /* Priority icon */
+    .priority-icon {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .priority-high   { background: #fee2e2; }
+    .priority-medium { background: #fef3c7; }
+    .priority-low    { background: #e5e7eb; }
+
+    /* Rebook flag */
+    .rebook-flag {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .rebook-active   { background: #fee2e2; }
+    .rebook-inactive { background: #e5e7eb; }
+
+    /* Count badge */
+    .count-badge {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #f3f4f6; border: 1px solid #e5e7eb;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #374151;
+    }
+
+    .consignment-link { color: #2563eb; text-decoration: none; }
+    .consignment-link:hover { text-decoration: underline; }
+
+    /* ── PAGINATION ──────────────────────────────────────── */
+    .pagination-bar {
+      display: flex; align-items: center;
+      padding: 14px 20px;
+      border-top: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      gap: 4px;
+    }
+
+    .pg-btn {
+      width: 30px; height: 30px; border: 1px solid #e5e7eb;
+      border-radius: 5px; background: #fff; cursor: pointer;
+      font-size: 13px; color: #374151;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pg-btn:hover { background: #f3f4f6; }
+    .pg-btn--active {
+      background: #3b82f6; color: #fff;
+      border-color: #3b82f6;
+    }
+    .pg-dots { padding: 0 4px; color: #9ca3af; font-size: 13px; }
+
+    .show-entries {
+      margin-left: auto; display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #6b7280;
+    }
+    .show-select {
+      height: 30px; padding: 0 28px 0 10px;
+      border: 1px solid #d1d5db; border-radius: 5px;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E") no-repeat right 8px center;
+      appearance: none; font-size: 13px; color: #374151; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── SIDE NAV BACKDROP ───────────────────── -->
+  <div class="sidenav-backdrop" id="sidenavBackdrop"></div>
+
+  <!-- ── SIDE NAV PANEL ───────────────────────── -->
+  <aside class="sidenav" id="sidenav" role="navigation" aria-label="Main navigation">
+
+    <!-- Top bar -->
+    <div class="sidenav__topbar">
+      <button class="sidenav__close" id="sidenavClose" aria-label="Close navigation">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M10 3L5 8l5 5"/>
+        </svg>
+      </button>
+      <div class="sidenav__logo">
+        <div class="sidenav__logo-mark">li</div>
+        <span class="sidenav__logo-text">ligentix<span>™</span></span>
+      </div>
+    </div>
+
+    <!-- Supplier -->
+    <button class="sidenav__item">
+      <div class="sidenav__icon-cell">
+        <svg class="sidenav__icon--dim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13"/>
+          <path d="M4 19a2 2 0 002 2h12a2 2 0 002-2"/>
+          <path d="M8 10h8M8 14h5"/>
+        </svg>
+      </div>
+      <span class="sidenav__label">Supplier</span>
+      <div class="sidenav__chevron">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4l5 6 5-6"/></svg>
+      </div>
+    </button>
+
+    <!-- Shipping -->
+    <button class="sidenav__item">
+      <div class="sidenav__icon-cell">
+        <svg class="sidenav__icon--lit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7h18M3 12h18M3 17h12"/>
+          <path d="M18 14l3 3-3 3"/>
+        </svg>
+      </div>
+      <span class="sidenav__label">Shipping</span>
+      <div class="sidenav__chevron">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4l5 6 5-6"/></svg>
+      </div>
+    </button>
+
+    <!-- Delivery (badge: 4) -->
+    <button class="sidenav__item">
+      <div class="sidenav__icon-cell">
+        <svg class="sidenav__icon--dim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h4l3 4v4h-7V8z"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+        <span class="sidenav__badge">4</span>
+      </div>
+      <span class="sidenav__label">Delivery</span>
+      <div class="sidenav__chevron">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4l5 6 5-6"/></svg>
+      </div>
+    </button>
+
+    <!-- Settings -->
+    <a href="client-settings.html" class="sidenav__item">
+      <div class="sidenav__icon-cell">
+        <svg class="sidenav__icon--lit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="7" r="3"/><circle cx="16" cy="10" r="2.5"/>
+          <path d="M3 20c0-3.3 2.7-6 6-6h2"/>
+          <path d="M16 16v6M13 19h6"/>
+        </svg>
+      </div>
+      <span class="sidenav__label">Settings</span>
+    </a>
+
+    <!-- Ligentix Classic -->
+    <button class="sidenav__item">
+      <div class="sidenav__icon-cell">
+        <svg class="sidenav__icon--lit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+          <path d="M12 6v6l4 2"/>
+          <path d="M9 3.5S7 6 7 8M15 3.5S17 6 17 8"/>
+        </svg>
+      </div>
+      <span class="sidenav__label">Ligentix Classic</span>
+    </button>
+
+  </aside>
+
+  <!-- ── TOP NAV ──────────────────────────────── -->
+  <nav class="topnav">
+    <!-- Hamburger -->
+    <div class="topnav__hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+
+    <!-- Logo -->
+    <div class="topnav__logo">
+      <div class="topnav__logo-mark">li</div>
+      <span class="topnav__logo-name">ligentix</span>
+      <span class="badge-delivery">Delivery</span>
+    </div>
+
+    <div class="topnav__divider"></div>
+
+    <!-- Search -->
+    <div class="topnav__search">
+      <div class="search-type">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:none;stroke:#6366f1;stroke-width:1.5">
+          <path d="M2 4h12M4 8h8M6 12h4" stroke-linecap="round"/>
+        </svg>
+        Purchase order
+        <svg viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#9ca3af"/></svg>
+      </div>
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" value="P123456789, P987654321" />
+        <button class="search-clear">✕</button>
+      </div>
+      <button class="btn-search">Search</button>
+    </div>
+
+    <!-- Right actions -->
+    <div class="topnav__actions">
+      <button class="btn-export">
+        <div class="excel-icon">X</div>
+        Export Excel
+        <div class="caret"></div>
+        <div class="caret-arrow"></div>
+      </button>
+
+      <button class="btn-basket">
+        Booking basket
+        <span class="basket-count">1</span>
+      </button>
+
+      <button class="btn-icon" aria-label="Settings">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="10" cy="10" r="3"/>
+          <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+
+      <div class="avatar" role="button" aria-label="User profile">U</div>
+    </div>
+  </nav>
+
+  <!-- ── PAGE CONTENT ─────────────────────────── -->
+  <div class="page">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <h1 class="page-title">Booking</h1>
+
+      <div class="page-header__controls">
+        <!-- Filters -->
+        <button class="btn-filter">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#7c3aed" stroke-width="1.5">
+            <path d="M1 3h12M3 7h8M5 11h4" stroke-linecap="round"/>
+          </svg>
+          Filters
+          <span class="filter-badge">1</span>
+          <span class="filter-x">✕</span>
+        </button>
+
+        <!-- Views -->
+        <button class="btn-views">
+          <div class="views-bars">
+            <span style="height:8px"></span>
+            <span style="height:12px"></span>
+            <span style="height:6px"></span>
+            <span style="height:10px"></span>
+          </div>
+          Views
+          <svg width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="#9ca3af"/></svg>
+        </button>
+
+        <!-- List / Calendar toggle -->
+        <div class="view-toggle">
+          <button class="view-toggle__btn view-toggle__btn--active">
+            <span class="checkmark">✓</span> List
+          </button>
+          <button class="view-toggle__btn">Calendar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <!-- Group labels -->
+          <tr class="group-row">
+            <th colspan="3" class="group-label">Party</th>
+            <th colspan="2" class="group-label">Status</th>
+            <th colspan="1" class="group-label">Priority</th>
+            <th colspan="3" class="group-label">Rebook</th>
+            <th colspan="1" class="group-label">Consignment</th>
+          </tr>
+          <!-- Column headers -->
+          <tr class="col-row">
+            <th><span class="col-sort">Customer <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Branch <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Legal entity <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Category <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Status <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Priority <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Rebook <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Reason <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Count <span class="sort-icon">⇅</span></span></th>
+            <th><span class="col-sort">Consignment <span class="sort-icon">⇅</span></span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <button class="pg-btn">«</button>
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn">1</button>
+        <button class="pg-btn pg-btn--active">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">4</button>
+        <button class="pg-btn">5</button>
+        <span class="pg-dots">…</span>
+        <button class="pg-btn">12</button>
+        <button class="pg-btn">›</button>
+        <button class="pg-btn">»</button>
+
+        <div class="show-entries">
+          Show
+          <select class="show-select">
+            <option>10</option>
+            <option>25</option>
+            <option selected>50</option>
+            <option>100</option>
+          </select>
+          entries
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const rows = [
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'acknowledged', priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'awaiting',    priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'error',       priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'planned',     priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'submitted',   priority: 'high',   rebook: true,  reason: 'I am a reason right here of suitable length', count: 1,     cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'multi',       priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'confirmed',   priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'cancelled',   priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'awaiting',    priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'submitted',   priority: 'high',   rebook: true,  reason: 'I am a reason right here of suitable length', count: 1,     cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'awaiting',    priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'delivered',   priority: 'low',    rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'delivered',   priority: 'low',    rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'confirmed',   priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'confirmed',   priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: 1,     cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'error',       priority: 'high',   rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+      { customer: 'Boohoo', branch: 'LBA', legal: 'Pretty little things', category: 'Consignment', status: 'confirmed',   priority: 'medium', rebook: false, reason: 'I am a reason right here of suitable length', count: null,  cons: 'BMOU668...' },
+    ];
+
+    const statusMeta = {
+      acknowledged: { label: 'Acknowledged', cls: 'badge--acknowledged', icon: '' },
+      awaiting:     { label: 'Awaiting booking', cls: 'badge--awaiting', icon: '' },
+      error:        { label: 'Error', cls: 'badge--error', icon: '⚠' },
+      planned:      { label: 'Planned', cls: 'badge--planned', icon: '' },
+      submitted:    { label: 'Submitted', cls: 'badge--submitted', icon: '🔒' },
+      multi:        { label: 'Multi', cls: 'badge--multi', icon: '📋' },
+      confirmed:    { label: 'Confirmed', cls: 'badge--confirmed', icon: '' },
+      cancelled:    { label: 'Cancelled', cls: 'badge--cancelled', icon: '' },
+      delivered:    { label: 'Delivered', cls: 'badge--delivered', icon: '' },
+    };
+
+    const priorityMeta = {
+      high:   { cls: 'priority-high',   icon: '▲' },
+      medium: { cls: 'priority-medium', icon: '▲' },
+      low:    { cls: 'priority-low',    icon: '▲' },
+    };
+
+    function buildTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = rows.map(row => {
+        const sm = statusMeta[row.status];
+        const pm = priorityMeta[row.priority];
+        return `<tr>
+          <td>${row.customer}</td>
+          <td>${row.branch}</td>
+          <td>${row.legal}</td>
+          <td>${row.category}</td>
+          <td>
+            <span class="badge ${sm.cls}">
+              ${sm.icon ? `<span class="badge-icon">${sm.icon}</span>` : ''}
+              ${sm.label}
+            </span>
+          </td>
+          <td>
+            <div class="priority-icon ${pm.cls}">${pm.icon}</div>
+          </td>
+          <td>
+            <div class="rebook-flag ${row.rebook ? 'rebook-active' : 'rebook-inactive'}">⚑</div>
+          </td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${row.reason}</td>
+          <td>${row.count !== null ? `<div class="count-badge">${row.count}</div>` : ''}</td>
+          <td><a class="consignment-link" href="#">${row.cons}</a></td>
+        </tr>`;
+      }).join('');
+    }
+
+    buildTable();
+
+    // ── Side nav toggle ───────────────────────────────────
+    const sidenav   = document.getElementById('sidenav');
+    const backdrop  = document.getElementById('sidenavBackdrop');
+    const hamburger = document.querySelector('.topnav__hamburger');
+    const closeBtn  = document.getElementById('sidenavClose');
+
+    function openNav()  { sidenav.classList.add('is-open');  backdrop.classList.add('is-open');  }
+    function closeNav() { sidenav.classList.remove('is-open'); backdrop.classList.remove('is-open'); }
+
+    hamburger.addEventListener('click', openNav);
+    closeBtn .addEventListener('click', closeNav);
+    backdrop .addEventListener('click', closeNav);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
+  </script>
+</body>
+</html>
