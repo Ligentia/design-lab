@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  githubOwner: 'dshyone',
+  githubOwner: 'Ligentia',
   githubRepo: 'design-lab',
   githubBranch: 'main',
 };
