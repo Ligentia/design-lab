@@ -1,5 +1,17 @@
 [
   {
+    "id": "loading-animation",
+    "title": "Loading animation",
+    "description": "",
+    "creator": "Adrian",
+    "date": "2026-06-17",
+    "tags": [
+      "animation"
+    ],
+    "folder": "prototypes/loading-animation",
+    "updatedAt": "2026-06-17"
+  },
+  {
     "id": "boking",
     "title": "Boking",
     "description": "",
