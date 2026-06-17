@@ -146,8 +146,10 @@ export class DashboardComponent implements OnInit {
       console.error('Save failed', err);
       const status = (err as any)?.status;
       const msg = (err as any)?.error?.message ?? (err as any)?.message ?? 'Unknown error';
-      if (status === 401 || status === 403) {
-        this.modalError.set('GitHub rejected the request — your PAT may be expired or missing the "Contents: write" permission. Re-enter it below.');
+      if (status === 401 || status === 403 || status === 404) {
+        // GitHub's Contents API returns 404 (not 403) when a token can't write to
+        // the repo, so treat it as a permission problem and prompt for a new token.
+        this.modalError.set(`GitHub rejected the request (${status}). Your token is likely expired, missing the "Contents: write" permission, or has no access to this repository. Re-enter a valid token below.`);
         this.svc.clearPat();
       } else {
         this.modalError.set(`Save failed (${status ?? 'network error'}): ${msg}`);
