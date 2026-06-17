@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Prototype, CREATORS } from '../../core/models/prototype.model';
@@ -37,7 +37,7 @@ const PAT_KEY = 'dl_github_pat';
             </label>
             <div
               class="drop-zone"
-              [class.has-file]="uploadedFiles.length > 0"
+              [class.has-file]="processing || uploadedFiles.length > 0"
               (dragover)="$event.preventDefault()"
               (drop)="onDrop($event)"
               (click)="fileInput.click()"
@@ -49,7 +49,13 @@ const PAT_KEY = 'dl_github_pat';
                 style="display:none"
                 (change)="onFileSelected($event)"
               />
-              <ng-container *ngIf="uploadedFiles.length === 0">
+              <ng-container *ngIf="processing">
+                <svg class="spin-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+                <p class="drop-filename">Adding file…</p>
+              </ng-container>
+              <ng-container *ngIf="!processing && uploadedFiles.length === 0">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
@@ -58,7 +64,7 @@ const PAT_KEY = 'dl_github_pat';
                 <p class="drop-label">Drop a ZIP or individual files, or <span class="drop-link">browse</span></p>
                 <p class="hint">CLAUDE.md will be included and stored with the prototype</p>
               </ng-container>
-              <ng-container *ngIf="uploadedFiles.length > 0">
+              <ng-container *ngIf="!processing && uploadedFiles.length > 0">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
@@ -337,6 +343,8 @@ export class AddPrototypeModalComponent implements OnInit {
   saving = false;
   errorMsg = '';
   uploadedFiles: { name: string; content: string }[] = [];
+  processing = false;
+  private cdr = inject(ChangeDetectorRef);
 
   // Tag dropdown state
   dropdownOpen = false;
@@ -467,23 +475,32 @@ export class AddPrototypeModalComponent implements OnInit {
   }
 
   private async processFiles(files: File[]) {
-    if (files.length === 1 && files[0].name.endsWith('.zip')) {
-      const JSZip = (await import('jszip')).default;
-      const zip = await JSZip.loadAsync(files[0]);
-      const result: { name: string; content: string }[] = [];
-      for (const [name, entry] of Object.entries(zip.files)) {
-        if (entry.dir || name.includes('__MACOSX') || name.startsWith('.')) continue;
-        const basename = name.split('/').filter(s => s.length > 0).pop()!;
-        result.push({ name: basename, content: await entry.async('base64') });
+    // Zoneless: this synchronous flag flips with the triggering event's CD pass,
+    // giving immediate "Adding file…" feedback before the async reads below.
+    this.processing = true;
+    try {
+      if (files.length === 1 && files[0].name.endsWith('.zip')) {
+        const JSZip = (await import('jszip')).default;
+        const zip = await JSZip.loadAsync(files[0]);
+        const result: { name: string; content: string }[] = [];
+        for (const [name, entry] of Object.entries(zip.files)) {
+          if (entry.dir || name.includes('__MACOSX') || name.startsWith('.')) continue;
+          const basename = name.split('/').filter(s => s.length > 0).pop()!;
+          result.push({ name: basename, content: await entry.async('base64') });
+        }
+        this.uploadedFiles = result;
+      } else {
+        const result: { name: string; content: string }[] = [];
+        for (const file of files) {
+          const name = file.name.endsWith('.html') ? 'index.html' : file.name;
+          result.push({ name, content: await this.toBase64(file) });
+        }
+        this.uploadedFiles = result;
       }
-      this.uploadedFiles = result;
-    } else {
-      const result: { name: string; content: string }[] = [];
-      for (const file of files) {
-        const name = file.name.endsWith('.html') ? 'index.html' : file.name;
-        result.push({ name, content: await this.toBase64(file) });
-      }
-      this.uploadedFiles = result;
+    } finally {
+      this.processing = false;
+      // The reads above resolve outside any event, so nudge zoneless CD to render the result.
+      this.cdr.markForCheck();
     }
   }
 
