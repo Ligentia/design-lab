@@ -74,7 +74,11 @@ export class AssetService {
     const updated = [asset, ...this._assets()];
     return new Promise<void>((resolve, reject) => {
       this.github.saveAssets(updated, this._sha(), pat).subscribe({
-        next: () => { this._assets.set(updated); resolve(); },
+        next: (res: any) => {
+          this._assets.set(updated);
+          if (res?.content?.sha) this._sha.set(res.content.sha);
+          resolve();
+        },
         error: reject,
       });
     });
@@ -84,7 +88,11 @@ export class AssetService {
     const list = this._assets().map((a) => (a.id === updated.id ? updated : a));
     return new Promise<void>((resolve, reject) => {
       this.github.saveAssets(list, this._sha(), pat).subscribe({
-        next: () => { this._assets.set(list); resolve(); },
+        next: (res: any) => {
+          this._assets.set(list);
+          if (res?.content?.sha) this._sha.set(res.content.sha);
+          resolve();
+        },
         error: reject,
       });
     });
