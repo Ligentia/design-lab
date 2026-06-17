@@ -97,7 +97,7 @@ import { environment } from '../../../environments/environment';
                 <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
                 <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
               </svg>
-              {{ copied ? 'Link copied!' : 'Copy shareable link' }}
+              {{ copied() ? 'Link copied!' : 'Copy shareable link' }}
             </button>
             <button class="btn-secondary" *ngIf="!iframeError" (click)="download(p)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -171,7 +171,7 @@ export class PrototypeDetailComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   proto = signal<Prototype | null>(null);
-  copied = false;
+  copied = signal(false);
   iframeError = false;
   private _urlCache = new Map<string, SafeResourceUrl>();
 
@@ -233,8 +233,8 @@ export class PrototypeDetailComponent implements OnInit {
   copyShareLink() {
     const id = this.route.snapshot.paramMap.get('id');
     navigator.clipboard.writeText(`${window.location.origin}/prototype/${id}`).then(() => {
-      this.copied = true;
-      setTimeout(() => (this.copied = false), 2000);
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
     });
   }
 }

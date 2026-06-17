@@ -42,7 +42,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
             <rect x="9" y="9" width="13" height="13" rx="2"/>
             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
           </svg>
-          {{ pathCopied ? 'Copied!' : 'Copy path' }}
+          {{ pathCopied() ? 'Copied!' : 'Copy path' }}
         </button>
         <a class="action-btn" [href]="rawUrl()" target="_blank" rel="noopener" title="Download">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -95,7 +95,7 @@ export class AssetCardComponent implements OnInit {
   private http = inject(HttpClient);
   private sanitizer = inject(DomSanitizer);
   svgContent = signal<SafeHtml | null>(null);
-  pathCopied = false;
+  pathCopied = signal(false);
 
   ngOnInit() {
     if (this.asset.type === 'svg') {
@@ -112,8 +112,8 @@ export class AssetCardComponent implements OnInit {
 
   copyPath() {
     navigator.clipboard.writeText(this.asset.file).then(() => {
-      this.pathCopied = true;
-      setTimeout(() => (this.pathCopied = false), 2000);
+      this.pathCopied.set(true);
+      setTimeout(() => this.pathCopied.set(false), 2000);
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AssetService } from '../../core/services/asset.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -53,8 +53,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     </div>
 
     <dl-add-asset-modal
-      *ngIf="showModal"
-      [editing]="editingAsset"
+      *ngIf="showModal()"
+      [editing]="editingAsset()"
       (saved)="onSaved($event)"
       (cancel)="closeModal()"
     />
@@ -76,8 +76,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class AssetsComponent implements OnInit {
   svc = inject(AssetService);
   private ui = inject(UiStateService);
-  showModal = false;
-  editingAsset: Asset | null = null;
+  // Signals (not plain props): openAdd() runs from the triggerAdd$ subscription,
+  // which originates outside this OnPush component, so a plain mutation would be
+  // invisible to change detection until the next event. Mirrors DashboardComponent.
+  showModal = signal(false);
+  editingAsset = signal<Asset | null>(null);
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -85,13 +88,13 @@ export class AssetsComponent implements OnInit {
 
   ngOnInit() { this.svc.load(); }
 
-  openAdd() { this.editingAsset = null; this.showModal = true; }
-  openEdit(a: Asset) { this.editingAsset = a; this.showModal = true; }
-  closeModal() { this.showModal = false; this.editingAsset = null; }
+  openAdd() { this.editingAsset.set(null); this.showModal.set(true); }
+  openEdit(a: Asset) { this.editingAsset.set(a); this.showModal.set(true); }
+  closeModal() { this.showModal.set(false); this.editingAsset.set(null); }
 
   async onSaved({ asset, pat }: { asset: Asset; pat: string }) {
     try {
-      if (this.editingAsset) {
+      if (this.editingAsset()) {
         await this.svc.updateAsset(asset, pat);
       } else {
         await this.svc.addAsset(asset, pat);

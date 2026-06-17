@@ -56,12 +56,12 @@ import { PrototypeService } from '../../core/services/prototype.service';
 
       <div class="actions" (click)="$event.stopPropagation()">
         <ng-container *ngIf="!isArchived">
-          <button class="action-btn" [attr.data-tooltip]="copied ? 'Copied!' : 'Copy link'" (click)="copyLink()">
-            <svg *ngIf="!copied" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="action-btn" [attr.data-tooltip]="copied() ? 'Copied!' : 'Copy link'" (click)="copyLink()">
+            <svg *ngIf="!copied()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
               <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
             </svg>
-            <svg *ngIf="copied" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--color-accent)">
+            <svg *ngIf="copied()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--color-accent)">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </button>
@@ -262,7 +262,7 @@ export class PrototypeCardComponent implements AfterViewInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private svc = inject(PrototypeService);
 
-  copied = false;
+  copied = signal(false);
   showPlaceholder = signal(false);
   scale = signal(0.25);
 
@@ -310,8 +310,8 @@ export class PrototypeCardComponent implements AfterViewInit, OnDestroy {
   copyLink() {
     const url = `${window.location.origin}/prototype/${this.prototype.id}`;
     navigator.clipboard.writeText(url).then(() => {
-      this.copied = true;
-      setTimeout(() => (this.copied = false), 2000);
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
     });
   }
 }
