@@ -55,6 +55,8 @@ export class AssetService {
     });
   }
 
+  clearPat() { sessionStorage.removeItem('dl_github_pat'); }
+
   setSearch(q: string) { this._search.set(q); }
 
   toggleType(type: string) {

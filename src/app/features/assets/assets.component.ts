@@ -55,6 +55,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     <dl-add-asset-modal
       *ngIf="showModal()"
       [editing]="editingAsset()"
+      [externalError]="modalError()"
       (saved)="onSaved($event)"
       (cancel)="closeModal()"
     />
@@ -81,6 +82,7 @@ export class AssetsComponent implements OnInit {
   // invisible to change detection until the next event. Mirrors DashboardComponent.
   showModal = signal(false);
   editingAsset = signal<Asset | null>(null);
+  modalError = signal('');
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -88,9 +90,9 @@ export class AssetsComponent implements OnInit {
 
   ngOnInit() { this.svc.load(); }
 
-  openAdd() { this.editingAsset.set(null); this.showModal.set(true); }
-  openEdit(a: Asset) { this.editingAsset.set(a); this.showModal.set(true); }
-  closeModal() { this.showModal.set(false); this.editingAsset.set(null); }
+  openAdd() { this.editingAsset.set(null); this.modalError.set(''); this.showModal.set(true); }
+  openEdit(a: Asset) { this.editingAsset.set(a); this.modalError.set(''); this.showModal.set(true); }
+  closeModal() { this.showModal.set(false); this.editingAsset.set(null); this.modalError.set(''); }
 
   async onSaved({ asset, pat }: { asset: Asset; pat: string }) {
     try {
@@ -100,8 +102,18 @@ export class AssetsComponent implements OnInit {
         await this.svc.addAsset(asset, pat);
       }
       this.closeModal();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Save failed', err);
+      const status = (err as any)?.status;
+      const msg = (err as any)?.error?.message ?? (err as any)?.message ?? 'Unknown error';
+      if (status === 401 || status === 403 || status === 404) {
+        // GitHub's Contents API returns 404 (not 403) when a token can't write to
+        // the repo, so treat it as a permission problem and prompt for a new token.
+        this.modalError.set(`GitHub rejected the request (${status}). Your token is likely expired, missing the "Contents: write" permission, or has no access to this repository. Re-enter a valid token below.`);
+        this.svc.clearPat();
+      } else {
+        this.modalError.set(`Save failed (${status ?? 'network error'}): ${msg}`);
+      }
     }
   }
 }

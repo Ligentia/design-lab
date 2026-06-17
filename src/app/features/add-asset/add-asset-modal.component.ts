@@ -115,6 +115,16 @@ const ALL_CREATORS = CREATORS;
 })
 export class AddAssetModalComponent implements OnInit {
   @Input() editing: Asset | null = null;
+  @Input() set externalError(msg: string) {
+    if (msg) {
+      this.saving = false;
+      this.errorMsg = msg;
+      if (msg.includes('PAT') || msg.includes('expired') || msg.includes('permission')) {
+        this.pat = '';
+        this.showPatPrompt = true;
+      }
+    }
+  }
   @Output() saved = new EventEmitter<{ asset: Asset; pat: string }>();
   @Output() cancel = new EventEmitter<void>();
 
