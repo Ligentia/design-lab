@@ -75,8 +75,12 @@ Asset     { id, name, type, description, file, tags?, addedBy, date }
 - `pointer-events: none` on the scale wrapper lets card clicks pass through to the router navigation.
 - Cards with no `index.html` show a placeholder icon (same shell detection as the detail page).
 
-## OnPush + signals pattern
-All state that is mutated from RxJS subscriptions (e.g. `showModal`, `editingPrototype` in DashboardComponent) must be Angular signals, not plain properties. Plain property mutations are invisible to OnPush change detection until the next event cycle.
+## Zoneless change detection — signals for anything mutated outside a sync event
+The app runs **zoneless** (no `zone.js` dependency). Change detection only runs on (a) the synchronous portion of a template event handler, (b) signal changes, or (c) an explicit `ChangeDetectorRef.markForCheck()`. Therefore **any state read in a template that is mutated outside a synchronous event handler must be an Angular signal** (or be followed by `markForCheck()`), or the view goes stale until the next unrelated event. This bites in four recurring places:
+- **RxJS subscriptions** — e.g. `showModal`/`editingAsset` set from the `triggerAdd$` subject (the trigger originates in the header, outside the tab component). Use signals (see DashboardComponent, AssetsComponent).
+- **`async` handlers after the first `await`** — e.g. the add-prototype file drop reads files via `FileReader`/`JSZip`; the assignment lands after CD has already run. Signal or `markForCheck()` (AddPrototypeModalComponent uses `markForCheck()`).
+- **Promise callbacks** — e.g. `navigator.clipboard.writeText().then(() => copied.set(true))` for the "Copied!" indicators. Signal.
+- **Timers / direct route loads** — `setTimeout`/`setInterval` callbacks, and route components must call `svc.load()` in `ngOnInit` (a deep-link refresh boots straight into that component; nothing else loads the data).
 
 ## Creators
 Current list in `src/app/core/models/prototype.model.ts`: Craig, Chuka, Adrian.
