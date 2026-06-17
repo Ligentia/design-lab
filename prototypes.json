@@ -1,5 +1,17 @@
 [
   {
+    "id": "loading-animation-with-depot-run-game",
+    "title": "Loading animation with 'depot run' game",
+    "description": "",
+    "creator": "Adrian",
+    "date": "2026-06-17",
+    "tags": [
+      "animation"
+    ],
+    "folder": "prototypes/loading-animation-with-depot-run-game",
+    "updatedAt": "2026-06-17"
+  },
+  {
     "id": "loading-animation",
     "title": "Loading animation",
     "description": "",
