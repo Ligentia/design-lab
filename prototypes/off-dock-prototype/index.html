@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ligentix – Delivery Module</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;background:#f0f2f5;color:#1a1a2e;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── Topbar ── */
+.topbar{background:#fff;border-bottom:1px solid #e2e5ea;padding:0 16px;height:44px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:8px;}
+.logo-text{font-size:15px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;}
+.logo-text span{color:#185FA5;}
+.logo-badge{background:#e63946;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.topbar-search{display:flex;align-items:center;gap:6px;background:#f5f6f8;border:1px solid #e2e5ea;border-radius:6px;padding:4px 10px;width:180px;}
+.topbar-search input{border:none;background:transparent;font-size:11px;outline:none;width:100%;}
+.tbtn{background:#f5f6f8;border:1px solid #e2e5ea;border-radius:6px;padding:4px 10px;font-size:11px;color:#444;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.tbtn:hover{background:#e8eaef;}
+.tbtn-primary{background:#185FA5;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;}
+.tbtn-primary:hover{background:#124f8c;}
+.avatar{width:26px;height:26px;border-radius:50%;background:#185FA5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+
+/* ── Layout ── */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* ── Table panel ── */
+.table-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;min-width:0;}
+.page-header{padding:10px 16px 8px;border-bottom:1px solid #e2e5ea;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-title-row{display:flex;align-items:center;gap:10px;}
+.page-title{font-size:17px;font-weight:700;color:#1a1a2e;}
+.selection-pill{display:none;align-items:center;gap:6px;background:#EBF3FC;color:#185FA5;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;}
+.selection-pill.show{display:inline-flex;}
+.page-actions{display:flex;align-items:center;gap:6px;}
+.btn-bulk{background:#0F6E56;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:none;align-items:center;gap:5px;}
+.btn-bulk.show{display:flex;}
+.btn-bulk:hover{background:#0a5240;}
+.table-wrap{flex:1;overflow:auto;}
+
+/* ── Table ── */
+.tbl{width:100%;border-collapse:collapse;white-space:nowrap;}
+.tbl thead tr.grp th{padding:3px 8px;font-size:9px;font-weight:700;color:#fff;text-align:left;border-right:2px solid rgba(255,255,255,0.3);letter-spacing:0.4px;text-transform:uppercase;}
+.tbl thead tr.grp th.g-party{background:#4B5563;}
+.tbl thead tr.grp th.g-status{background:#374151;}
+.tbl thead tr.grp th.g-cons{background:#1E40AF;}
+.tbl thead tr.grp th.g-book{background:#1D4ED8;}
+.tbl thead tr.grp th.g-ship{background:#1E3A5F;}
+.tbl thead tr.grp th.g-rates{background:#374151;}
+.tbl thead tr.grp th.g-od{background:#065F46;}
+.tbl thead tr.col th{padding:5px 8px;font-size:10px;font-weight:600;color:#374151;background:#f8f9fb;border-bottom:2px solid #e2e5ea;border-right:1px solid #f0f2f5;cursor:pointer;user-select:none;}
+.tbl thead tr.col th:hover{background:#f0f2f5;}
+.tbl thead tr.col th.od-col{background:#ECFDF5;color:#065F46;}
+.tbl tbody tr{cursor:pointer;}
+.tbl tbody tr:hover td{background:#f8f9fb;}
+.tbl tbody tr.checked td{background:#EBF3FC;}
+.tbl td{padding:5px 8px;font-size:11px;color:#374151;border-bottom:1px solid #f0f2f5;border-right:1px solid #f8f9fb;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
+.tbl td.od-cell{background:#F0FDF4;}
+.tbl tr:hover td.od-cell{background:#DCFCE7;}
+.tbl tr.checked td.od-cell{background:#bbf7d0;}
+
+.status-pill{display:inline-flex;align-items:center;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700;white-space:nowrap;}
+.sp-awaiting{background:#185FA5;color:#fff;}
+.sp-booked{background:#15803d;color:#fff;}
+.sp-partial{background:#d97706;color:#fff;}
+
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.dot-green{background:#22c55e;}.dot-red{background:#ef4444;}
+
+.hbl-bar{display:flex;align-items:center;gap:4px;}
+.hbl-track{height:5px;border-radius:3px;background:#e2e5ea;width:24px;overflow:hidden;}
+.hbl-fill{height:5px;border-radius:3px;background:#185FA5;}
+.hbl-lbl{font-size:10px;color:#6b7280;}
+
+.od-badge{display:inline-flex;align-items:center;gap:3px;background:#D1FAE5;color:#065F46;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:600;}
+.od-empty{color:#d1d5db;}
+
+/* ── Pagination ── */
+.pagination{padding:7px 16px;background:#fff;border-top:1px solid #e2e5ea;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-info{font-size:11px;color:#6b7280;}
+.page-btns{display:flex;align-items:center;gap:3px;}
+.pbtn{width:24px;height:24px;border:1px solid #e2e5ea;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;background:#fff;color:#374151;}
+.pbtn:hover{background:#f5f6f8;}
+.pbtn.active{background:#185FA5;color:#fff;border-color:#185FA5;}
+.get-started-btn{background:#185FA5;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.gs-badge{background:rgba(255,255,255,0.25);border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700;}
+
+/* ── SIP shared ── */
+.sip{width:0;flex-shrink:0;background:#fff;border-left:1px solid #e2e5ea;display:flex;flex-direction:column;overflow:hidden;transition:width 0.22s ease;}
+.sip.open-single{width:490px;}
+.sip.open-bulk{width:980px;}
+.sip-header{padding:11px 14px 0;border-bottom:1px solid #e2e5ea;flex-shrink:0;}
+.sip-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sip-title{font-size:13px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:8px;}
+.sip-count-badge{font-size:10px;font-weight:600;color:#6b7280;background:#f0f2f5;border-radius:20px;padding:2px 8px;}
+.sip-icons{display:flex;align-items:center;gap:5px;}
+.ic{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.ic-blue{background:#EBF3FC;color:#185FA5;}.ic-green{background:#f0fdf4;color:#16a34a;}
+.icon-btn{background:none;border:none;cursor:pointer;color:#9299a5;padding:2px;display:flex;align-items:center;}
+.icon-btn:hover{color:#374151;}
+.sip-tabs{display:flex;}
+.sip-tab{font-size:11px;color:#6b7280;padding:6px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.sip-tab.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:600;}
+.sip-tab:hover:not(.active){color:#374151;}
+.sip-body{flex:1;overflow-y:auto;padding:13px 14px;}
+.sip-footer{border-top:1px solid #e2e5ea;padding:9px 14px;display:flex;align-items:center;justify-content:flex-end;background:#fff;flex-shrink:0;}
+
+/* ── Single SIP ── */
+.dcard{border:1px solid #e2e5ea;border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.dcard-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8f9fb;cursor:pointer;user-select:none;}
+.dcard-hdr-left{display:flex;align-items:center;gap:8px;}
+.dcard-label{font-size:12px;font-weight:600;color:#1a1a2e;}
+.awaiting-badge{font-size:10px;font-weight:600;background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:20px;}
+.booked-badge{font-size:10px;font-weight:600;background:#DCFCE7;color:#15803d;padding:2px 8px;border-radius:20px;}
+.chevron{color:#9299a5;font-size:13px;transition:transform 0.2s;display:inline-block;}
+.chevron.open{transform:rotate(180deg);}
+.dcard-body{padding:13px;}
+
+.form-row{display:flex;gap:9px;margin-bottom:10px;}
+.fg{flex:1;min-width:0;}
+.fg.full{width:100%;flex:none;}
+.flabel{display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;}
+.fctrl{width:100%;border:1px solid #d1d5db;border-radius:6px;padding:6px 9px;font-size:12px;color:#1a1a2e;background:#fff;display:flex;align-items:center;justify-content:space-between;cursor:pointer;min-height:31px;}
+.fctrl:hover{border-color:#9299a5;}
+.fctrl.focused{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.12);}
+.fctrl.error{border-color:#ef4444;box-shadow:0 0 0 2px rgba(239,68,68,0.12);}
+.fctrl.filled{border-color:#15803d;background:#f0fdf4;}
+.fctrl input[type="date"]{border:none;background:transparent;font-size:12px;color:#1a1a2e;outline:none;width:100%;font-family:inherit;cursor:pointer;}
+.fctrl input[type="text"]{border:none;background:transparent;font-size:12px;color:#1a1a2e;outline:none;width:100%;font-family:inherit;}
+.ph{color:#9299a5;font-size:12px;}
+.ferr{font-size:10px;color:#ef4444;margin-top:3px;display:none;}
+.ferr.show{display:block;}
+
+.act-row{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.btn-sm{display:inline-flex;align-items:center;gap:4px;border:1px solid #d1d5db;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:500;background:#fff;color:#374151;cursor:pointer;white-space:nowrap;}
+.btn-sm:hover{background:#f5f6f8;border-color:#9299a5;}
+.btn-sm-blue{border-color:#B5D4F4;background:#EBF3FC;color:#185FA5;}
+.btn-sm-blue:hover{background:#d0e6f8;}
+.btn-save{border:1px solid #d1d5db;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:500;background:#f5f6f8;color:#374151;cursor:pointer;margin-left:auto;}
+.btn-save:hover{background:#e8eaef;}
+
+.od-card{border:1px solid #B5D4F4;border-radius:8px;overflow:visible;margin-top:11px;display:none;}
+.od-card.show{display:block;}
+.od-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#EBF3FC;}
+.od-hdr-left{display:flex;align-items:center;gap:6px;}
+.od-title{font-size:11px;font-weight:700;color:#185FA5;}
+.od-remove{background:none;border:none;cursor:pointer;color:#9299a5;display:flex;align-items:center;padding:0;}
+.od-remove:hover{color:#ef4444;}
+.od-body{padding:13px;}
+.info-note{background:#FFF9E6;border:1px solid #FDE68A;border-radius:6px;padding:8px 10px;margin-bottom:11px;font-size:11px;color:#92400E;line-height:1.5;}
+
+.sdiv{border:none;border-top:1px solid #e2e5ea;margin:13px 0;}
+.complete-lbl{font-size:11px;color:#6b7280;margin-bottom:8px;}
+.complete-btns{display:flex;gap:8px;}
+.btn-basket{flex:1;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:8px 10px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn-basket:hover{background:#124f8c;}
+.btn-quick{flex:1;background:#0F6E56;color:#fff;border:none;border-radius:6px;padding:8px 10px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn-quick:hover{background:#0a5240;}
+
+/* ── Bulk SIP ── */
+.bulk-tabs{display:flex;border-bottom:1px solid #e2e5ea;margin-bottom:10px;}
+.bulk-tab{font-size:11px;color:#6b7280;padding:7px 12px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.bulk-tab.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:600;}
+.bulk-tab:hover:not(.active){color:#374151;}
+
+.bulk-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.bulk-tbl thead th{padding:6px 8px;font-size:10px;font-weight:700;color:#374151;background:#f8f9fb;border-bottom:2px solid #e2e5ea;text-align:left;border-right:1px solid #f0f2f5;white-space:nowrap;position:sticky;top:0;z-index:5;}
+.bulk-tbl thead th.th-od{background:#ECFDF5;color:#065F46;}
+.bulk-tbl thead th.th-deliv{background:#EBF3FC;color:#185FA5;}
+.bulk-tbl thead th.th-wpc{background:#FFF9E6;color:#92400E;}
+.bulk-tbl tbody td{padding:6px 8px;font-size:11px;color:#374151;border-bottom:1px solid #f0f2f5;border-right:1px solid #f8f9fb;vertical-align:middle;}
+.bulk-tbl td.td-od{background:#F0FDF4;}
+.bulk-tbl td.td-deliv{background:#EBF3FC;}
+.bulk-tbl td.td-wpc{background:#FFFBEB;}
+
+.confirmed{display:inline-flex;align-items:center;gap:4px;background:#15803d;color:#fff;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700;}
+.confirmed-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.6);}
+
+.idate{border:1px solid #d1d5db;border-radius:5px;padding:4px 6px;font-size:10px;color:#1a1a2e;background:#fff;cursor:pointer;font-family:inherit;outline:none;width:96px;}
+.idate:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.1);}
+.itime{border:1px solid #d1d5db;border-radius:5px;padding:4px 4px;font-size:10px;color:#1a1a2e;background:#fff;cursor:pointer;font-family:inherit;outline:none;width:62px;}
+.itime:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.1);}
+.idate.prefilled{border-color:#15803d;background:#f0fdf4;color:#15803d;font-weight:600;}
+.itime.prefilled{border-color:#15803d;background:#f0fdf4;color:#15803d;font-weight:600;}
+.idate.blue-fill{border-color:#185FA5;background:#EBF3FC;color:#185FA5;font-weight:600;}
+.itime.blue-fill{border-color:#185FA5;background:#EBF3FC;color:#185FA5;font-weight:600;}
+.idate.amber-fill{border-color:#d97706;background:#FFFBEB;color:#92400E;font-weight:600;}
+
+.auto-badge{display:inline-flex;align-items:center;gap:3px;background:#D1FAE5;color:#065F46;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;}
+
+.bulk-banner{background:#EBF3FC;border:1px solid #B5D4F4;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11px;color:#185FA5;display:flex;align-items:flex-start;gap:7px;line-height:1.5;}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:22px;right:22px;background:#1a1a2e;color:#fff;padding:9px 15px;border-radius:8px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(8px);transition:opacity 0.25s,transform 0.25s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;transform:translateY(0);}
+.tdot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;}
+.toast.err .tdot{background:#ef4444;}
+
+/* ── Dropdown ── */
+.dd-overlay{position:fixed;inset:0;z-index:200;display:none;}
+
+/* ── Client switcher (feature switch demo) ── */
+.client-switcher{display:flex;align-items:center;gap:5px;background:#f0f2f5;border:1px solid #e2e5ea;border-radius:6px;padding:3px 4px 3px 10px;}
+.client-switcher-label{font-size:10px;font-weight:700;color:#9299a5;text-transform:uppercase;letter-spacing:0.4px;}
+.client-pill{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid #e2e5ea;border-radius:4px;padding:3px 8px;font-size:11px;color:#374151;cursor:pointer;font-weight:500;}
+.client-pill:hover{background:#f8f9fb;}
+.client-pill.active{background:#185FA5;color:#fff;border-color:#185FA5;font-weight:600;}
+.client-pill.active .od-on{display:inline-flex;}
+.client-pill .od-on{display:none;align-items:center;gap:2px;background:rgba(255,255,255,0.25);border-radius:3px;padding:1px 4px;font-size:9px;font-weight:700;}
+
+/* ── Feature switch banner ── */
+.fs-banner{background:#FFF9E6;border-left:3px solid #d97706;padding:7px 12px;font-size:11px;color:#92400E;display:flex;align-items:center;gap:7px;}
+.fs-banner svg{flex-shrink:0;}
+.fs-banner.off{background:#FEF2F2;border-left-color:#dc2626;color:#7f1d1d;}
+.fs-banner.on{background:#F0FDF4;border-left-color:#15803d;color:#065F46;}
+.fs-banner strong{font-weight:700;}
+
+/* Hidden when feature switch off */
+.fs-hide{display:none !important;}
+
+/* ── WPC lock state ── */
+.lock-banner{display:flex;align-items:flex-start;gap:7px;background:#F3F4F6;border:1px solid #d1d5db;border-left:3px solid #6b7280;border-radius:6px;padding:8px 11px;margin-bottom:11px;font-size:11px;color:#374151;line-height:1.5;}
+.lock-banner strong{font-weight:700;color:#1a1a2e;}
+.dcard-body.locked .fctrl{pointer-events:none;background:#f8f9fb;cursor:not-allowed;opacity:0.85;}
+.dcard-body.locked .fctrl input{pointer-events:none;cursor:not-allowed;background:transparent;}
+.dcard-body.locked .od-feature,
+.dcard-body.locked .btn-save,
+.dcard-body.locked .complete-btns,
+.dcard-body.locked .complete-lbl,
+.dcard-body.locked .od-remove,
+.dcard-body.locked .sdiv{display:none;}
+.dcard-body.locked .act-row{display:none;}
+.dcard-body.locked .awaiting-badge{background:#E5E7EB;color:#374151;}
+.lock-pill{display:inline-flex;align-items:center;gap:4px;background:#374151;color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;margin-left:6px;}
+
+.dd-overlay.open{display:block;}
+.dd-menu{position:absolute;background:#fff;border:1px solid #e2e5ea;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.13);overflow:hidden;min-width:200px;max-height:260px;overflow-y:auto;z-index:201;}
+.dd-section{padding:5px 12px 3px;font-size:9px;font-weight:700;color:#9299a5;text-transform:uppercase;letter-spacing:0.5px;background:#f8f9fb;border-top:1px solid #f0f2f5;}
+.dd-item{padding:8px 13px;font-size:12px;color:#374151;cursor:pointer;}
+.dd-item:hover{background:#f5f6f8;}
+.dd-item.sel{background:#EBF3FC;color:#185FA5;font-weight:500;}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:7px;}
+.ti{padding:6px 3px;text-align:center;font-size:11px;border-radius:5px;cursor:pointer;color:#374151;}
+.ti:hover{background:#EBF3FC;color:#185FA5;}
+.ti.sel{background:#185FA5;color:#fff;}
+.ti.dis{color:#d1d5db;cursor:not-allowed;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="cursor:pointer"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <div class="logo-text">ligenti<span>x</span><span class="logo-badge">DELIVERY</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="client-switcher" title="Demo only: simulate the backend feature switch state per client. In production this is dev-toggled in the DB.">
+      <span class="client-switcher-label">Demo: client view</span>
+      <div class="client-pill active" id="client-range" onclick="switchClient('range')">
+        The Range
+        <span class="od-on">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          OD
+        </span>
+      </div>
+      <div class="client-pill" id="client-river" onclick="switchClient('river')">
+        River Island
+      </div>
+    </div>
+    <div class="topbar-search">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9299a5" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search consignment...">
+    </div>
+    <button class="tbtn">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Export
+    </button>
+    <button class="tbtn-primary">Booking review</button>
+    <div class="avatar">DJ</div>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Table panel -->
+  <div class="table-panel">
+    <div class="page-header">
+      <div class="page-title-row">
+        <div class="page-title">Bookings</div>
+        <span class="selection-pill" id="selPill">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="selPillCount">0 selected</span>
+        </span>
+      </div>
+      <div class="page-actions">
+        <button class="btn-bulk" id="bulkBtn" onclick="openBulkSip()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Bulk actions
+        </button>
+        <button class="tbtn">Filters</button>
+      </div>
+    </div>
+    <div class="fs-banner on" id="fsBanner">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <span><strong>Feature switch:</strong> Off Dock Warehouse — <strong id="fsClient">ON for The Range</strong> (backend, dev-toggled). Single SIP off dock entry and Bulk SIP auto-fill columns appear only for switch-enabled clients. Main Bookings OD columns are always visible to internal Ligentia users.</span>
+    </div>
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead>
+          <tr class="grp">
+            <th class="g-party" colspan="3">Party</th>
+            <th class="g-status" colspan="2">Status</th>
+            <th class="g-cons" colspan="6">Consignment</th>
+            <th class="g-book" colspan="6">Booking details</th>
+            <th class="g-ship" colspan="6">Shipment</th>
+            <th class="g-rates" colspan="3">Rates</th>
+            <th class="g-od od-group" colspan="3">Off dock</th>
+          </tr>
+          <tr class="col">
+            <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)" style="width:11px;height:11px;"></th>
+            <th>Customer ⇅</th>
+            <th>Branch ⇅</th>
+            <th>Category ⇅</th>
+            <th>Status ⇅</th>
+            <th>Consignment ⇅</th>
+            <th>Size ⇅</th>
+            <th>Load ⇅</th>
+            <th>Mode ⇅</th>
+            <th>Master bill ⇅</th>
+            <th>House bill ⇅</th>
+            <th>HBL ⇅</th>
+            <th>Warehouse ⇅</th>
+            <th>Delivery date &amp; time ⇅</th>
+            <th>Booked by ⇅</th>
+            <th>Booked when ⇅</th>
+            <th>ETA ⇅</th>
+            <th>Shipment no. ⇅</th>
+            <th>Carrier ⇅</th>
+            <th>Vessel ⇅</th>
+            <th>Port ⇅</th>
+            <th>Rent start ⇅</th>
+            <th>Book from ⇅</th>
+            <th>Cut off ⇅</th>
+            <th class="od-col od-th">OD Warehouse ⇅</th>
+            <th class="od-col od-th">OD Date ⇅</th>
+            <th class="od-col od-th">OD Time ⇅</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="page-info" id="pageInfo">Rows: 20</div>
+      <div class="page-btns">
+        <button class="pbtn">«</button><button class="pbtn">‹</button>
+        <button class="pbtn active">1</button><button class="pbtn">2</button>
+        <button class="pbtn">›</button><button class="pbtn">»</button>
+      </div>
+      <button class="get-started-btn"><span class="gs-badge">3</span> Get Started</button>
+    </div>
+  </div>
+
+  <!-- ─────────── Single SIP (1 selection) ─────────── -->
+  <div class="sip" id="singleSip">
+    <div class="sip-header">
+      <div class="sip-title-row">
+        <span class="sip-title" id="sipTitle">—</span>
+        <div class="sip-icons">
+          <div class="ic ic-blue">A</div>
+          <div class="ic ic-green">P</div>
+          <button class="icon-btn" title="Close" onclick="closeSingleSip()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="sip-tabs">
+        <div class="sip-tab active">Book</div>
+        <div class="sip-tab">PIN/Badge</div>
+        <div class="sip-tab">Contents</div>
+        <div class="sip-tab">Notes</div>
+        <div class="sip-tab">Documents</div>
+        <div class="sip-tab">Log</div>
+      </div>
+    </div>
+    <div class="sip-body">
+      <div class="dcard">
+        <div class="dcard-hdr" onclick="toggleCard()">
+          <div class="dcard-hdr-left">
+            <span class="dcard-label">Delivery 1</span>
+            <span id="delivBadge" class="awaiting-badge">Awaiting Booking</span>
+          </div>
+          <span class="chevron open" id="cardChev">▾</span>
+        </div>
+        <div class="dcard-body" id="cardBody">
+
+          <!-- WPC lock banner (shown when Warehouse Processing Complete is set) -->
+          <div class="lock-banner" id="lockBanner" style="display:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" style="flex-shrink:0;margin-top:2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>This consignment's <strong>Warehouse Processing</strong> is complete (<span id="lockWpcDate">—</span>). Off dock fields are read-only.</span>
+          </div>
+
+          <div class="form-row">
+            <div class="fg">
+              <div class="flabel">Warehouse</div>
+              <div class="fctrl" id="whCtrl" onclick="openDD('wh',event)">
+                <span id="whVal" class="ph">Select warehouse</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="flabel">Warehouse ref (optional)</div>
+              <div class="fctrl"><input type="text" id="whRef" placeholder="—"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <div class="flabel">Delivery date</div>
+              <div class="fctrl" id="dDateCtrl">
+                <input type="date" id="dDate" onchange="onDDateChange()">
+              </div>
+            </div>
+            <div class="fg">
+              <div class="flabel">Delivery time</div>
+              <div class="fctrl" id="dTimeCtrl" onclick="openDD('dtime',event)">
+                <span id="dTimeVal" class="ph">Select time</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="od-card" id="odCard">
+            <div class="od-hdr">
+              <div class="od-hdr-left">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                <span class="od-title">Off dock delivery — Leg 1</span>
+              </div>
+              <button class="od-remove" onclick="removeOD()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="od-body">
+              <div class="info-note">
+                <div style="display:flex;align-items:flex-start;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2" style="flex-shrink:0;margin-top:2px"><polyline points="9 18 3 12 9 6"/><polyline points="15 18 21 12 15 6"/></svg>
+                  <span>Off dock = <strong>Leg 1</strong>, final delivery = <strong>Leg 2</strong>. Both legs appear in the consignment timeline.</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="fg full">
+                  <div class="flabel">Off dock warehouse</div>
+                  <div class="fctrl" id="odWhCtrl" onclick="openDD('odwh',event)">
+                    <span id="odWhVal" class="ph">Select off dock warehouse</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:0">
+                <div class="fg">
+                  <div class="flabel">Off dock date</div>
+                  <div class="fctrl" id="odDateCtrl">
+                    <input type="date" id="odDate" onchange="validateOD()">
+                  </div>
+                  <div class="ferr" id="odDateErr">Must be before delivery date</div>
+                </div>
+                <div class="fg">
+                  <div class="flabel">Off dock time</div>
+                  <div class="fctrl" id="odTimeCtrl" onclick="openDD('odtime',event)">
+                    <span id="odTimeVal" class="ph">Select time</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="ferr" id="odTimeErr">Must be before delivery time</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="act-row">
+            <button class="btn-sm" onclick="showToast('Delivery slot added')">+ Add delivery</button>
+            <button class="btn-sm btn-sm-blue od-feature" id="addODBtn" onclick="showOD()">+ Add off dock delivery</button>
+            <button class="btn-save" onclick="saveProgress()">Save progress</button>
+          </div>
+
+          <hr class="sdiv">
+          <p class="complete-lbl">Ready to complete this booking?</p>
+          <div class="complete-btns">
+            <button class="btn-basket" onclick="completeBooking('basket')">Update basket</button>
+            <button class="btn-quick" onclick="completeBooking('quick')">Quick book</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sip-footer">
+      <button class="get-started-btn"><span class="gs-badge">3</span> Get Started</button>
+    </div>
+  </div>
+
+  <!-- ─────────── Bulk SIP (2+ selections) ─────────── -->
+  <div class="sip" id="bulkSip">
+    <div class="sip-header">
+      <div class="sip-title-row">
+        <span class="sip-title">
+          Bulk actions
+          <span class="sip-count-badge" id="bulkCount">0 consignments selected</span>
+        </span>
+        <div class="sip-icons">
+          <button class="icon-btn" title="Close" onclick="closeBulkSip()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="bulk-tabs">
+        <div class="bulk-tab">Quick book</div>
+        <div class="bulk-tab">Quick release</div>
+        <div class="bulk-tab active">Warehouse actions</div>
+      </div>
+    </div>
+    <div class="sip-body">
+      <div class="bulk-banner" id="bulkBanner">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="bulkBannerText"><strong>Off dock warehouse</strong>, <strong>Off dock date</strong> and <strong>Delivered to warehouse</strong> fields are auto-filled from the original booking data. Edit any value to override before applying.</span>
+      </div>
+
+      <table class="bulk-tbl">
+        <thead>
+          <tr>
+            <th>Consignment</th>
+            <th>Status</th>
+            <th>Warehouse</th>
+            <th>Delivery</th>
+            <th class="th-od od-th-bulk">
+              Off dock warehouse
+              <span class="auto-badge"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Auto</span>
+            </th>
+            <th class="th-od od-th-bulk">
+              Off dock date
+              <span class="auto-badge"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Auto</span>
+            </th>
+            <th class="th-deliv">
+              Delivered to warehouse
+              <span class="auto-badge" style="background:#DBEAFE;color:#1d4ed8;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Auto</span>
+            </th>
+            <th class="th-wpc">Warehouse processing complete</th>
+          </tr>
+        </thead>
+        <tbody id="bulkBody"></tbody>
+      </table>
+    </div>
+    <div class="sip-footer" style="justify-content:space-between;">
+      <span style="font-size:11px;color:#6b7280;">Changes apply to all selected consignments</span>
+      <div style="display:flex;gap:8px;">
+        <button class="tbtn" onclick="closeBulkSip()">Cancel</button>
+        <button class="tbtn-primary" onclick="applyBulk()">Apply to selected</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><div class="tdot"></div><span id="toastMsg"></span></div>
+
+<!-- Dropdown -->
+<div class="dd-overlay" id="ddOverlay" onclick="closeDD()">
+  <div class="dd-menu" id="ddMenu"></div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+// FEATURE SWITCH: Off Dock Warehouse — controlled per client
+const FEATURE_SWITCHES = {
+  range: { name: 'The Range Ltd',                 offDockEnabled: true  },
+  river: { name: 'River Island Clothing Co Ltd',  offDockEnabled: false },
+};
+let currentClient = 'range';
+let currentClientName = FEATURE_SWITCHES[currentClient].name;
+
+function offDockEnabled() {
+  return FEATURE_SWITCHES[currentClient].offDockEnabled;
+}
+
+function switchClient(client) {
+  if(client === currentClient) return;
+  currentClient = client;
+  currentClientName = FEATURE_SWITCHES[client].name;
+
+  // Update active pill
+  document.getElementById('client-range').classList.toggle('active', client==='range');
+  document.getElementById('client-river').classList.toggle('active', client==='river');
+
+  // Update feature switch banner
+  const banner = document.getElementById('fsBanner');
+  const fsClient = document.getElementById('fsClient');
+  if(offDockEnabled()) {
+    banner.classList.add('on'); banner.classList.remove('off');
+    fsClient.textContent = `ON for ${currentClientName}`;
+    banner.querySelector('svg').innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  } else {
+    banner.classList.add('off'); banner.classList.remove('on');
+    fsClient.textContent = `OFF for ${currentClientName}`;
+    banner.querySelector('svg').innerHTML = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  }
+
+  applyFeatureSwitch();
+  // close any open SIPs to avoid stale state
+  if(openedSip==='single') closeSingleSip();
+  if(openedSip==='bulk')   closeBulkSip();
+  showToast(`Switched to ${currentClientName} — off dock ${offDockEnabled()?'ON':'OFF'}`);
+}
+
+function applyFeatureSwitch() {
+  const enabled = offDockEnabled();
+
+  // Main Bookings table: OD columns are ALWAYS visible (Ligentia users see across all clients).
+  // We do NOT toggle .od-group / .od-th / .od-td. They stay visible regardless of switch.
+  document.querySelectorAll('.od-group, .od-th, .od-td').forEach(el => {
+    el.classList.remove('fs-hide');
+  });
+
+  // Single SIP — "Add off dock delivery" button (gated by client switch)
+  document.querySelectorAll('.od-feature').forEach(el => {
+    el.classList.toggle('fs-hide', !enabled);
+  });
+  if(!enabled) {
+    const odCard = document.getElementById('odCard');
+    if(odCard) odCard.classList.add('fs-hide');
+  } else {
+    const odCard = document.getElementById('odCard');
+    if(odCard) odCard.classList.remove('fs-hide');
+  }
+
+  // Bulk SIP — off dock columns (gated by client switch)
+  document.querySelectorAll('.od-th-bulk, .od-td-bulk').forEach(el => {
+    el.classList.toggle('fs-hide', !enabled);
+  });
+  const bulkBannerText = document.getElementById('bulkBannerText');
+  if(bulkBannerText) {
+    bulkBannerText.innerHTML = enabled
+      ? '<strong>Off dock warehouse</strong>, <strong>Off dock date</strong> and <strong>Delivered to warehouse</strong> fields are auto-filled from the original booking data. Edit any value to override before applying.'
+      : '<strong>Delivered to warehouse</strong> fields are auto-filled from the original booking data. Edit any value to override before applying.';
+  }
+
+  buildTable();
+}
+
+const RANGE_WH = ['The Range NDC - Plymouth','The Range RDC - Bristol','Magna Park - Lutterworth','East Midlands Gateway'];
+const OFFDOCK_WH = ['Avonmouth - Bristol','Tilbury - London Gateway','Felixstowe - Suffolk','Southampton - Western Docks','Teesport - Middlesbrough','Grangemouth - Scotland','The Range NDC - Plymouth (Off Dock)','The Range RDC - Bristol (Off Dock)'];
+const TIMES = ['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+const TIMES_FULL = ['05:00','05:30','06:00','06:15','06:30','06:45','07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:30','11:00','11:30','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+
+const consignments = ['BSIU9594370','TGBU6369157','TGHU3891909','GESU5426101','TCLU5232413','TCLU5629550','MEDU7114570','TGBU9376479','HAMU2314284','UACU6024408','MSMU5384796','HLBU2259818','MSDU4098997','MSMU5224782','HAMU4319813','HAMU4320861','HAMU4332965','FANU3772534','TCNU9874960','HAMU1148825'];
+const sizes   = ['40HC','40HCSUB','LOOSE','40HPBF','40HPBF','40HPBF','40HC','40HC','40HCSUB','40HCSUB','40HC','40HCGOH','40GP','40HC','40HCGOH','40HCGOH','40HCGOH','40HC','40HC','40HC'];
+const loads   = ['FCL','FCL','LSE','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL','FCL'];
+const modes   = ['CFS/CY','CFS/CY','','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CY/CY','CFS/CY','CFS/CY','CFS/CY'];
+const masterB = ['HLCUSHA2506HFEC5','HLCUSHA2506HFEC5','HLCUSHA2506HFEC5','MEDUHP726969','MEDUHP726969','MEDUHP726969','CNTAO1999441','MEDUOP721576','HLCUSZX2506CCKX0','HLCUSZX2506CCKX0','MEDUK6813050','HLCUTA12407AS','MEDUJL943985','MEDUK6699673','HLCUSHA2506HFZ04','HLCUSHA2506HFZ04','HLCUSHA2506HFZ04','HLCUKHI25071354','HLCUDA1250627047','HLCUDA1250627047'];
+const houseB  = ['CNSHA01987091','CNSHA01989007','EFAE25070066','HPH02001287','HPH02001287','HPH02001287','CNTAO1999441','CNTAO1999441','CNSZX01996156','CNSZX01996156','CNSZX01999813','CNTAO1994786','CNNG801993557','CNSZX01999831','CNSHA01992710','CNSHA01992710','CNSHA01992710','LOT7-LHE-262009','EFOE25061123','EFOE25062689'];
+const hblV    = ['3/4','3/4','1/1','2/1','2/1','2/1','1/1','1/1','1/1','1/1','1/1','1/1','1/1','1/1','1/1','1/1','1/1','3/1','3/1','3/1'];
+const etas    = ['01/06/2025','01/06/2025','05/07/2025','02/06/2025','02/06/2025','02/06/2025','01/06/2025','01/06/2025','27/06/2025','27/06/2025','20/06/2025','20/06/2025','22/06/2025','20/06/2025','27/06/2025','27/06/2025','27/06/2025','27/06/2025','28/06/2025','28/06/2025'];
+const shipNos = ['S2780587','S2780589','S2780643','S2203587','S2203587','S2203587','S2199441','S2199441','S2784786','S2784786','S2784831','S2784786','S2993557','S2784831','S2892710','S2892710','S2892710','S2784786','S2784786','S2784786'];
+const carriers= ['Hapag-Lloyd AG','Hapag-Lloyd AG','TUI Airlines','MSC Ltd','MSC Ltd','MSC Ltd','MSC Ltd','MSC Ltd','Hapag-Lloyd AG','Hapag-Lloyd AG','MSC Ltd','Hapag-Lloyd AG','Hapag-Lloyd AG','MSC Ltd','Hapag-Lloyd AG','Hapag-Lloyd AG','Hapag-Lloyd AG','Hapag-Lloyd AG','Hapag-Lloyd AG','Hapag-Lloyd AG'];
+const vessels = ['Berlin Maersk','Berlin Maersk','Berlin Maersk','MSC Olivia','MSC Olivia','MSC Olivia','MSC Savannah','MSC Savannah','MSC Zola','MSC Zola','MSC Olivia','MSC Olivia','MSC Zola','MSC Olivia','MSC Olivia','MSC Olivia','MSC Olivia','MSC Zola','Maersk San Clements','Maersk San Clements'];
+const rentSt  = ['02/06/2025','02/06/2025','','02/06/2025','02/06/2025','02/06/2025','03/06/2025','03/06/2025','02/07/2025','02/07/2025','22/06/2025','22/06/2025','23/06/2025','22/06/2025','29/06/2025','29/06/2025','29/06/2025','29/06/2025','30/06/2025','30/06/2025'];
+const bookFr  = ['01/06/2025','01/06/2025','','01/06/2025','01/06/2025','01/06/2025','02/06/2025','02/06/2025','28/06/2025','28/06/2025','19/06/2025','19/06/2025','20/06/2025','19/06/2025','25/06/2025','25/06/2025','25/06/2025','25/06/2025','26/06/2025','26/06/2025'];
+const cutOff  = ['07/06/2025','07/06/2025','','08/06/2025','08/06/2025','08/06/2025','09/06/2025','09/06/2025','30/06/2025','30/06/2025','24/06/2025','23/06/2025','25/06/2025','24/06/2025','27/06/2025','27/06/2025','27/06/2025','30/06/2025','01/07/2025','01/07/2025'];
+const bookedB = ['S.Brown','S.Brown','','D.Jones','D.Jones','D.Jones','S.Brown','S.Brown','D.Jones','D.Jones','S.Brown','D.Jones','D.Jones','S.Brown','D.Jones','D.Jones','D.Jones','S.Brown','S.Brown','S.Brown'];
+
+// Mutable bookings (checked is the multi-select state)
+const bookings = consignments.map((c,i) => ({
+  wh:null, wRef:'', dDate:'', dTime:null,
+  odWh:null, odDate:'', odTime:null,
+  status:'awaiting', bookedBy:bookedB[i], bookedWhen:'',
+  checked:false, wpc:'',
+}));
+
+// Pre-populate confirmed bookings for realism
+[
+  [0,'The Range NDC - Plymouth','','2025-06-08','08:00','Tilbury - London Gateway','2025-06-04','07:00','booked','08/06/2025 08:00',''],
+  [1,'The Range NDC - Plymouth','','2025-06-08','09:00','Tilbury - London Gateway','2025-06-04','07:00','booked','08/06/2025 09:00',''],
+  [3,'Magna Park - Lutterworth','','2025-06-09','10:00','Avonmouth - Bristol','2025-06-06','09:00','booked','09/06/2025 10:00',''],
+  [4,'Magna Park - Lutterworth','','2025-06-09','10:00','Avonmouth - Bristol','2025-06-06','09:00','booked','09/06/2025 10:00',''],
+  [6,'East Midlands Gateway','','2025-06-10','09:00','Felixstowe - Suffolk','2025-06-07','08:00','booked','10/06/2025 09:00',''],
+  [7,'East Midlands Gateway','','2025-06-10','09:00','Felixstowe - Suffolk','2025-06-07','08:00','booked','10/06/2025 09:00',''],
+  [10,'The Range NDC - Plymouth','','2025-06-25','10:00','Southampton - Western Docks','2025-06-23','11:00','booked','25/06/2025 10:00',''],
+  // Rows 14 & 15: Warehouse Processing Complete is set — off dock will be read-only
+  [14,'The Range RDC - Bristol','','2025-06-28','08:00','Grangemouth - Scotland','2025-06-26','10:00','booked','28/06/2025 08:00','2025-06-29'],
+  [15,'The Range RDC - Bristol','','2025-06-28','08:00','Grangemouth - Scotland','2025-06-26','10:00','booked','28/06/2025 08:00','2025-06-29'],
+  [8,'The Range RDC - Bristol','','','',null,'','','partial','',''],
+].forEach(([i,wh,wRef,dDate,dTime,odWh,odDate,odTime,status,bw,wpc])=>{
+  bookings[i]={...bookings[i],wh,wRef,dDate,dTime,odWh,odDate,odTime,status,bookedWhen:bw,wpc};
+});
+
+// ── State ─────────────────────────────────────────────────────────────────
+let openedSip = null; // 'single' | 'bulk' | null
+let singleSipRow = null; // index of row open in single SIP
+let ddType = null;
+let form = { wh:null, dDate:'', dTime:null, odWh:null, odDate:'', odTime:null };
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function fmtDateDisplay(iso) {
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function isoFromDisplay(d) {
+  if(!d) return '';
+  const parts = d.split('/');
+  if(parts.length===3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  return d;
+}
+function hblBar(v) {
+  if(!v) return '';
+  const [a,b] = v.split('/');
+  const pct = (parseInt(a)/parseInt(b))*100;
+  return `<div class="hbl-bar"><div class="hbl-track"><div class="hbl-fill" style="width:${pct}%"></div></div><span class="hbl-lbl">${v}</span></div>`;
+}
+function countSelected() { return bookings.filter(b=>b.checked).length; }
+
+// ── Selection / row click behaviour ───────────────────────────────────────
+function toggleCheckbox(i, e) {
+  e.stopPropagation();
+  bookings[i].checked = !bookings[i].checked;
+  syncSelectionUI();
+}
+
+function syncSelectionUI() {
+  const n = countSelected();
+  // selection pill
+  const pill = document.getElementById('selPill');
+  if(n>0) { pill.classList.add('show'); document.getElementById('selPillCount').textContent = `${n} selected`; }
+  else { pill.classList.remove('show'); }
+  // bulk button
+  const bulkBtn = document.getElementById('bulkBtn');
+  if(n>=2) bulkBtn.classList.add('show'); else bulkBtn.classList.remove('show');
+  // select all checkbox
+  const sa = document.getElementById('selectAll');
+  if(sa) sa.checked = n===bookings.length;
+  buildTable();
+}
+
+function toggleAll(cb) {
+  bookings.forEach(b => b.checked = cb.checked);
+  syncSelectionUI();
+}
+
+// Row click — opens single SIP if row not already selected, else focuses it
+function onRowClick(i) {
+  // close bulk if open
+  if(openedSip==='bulk') closeBulkSip();
+  openSingleSip(i);
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────
+function buildTable() {
+  document.getElementById('tBody').innerHTML = consignments.map((c,i) => {
+    const bk = bookings[i];
+    const isLocked = !!bk.wpc;
+    const statusPill = bk.status==='booked'
+      ? `<span class="status-pill sp-booked">Booking Booked</span>${isLocked ? '<span class="lock-pill" title="Warehouse Processing Complete — locked"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>WPC</span>' : ''}`
+      : bk.status==='partial'
+      ? `<span class="status-pill sp-partial">Partial</span>`
+      : `<span class="status-pill sp-awaiting">Awaiting Booking</span>`;
+    const delivDT = bk.dDate ? `${fmtDateDisplay(bk.dDate)}${bk.dTime?' '+bk.dTime:''}` : '';
+    const odWh = bk.odWh ? `<span class="od-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>${bk.odWh}</span>` : '<span class="od-empty">—</span>';
+    const odDate = bk.odDate ? `<span style="font-weight:600;color:#065F46;">${fmtDateDisplay(bk.odDate)}</span>` : '<span class="od-empty">—</span>';
+    const odTime = bk.odTime ? `<span style="font-weight:600;color:#065F46;">${bk.odTime}</span>` : '<span class="od-empty">—</span>';
+
+    return `<tr class="${bk.checked?'checked':''}" onclick="onRowClick(${i})">
+      <td><input type="checkbox" ${bk.checked?'checked':''} style="width:11px;height:11px;" onclick="toggleCheckbox(${i},event)"></td>
+      <td style="font-weight:600;color:#185FA5;">${currentClientName}</td>
+      <td>${currentClient==='range'?'PLY':'LBA'}</td>
+      <td>Consignment</td>
+      <td>${statusPill}</td>
+      <td style="font-weight:700;">${c}</td>
+      <td>${sizes[i]}</td>
+      <td>${loads[i]}</td>
+      <td>${modes[i]}</td>
+      <td style="font-size:10px;color:#6b7280;">${masterB[i]}</td>
+      <td style="font-size:10px;color:#6b7280;">${houseB[i]}</td>
+      <td>${hblBar(hblV[i])}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;">${bk.wh||''}</td>
+      <td style="font-weight:${bk.dDate?'600':'400'};color:${bk.dDate?'#1a1a2e':'#9299a5'};">${delivDT||'—'}</td>
+      <td style="font-size:10px;color:#6b7280;">${bk.bookedBy||''}</td>
+      <td style="font-size:10px;color:#6b7280;">${bk.bookedWhen||''}</td>
+      <td>${etas[i]}</td>
+      <td style="font-size:10px;color:#6b7280;">${shipNos[i]}</td>
+      <td style="max-width:100px;overflow:hidden;text-overflow:ellipsis;">${carriers[i]}</td>
+      <td style="max-width:100px;overflow:hidden;text-overflow:ellipsis;">${vessels[i]}</td>
+      <td>GBU2P</td>
+      <td style="font-size:10px;">${rentSt[i]}</td>
+      <td style="font-size:10px;">${bookFr[i]}</td>
+      <td style="font-size:10px;">${cutOff[i]}</td>
+      <td class="od-cell od-td">${odWh}</td>
+      <td class="od-cell od-td">${odDate}</td>
+      <td class="od-cell od-td">${odTime}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Single SIP
+// ─────────────────────────────────────────────────────────────────────────
+function openSingleSip(i) {
+  if(openedSip==='bulk') closeBulkSip();
+  singleSipRow = i;
+  const bk = bookings[i];
+  document.getElementById('sipTitle').textContent = consignments[i];
+  document.getElementById('singleSip').classList.add('open-single');
+  openedSip='single';
+  form = { wh:bk.wh, dDate:bk.dDate, dTime:bk.dTime, odWh:bk.odWh, odDate:bk.odDate, odTime:bk.odTime };
+  renderSingleForm();
+  clearODErrors();
+  if(form.odWh||form.odDate||form.odTime) {
+    document.getElementById('odCard').classList.add('show');
+    document.getElementById('addODBtn').style.display='none';
+  } else {
+    document.getElementById('odCard').classList.remove('show');
+    document.getElementById('addODBtn').style.display='';
+  }
+  updateBadge(bk.status);
+
+  // WPC lock — if Warehouse Processing Complete is set, render fields read-only
+  const cardBody = document.getElementById('cardBody');
+  const lockBanner = document.getElementById('lockBanner');
+  if(bk.wpc) {
+    cardBody.classList.add('locked');
+    lockBanner.style.display = 'flex';
+    document.getElementById('lockWpcDate').textContent = fmtDateDisplay(bk.wpc);
+  } else {
+    cardBody.classList.remove('locked');
+    lockBanner.style.display = 'none';
+  }
+}
+
+function closeSingleSip() {
+  document.getElementById('singleSip').classList.remove('open-single');
+  openedSip=null; singleSipRow=null;
+}
+
+function renderSingleForm() {
+  const whVal = document.getElementById('whVal');
+  whVal.textContent = form.wh||'Select warehouse';
+  whVal.className = form.wh?'':'ph';
+  document.getElementById('whCtrl').className='fctrl'+(form.wh?' filled':'');
+  document.getElementById('dDate').value = form.dDate||'';
+  const dtv = document.getElementById('dTimeVal');
+  dtv.textContent = form.dTime||'Select time';
+  dtv.className = form.dTime?'':'ph';
+  document.getElementById('dTimeCtrl').className='fctrl'+(form.dTime?' filled':'');
+  const odwv = document.getElementById('odWhVal');
+  odwv.textContent = form.odWh||'Select off dock warehouse';
+  odwv.className = form.odWh?'':'ph';
+  document.getElementById('odWhCtrl').className='fctrl'+(form.odWh?' filled':'');
+  document.getElementById('odDate').value = form.odDate||'';
+  const odtv = document.getElementById('odTimeVal');
+  odtv.textContent = form.odTime||'Select time';
+  odtv.className = form.odTime?'':'ph';
+  document.getElementById('odTimeCtrl').className='fctrl'+(form.odTime?' filled':'');
+}
+
+function updateBadge(status) {
+  const b = document.getElementById('delivBadge');
+  if(status==='booked'){ b.className='booked-badge'; b.textContent='Booking Booked'; }
+  else if(status==='partial'){ b.className='awaiting-badge'; b.textContent='Partial'; }
+  else { b.className='awaiting-badge'; b.textContent='Awaiting Booking'; }
+}
+
+function toggleCard() {
+  const body = document.getElementById('cardBody');
+  const chev = document.getElementById('cardChev');
+  const open = body.style.display !== 'none';
+  body.style.display = open?'none':'';
+  chev.classList.toggle('open',!open);
+}
+
+function showOD() {
+  document.getElementById('odCard').classList.add('show');
+  document.getElementById('addODBtn').style.display='none';
+}
+function removeOD() {
+  document.getElementById('odCard').classList.remove('show');
+  document.getElementById('addODBtn').style.display='';
+  form.odWh=null; form.odDate=''; form.odTime=null;
+  renderSingleForm(); clearODErrors();
+}
+
+function onDDateChange() { form.dDate=document.getElementById('dDate').value; validateOD(); }
+
+function validateOD() {
+  // Phase 1: no date/time validation per business rules
+  clearODErrors();
+  return true;
+}
+function showFErr(cId,eId,msg) { document.getElementById(cId).classList.add('error'); const e=document.getElementById(eId); e.textContent=msg; e.classList.add('show'); }
+function clearODErrors() {
+  ['odDateCtrl','odTimeCtrl'].forEach(id=>document.getElementById(id).classList.remove('error'));
+  ['odDateErr','odTimeErr'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+function saveProgress() {
+  if(!validateOD()){ showToast('Fix validation errors first',true); return; }
+  if(singleSipRow===null) return;
+  const bk = bookings[singleSipRow];
+  Object.assign(bk,form); bk.status='partial'; bk.bookedWhen='';
+  updateBadge('partial'); buildTable(); showToast('Progress saved');
+}
+function completeBooking(type) {
+  if(!validateOD()){ showToast('Fix validation errors first',true); return; }
+  if(singleSipRow===null) return;
+  if(!form.wh||!form.dDate||!form.dTime){ showToast('Select warehouse, date and time',true); return; }
+  const bk = bookings[singleSipRow];
+  Object.assign(bk,form);
+  bk.status='booked'; bk.bookedBy='D.Jones'; bk.bookedWhen=`${fmtDateDisplay(form.dDate)} ${form.dTime}`;
+  updateBadge('booked'); buildTable();
+  showToast(type==='quick'?`Booking confirmed — ${consignments[singleSipRow]}`:'Added to basket');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Bulk SIP
+// ─────────────────────────────────────────────────────────────────────────
+function openBulkSip() {
+  if(openedSip==='single') closeSingleSip();
+  if(countSelected()<2){ showToast('Select 2 or more consignments',true); return; }
+  document.getElementById('bulkSip').classList.add('open-bulk');
+  openedSip='bulk';
+  renderBulk();
+}
+
+function closeBulkSip() {
+  document.getElementById('bulkSip').classList.remove('open-bulk');
+  openedSip=null;
+}
+
+function renderBulk() {
+  const sel = bookings.map((b,i)=>({...b,_idx:i,_cons:consignments[i],_size:sizes[i]})).filter(b=>b.checked);
+  document.getElementById('bulkCount').textContent = `${sel.length} consignments selected`;
+
+  document.getElementById('bulkBody').innerHTML = sel.map((b,j) => {
+    const idx = b._idx;
+    const hasOD = !!b.odDate;
+    const hasDeliv = !!b.dDate;
+    const hasWPC = !!b.wpc;
+
+    const wh = b.wh || '—';
+    const delivStr = b.dDate ? `${fmtDateDisplay(b.dDate)} – ${b.dTime||'—'}` : '<span style="color:#9299a5;">—</span>';
+
+    // Off dock auto-fill cells
+    const odDateInput = hasOD
+      ? `<input type="date" class="idate prefilled" value="${b.odDate}" onchange="bulkUpdate(${idx},'odDate',this.value)">`
+      : `<input type="date" class="idate" onchange="bulkUpdate(${idx},'odDate',this.value)">`;
+    const odTimeInput = hasOD
+      ? bulkTimeSelect(b.odTime,'itime prefilled',idx,'odTime')
+      : bulkTimeSelect('','itime',idx,'odTime');
+
+    // Delivered to warehouse cells (auto from delivery date/time)
+    const dDateInput = hasDeliv
+      ? `<input type="date" class="idate blue-fill" value="${b.dDate}" onchange="bulkUpdate(${idx},'dDate',this.value)">`
+      : `<input type="date" class="idate" onchange="bulkUpdate(${idx},'dDate',this.value)">`;
+    const dTimeInput = hasDeliv
+      ? bulkTimeSelect(b.dTime,'itime blue-fill',idx,'dTime')
+      : bulkTimeSelect('','itime',idx,'dTime');
+
+    // WPC
+    const wpcInput = hasWPC
+      ? `<input type="date" class="idate amber-fill" value="${b.wpc}" onchange="bulkUpdate(${idx},'wpc',this.value)">`
+      : `<input type="date" class="idate" onchange="bulkUpdate(${idx},'wpc',this.value)">`;
+
+    return `<tr>
+      <td>
+        <div style="font-weight:700;font-size:11px;">${b._cons}</div>
+        <div style="font-size:9px;color:#9299a5;">${b._size}</div>
+      </td>
+      <td><span class="confirmed"><span class="confirmed-dot"></span>${b.status==='booked'?'Confirmed':b.status==='partial'?'Partial':'Awaiting'}</span></td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;">${wh}</td>
+      <td style="font-weight:600;white-space:nowrap;">${delivStr}</td>
+      <td class="td-od od-td-bulk" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;">
+        ${b.odWh
+          ? `<div style="display:flex;align-items:center;gap:5px;"><span class="od-badge" style="white-space:normal;line-height:1.3;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>${b.odWh}</span></div>`
+          : `<span style="color:#9299a5;font-style:italic;">No off dock</span>`}
+      </td>
+      <td class="td-od od-td-bulk">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap;">
+          ${odDateInput}${odTimeInput}
+          ${hasOD?`<span class="auto-badge" title="Auto-filled from booking"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>`:''}
+        </div>
+      </td>
+      <td class="td-deliv">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap;">
+          ${dDateInput}${dTimeInput}
+          ${hasDeliv?`<span class="auto-badge" style="background:#DBEAFE;color:#1d4ed8;" title="Auto-filled from booking"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>`:''}
+        </div>
+      </td>
+      <td class="td-wpc">${wpcInput}</td>
+    </tr>`;
+  }).join('');
+  // re-apply hiding to the newly rendered bulk cells
+  if(!offDockEnabled()) {
+    document.querySelectorAll('.od-td-bulk').forEach(el => el.classList.add('fs-hide'));
+  }
+}
+
+function bulkTimeSelect(val,cls,idx,field) {
+  const opts = TIMES_FULL.map(t=>`<option value="${t}" ${t===val?'selected':''}>${t}</option>`).join('');
+  return `<select class="${cls}" onchange="bulkUpdate(${idx},'${field}',this.value)"><option value="">--:--</option>${opts}</select>`;
+}
+
+function bulkUpdate(idx,field,val) {
+  bookings[idx][field] = val;
+}
+
+function applyBulk() {
+  showToast(`Applied to ${countSelected()} consignments`);
+  buildTable();
+  closeBulkSip();
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Dropdown (single SIP)
+// ─────────────────────────────────────────────────────────────────────────
+function openDD(type,e) {
+  e.stopPropagation();
+  ddType=type;
+  const menu=document.getElementById('ddMenu');
+  const rect=e.currentTarget.getBoundingClientRect();
+  menu.innerHTML='';
+  if(type==='wh') {
+    RANGE_WH.forEach(w=>{
+      const d=document.createElement('div');
+      d.className='dd-item'+(form.wh===w?' sel':''); d.textContent=w;
+      d.onclick=ev=>{ev.stopPropagation();form.wh=w;renderSingleForm();closeDD();};
+      menu.appendChild(d);
+    });
+  } else if(type==='odwh') {
+    const lbl=document.createElement('div'); lbl.className='dd-section'; lbl.textContent='The Range — off dock warehouses'; menu.appendChild(lbl);
+    OFFDOCK_WH.forEach(w=>{
+      const d=document.createElement('div');
+      d.className='dd-item'+(form.odWh===w?' sel':''); d.textContent=w;
+      d.onclick=ev=>{ev.stopPropagation();form.odWh=w;renderSingleForm();closeDD();};
+      menu.appendChild(d);
+    });
+  } else {
+    const curSel=(type==='dtime')?form.dTime:form.odTime;
+    const grid=document.createElement('div'); grid.className='time-grid';
+    TIMES.forEach(t=>{
+      const d=document.createElement('div');
+      d.className='ti'+(curSel===t?' sel':'');
+      d.textContent=t;
+      d.onclick=ev=>{ev.stopPropagation();if(type==='dtime'){form.dTime=t;}else{form.odTime=t;}renderSingleForm();closeDD();};
+      grid.appendChild(d);
+    });
+    menu.appendChild(grid);
+  }
+  const left=Math.min(rect.left, window.innerWidth-220);
+  menu.style.top=(rect.bottom+3)+'px'; menu.style.left=left+'px';
+  document.getElementById('ddOverlay').classList.add('open');
+}
+function closeDD() { document.getElementById('ddOverlay').classList.remove('open'); ddType=null; }
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+function showToast(msg,isErr) {
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.toggle('err',!!isErr); t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+buildTable();
+syncSelectionUI();
+applyFeatureSwitch();
+</script>
+</body>
+</html>
