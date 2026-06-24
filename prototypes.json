@@ -1,5 +1,16 @@
 [
   {
+    "id": "off-dock-prototype",
+    "title": "Off Dock Prototype",
+    "description": "",
+    "creator": "Dennis",
+    "date": "2026-06-24",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/off-dock-prototype"
+  },
+  {
     "id": "loading-animation-with-depot-run-game",
     "title": "Loading animation with 'depot run' game",
     "description": "",
