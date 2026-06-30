@@ -284,6 +284,18 @@
     </div>
   </div>
 
+  <!-- Toggle individual goals (moved above chart, as accordion) -->
+  <details class="caveat-accordion outer-accordion" id="toggles-section" style="margin-bottom:20px;">
+    <summary id="toggles-label">Toggle individual goals</summary>
+    <div style="padding:0 16px 16px;">
+      <div class="toggles-actions" role="group" aria-label="Bulk toggle controls" style="margin-bottom:10px;">
+        <button class="btn" onclick="setAll(true)"  aria-label="Show all goals">Show all</button>
+        <button class="btn" onclick="setAll(false)" aria-label="Hide all goals">Hide all</button>
+      </div>
+      <div class="toggles-grid" id="toggles" role="group" aria-labelledby="toggles-label"></div>
+    </div>
+  </details>
+
   <!-- Chart -->
   <div class="chart-wrap">
     <div class="chart-inner">
@@ -360,17 +372,6 @@
         <tbody id="data-table-body"></tbody>
       </table>
     </details>
-  </div>
-
-  <div class="toggles-section" id="toggles-section">
-    <div class="toggles-header">
-      <span id="toggles-label">Toggle individual goals</span>
-      <div class="toggles-actions" role="group" aria-label="Bulk toggle controls">
-        <button class="btn" onclick="setAll(true)"  aria-label="Show all goals">Show all</button>
-        <button class="btn" onclick="setAll(false)" aria-label="Hide all goals">Hide all</button>
-      </div>
-    </div>
-    <div class="toggles-grid" id="toggles" role="group" aria-labelledby="toggles-label"></div>
   </div>
 
 </main>
