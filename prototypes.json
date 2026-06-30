@@ -1,5 +1,16 @@
 [
   {
+    "id": "design-team-goal-progress",
+    "title": "Design Team Goal Progress",
+    "description": "Visual illustrations of the design team's progress through the year towards our team goals.",
+    "creator": "Craig",
+    "date": "2026-06-30",
+    "tags": [
+      "design team"
+    ],
+    "folder": "prototypes/design-team-goal-progress"
+  },
+  {
     "id": "off-dock-prototype",
     "title": "Off Dock Prototype",
     "description": "",
