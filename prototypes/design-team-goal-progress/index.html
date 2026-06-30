@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Team Goals — 2026 Progress Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0c0c10;--surface:#14141a;--surface2:#1c1c24;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+    --text:#f0f0f8;--text2:#a0a0b4;--text3:#686878;
+    --accent:#7c9eff;--focus:#7c9eff;
+    --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh;padding:40px 32px}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+
+  header{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .header-left h1{font-size:22px;font-weight:500;letter-spacing:-0.3px;color:var(--text);margin-bottom:4px}
+  .header-left p{font-size:13px;color:var(--text2);font-family:var(--mono)}
+  .header-right{display:flex;gap:20px;align-items:center}
+  .stat{text-align:right}
+  .stat-val{font-size:22px;font-weight:600;font-family:var(--mono);color:var(--text);line-height:1}
+  .stat-lbl{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-top:3px}
+  .stat-divider{width:1px;height:32px;background:var(--border2)}
+
+  /* View switch */
+  .view-switch{display:flex;align-items:center;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;width:fit-content}
+  .view-switch button{font-size:13px;font-family:var(--mono);padding:8px 20px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:background 0.15s,color 0.15s;min-height:38px;letter-spacing:0.2px}
+  .view-switch button:first-child{border-right:1px solid var(--border2)}
+  .view-switch button:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+  .view-switch button[aria-pressed="true"]{background:rgba(124,158,255,0.18);color:#afc6ff;font-weight:500}
+  .view-switch-label{font-size:12px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-right:12px}
+
+  .key-bar{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)}
+  .key-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text2);font-family:var(--mono)}
+  .key-symbol{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;flex-shrink:0;font-size:11px;font-weight:500}
+  .key-line{width:22px;height:4px;flex-shrink:0}
+
+  .controls-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .control-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ctrl-label{font-size:12px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);font-family:var(--mono);margin-right:4px}
+  .btn-group{display:flex;gap:4px;flex-wrap:wrap}
+  .btn{font-size:13px;font-family:var(--mono);padding:6px 13px;border-radius:5px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;transition:background 0.12s,color 0.12s,border-color 0.12s;letter-spacing:0.2px;min-height:36px}
+  .btn:hover{border-color:rgba(255,255,255,0.25);color:var(--text);background:rgba(255,255,255,0.06)}
+  .btn[aria-pressed="true"]{background:rgba(124,158,255,0.18);border-color:rgba(124,158,255,0.5);color:#afc6ff}
+
+  /* Month selector */
+  .month-selector-wrap{position:relative;display:inline-block;margin-bottom:20px}
+  .month-selector-trigger{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:var(--mono);font-size:13px;min-height:36px;user-select:none;transition:border-color 0.12s,color 0.12s}
+  .month-selector-trigger:hover,.month-selector-trigger.open{border-color:rgba(255,255,255,0.25);color:var(--text)}
+  .month-selector-trigger .arrow{font-size:10px;transition:transform 0.15s;margin-left:4px}
+  .month-selector-trigger.open .arrow{transform:rotate(180deg)}
+  .month-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:100;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px;min-width:280px;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+  .month-dropdown.open{display:block}
+  .month-dropdown-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .month-dropdown-header span{font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);font-family:var(--mono)}
+  .month-dropdown-header div{display:flex;gap:6px}
+  .month-ytd-row{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .month-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .month-cb-label{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;cursor:pointer;font-size:13px;font-family:var(--mono);color:var(--text2);transition:background 0.1s,color 0.1s;border:1px solid transparent}
+  .month-cb-label:hover{background:var(--surface2);color:var(--text)}
+  .month-cb-label input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+  .month-cb-label.checked{color:var(--text);border-color:var(--border)}
+  .month-cb-label.future{opacity:0.4;pointer-events:none}
+  .month-apply-btn{width:100%;margin-top:10px;padding:7px;border-radius:5px;border:1px solid rgba(124,158,255,0.4);background:rgba(124,158,255,0.12);color:#afc6ff;font-family:var(--mono);font-size:13px;cursor:pointer;transition:background 0.12s}
+  .month-apply-btn:hover{background:rgba(124,158,255,0.2)}
+
+  .zoom-wrap{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:20px}
+  .zoom-label{font-size:12px;font-family:var(--mono);color:var(--text3);white-space:nowrap}
+  .zoom-label strong{color:var(--text2)}
+  input[type=range]{flex:1;accent-color:var(--accent);height:4px;cursor:pointer;min-width:120px}
+  .zoom-vals{font-size:12px;font-family:var(--mono);color:var(--text2);white-space:nowrap;min-width:80px;text-align:right}
+
+  .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px 28px 20px;margin-bottom:0}
+  .chart-inner{position:relative;width:100%;height:440px}
+
+  /* Performance bands legend below chart */
+  .perf-bands-wrap{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:14px 28px;margin-bottom:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .band-pill{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:12px;font-family:var(--mono)}
+  .band-swatch{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+
+  /* Caveat note */
+  .caveat-note{font-size:12px;font-family:var(--mono);color:var(--text3);padding:10px 16px;margin-bottom:20px;border-left:2px solid rgba(255,255,255,0.1);line-height:1.7}
+  .caveat-note strong{color:var(--text2)}
+  .caveat-accordion{margin-top:10px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.02)}
+  .caveat-accordion summary{cursor:pointer;padding:8px 12px;color:#e8a838;font-weight:500;list-style:none;user-select:none}
+  .caveat-accordion summary::-webkit-details-marker{display:none}
+  .caveat-accordion summary::before{content:'▸ ';display:inline-block;transition:transform 0.15s}
+  .caveat-accordion[open] summary::before{content:'▾ '}
+  .caveat-accordion .accordion-body{padding:0 12px 12px;border-top:1px solid var(--border)}
+  .outer-accordion{border:1px solid var(--border);background:var(--surface)}
+  .outer-accordion>summary{font-size:13px;padding:12px 16px;color:var(--text2)}
+  .outer-accordion>summary::before{color:#e8a838}
+  .outer-accordion .caveat-note,.outer-accordion .projection-note{border-left:none;margin-bottom:0}
+  .outer-accordion .projection-note{border-top:1px solid var(--border)}
+  .accordion-body table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}
+  .accordion-body td,.accordion-body th{padding:4px 8px;text-align:left;border-bottom:1px solid var(--border)}
+
+  .projection-note{font-size:12px;font-family:var(--mono);color:var(--text3);padding:8px 16px;margin-bottom:20px;border-left:2px solid rgba(232,168,56,0.4)}
+  .projection-note strong{color:#e8a838}
+
+  .total-info{display:none;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);font-size:13px;font-family:var(--mono)}
+  .total-info.visible{display:flex}
+  .total-info-item{display:flex;flex-direction:column;gap:2px}
+  .total-info-item .ti-val{font-size:20px;font-weight:600;color:var(--text)}
+  .total-info-item .ti-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px}
+  .total-divider{width:1px;background:var(--border2);align-self:stretch}
+
+  .data-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:24px;overflow-x:auto}
+  .data-table-wrap summary{font-size:12px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);font-family:var(--mono);cursor:pointer;padding:4px 0}
+  .data-table-wrap summary:hover{color:var(--text2)}
+  .data-table-wrap summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:3px}
+  .data-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;font-family:var(--mono)}
+  .data-table th{text-align:left;padding:8px 12px;color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border2)}
+  .data-table td{padding:7px 12px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle}
+  .data-table tr:last-child td{border-bottom:none}
+  .data-table tr:hover td{background:var(--surface2)}
+  .data-table td.score-cell{padding:0}
+  .score-pill{display:block;padding:7px 4px;border-radius:0;font-size:12px;font-weight:500;text-align:center}
+
+  .toggles-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:24px}
+  .toggles-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .toggles-header span{font-size:12px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);font-family:var(--mono)}
+  .toggles-actions{display:flex;gap:6px}
+  .toggles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+  .toggle-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:400;transition:opacity 0.15s,border-color 0.15s,color 0.15s;text-align:left;overflow:hidden;min-height:40px}
+  .toggle-btn:hover{border-color:var(--border2);color:var(--text)}
+  .toggle-btn[aria-pressed="true"]{color:var(--text)}
+  .toggle-btn[aria-pressed="false"]{opacity:0.35}
+  .toggle-btn[aria-pressed="false"]:hover{opacity:0.58}
+  .swatch{width:22px;height:3px;border-radius:2px;flex-shrink:0}
+  .goal-id{font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;width:26px}
+  .toggle-btn[aria-pressed="true"] .goal-id{color:inherit;opacity:0.7}
+  .score-badge{margin-left:auto;font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:3px;flex-shrink:0;font-weight:500}
+
+  footer{margin-top:8px;font-size:12px;color:var(--text3);font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:20px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="sr-only" style="position:absolute;top:8px;left:8px;background:#7c9eff;color:#000;padding:6px 12px;border-radius:4px;font-weight:600;z-index:9999;text-decoration:none;">Skip to main content</a>
+
+<header role="banner">
+  <div class="header-left">
+    <h1>Design Team Goals — 2026</h1>
+    <p>Cumulative points progress &nbsp;·&nbsp; Jan – Dec &nbsp;·&nbsp; CW / AP / CE</p>
+  </div>
+  <div class="header-right" aria-label="Summary statistics">
+    <div class="stat">
+      <div class="stat-val" id="stat-max" aria-label="Maximum possible score">48</div>
+      <div class="stat-lbl" aria-hidden="true" id="stat-max-lbl">Max possible</div>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat">
+      <div class="stat-val" id="stat-actual">—</div>
+      <div class="stat-lbl" aria-hidden="true" id="stat-actual-lbl">Median cum. (Mar)</div>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat">
+      <div class="stat-val" id="stat-projected">—</div>
+      <div class="stat-lbl" aria-hidden="true" id="stat-projected-lbl">Projected year-end</div>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat">
+      <div class="stat-val" aria-label="14 active goals">14</div>
+      <div class="stat-lbl" aria-hidden="true">Active goals</div>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+
+  <!-- View switch -->
+  <div style="display:flex;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <span class="view-switch-label" id="view-switch-label">View</span>
+    <div class="view-switch" role="group" aria-labelledby="view-switch-label">
+      <button id="btn-individual" aria-pressed="true"  onclick="switchView('individual',this)">Individual goals</button>
+      <button id="btn-total"      aria-pressed="false" onclick="switchView('total',this)">Total accumulated</button>
+    </div>
+  </div>
+
+  <!-- Key bar -->
+  <div class="key-bar" role="list" aria-label="Chart legend">
+    <div class="key-item" role="listitem">
+      <span class="key-symbol" style="background:#1a3a1a;color:#4ade80;" aria-hidden="true">4</span><span>4 pts — on track</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <span class="key-symbol" style="background:#3a2e00;color:#fbbf24;" aria-hidden="true">3</span><span>3 pts — monitor</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <span class="key-symbol" style="background:#3a1e00;color:#fb923c;" aria-hidden="true">2</span><span>2 pts — at risk</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <span class="key-symbol" style="background:#3a0a0a;color:#f87171;" aria-hidden="true">1</span><span>1 pt — critical</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <svg class="key-line" viewBox="0 0 22 4" aria-hidden="true"><line x1="0" y1="2" x2="22" y2="2" stroke="#5a5a7a" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      <span>Max possible</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <svg class="key-line" viewBox="0 0 22 4" aria-hidden="true"><line x1="0" y1="2" x2="22" y2="2" stroke="#444450" stroke-width="1.5" stroke-dasharray="3 4"/></svg>
+      <span style="color:var(--text3);">Sunset goal (G8)</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true">
+        <line x1="11" y1="0" x2="11" y2="10" stroke="rgba(148,163,184,0.4)" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="11" y="14" font-size="7" font-family="DM Mono,monospace" fill="rgba(148,163,184,0.7)" text-anchor="middle">starts</text>
+      </svg>
+      <span style="color:var(--text3);">Mid-year start (G10, G15)</span>
+    </div>
+    <div class="key-item" role="listitem">
+      <svg class="key-line" viewBox="0 0 22 4" aria-hidden="true"><line x1="0" y1="2" x2="22" y2="2" stroke="#e8a838" stroke-width="2" stroke-dasharray="6 3"/></svg>
+      <span id="key-median-label">Median (actual → projected)</span>
+    </div>
+  </div>
+
+  <!-- Total info bar -->
+  <div class="total-info" id="total-info" role="region" aria-label="Total accumulated summary">
+    <div class="total-info-items" id="ti-months" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+    <div class="total-divider" aria-hidden="true"></div>
+    <div class="total-info-item"><span class="ti-val" id="ti-pct">—</span><span class="ti-lbl" id="ti-pct-lbl">% of max</span></div>
+    <div class="total-divider" aria-hidden="true"></div>
+    <div class="total-info-item"><span class="ti-val" id="ti-proj">—</span><span class="ti-lbl">Projected Dec total</span></div>
+  </div>
+
+  <!-- Assignee filter -->
+  <div class="controls-row" id="assignee-controls">
+    <div class="control-group" role="group" aria-label="Filter goals by assignee">
+      <span class="ctrl-label" id="filter-label">Assignee</span>
+      <div class="btn-group" role="group" aria-labelledby="filter-label">
+        <button class="btn" aria-pressed="true"  onclick="filterAssignee('all',this)">All</button>
+        <button class="btn" aria-pressed="false" onclick="filterAssignee('CW',this)">Craig (CW)</button>
+        <button class="btn" aria-pressed="false" onclick="filterAssignee('AP',this)">Adrian (AP)</button>
+        <button class="btn" aria-pressed="false" onclick="filterAssignee('CE',this)">Chukwuka (CE)</button>
+        <button class="btn" aria-pressed="false" onclick="filterAssignee('Team',this)">Team</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Month selector + zoom row -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px;">
+
+    <!-- Month selector dropdown -->
+    <div class="month-selector-wrap" id="month-selector-wrap">
+      <div class="month-selector-trigger" id="month-trigger" role="button" tabindex="0"
+           aria-haspopup="true" aria-expanded="false" aria-controls="month-dropdown"
+           onclick="toggleMonthDropdown()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleMonthDropdown()">
+        <span id="month-trigger-label">Months: all</span>
+        <span class="arrow" aria-hidden="true">▼</span>
+      </div>
+      <div class="month-dropdown" id="month-dropdown" role="dialog" aria-label="Select months to display">
+        <div class="month-dropdown-header">
+          <span>Select months</span>
+          <div>
+            <button class="btn" style="padding:3px 8px;min-height:unset;font-size:11px;" onclick="selectAllMonths()">All</button>
+            <button class="btn" style="padding:3px 8px;min-height:unset;font-size:11px;" onclick="clearAllMonths()">None</button>
+          </div>
+        </div>
+        <!-- Year to date -->
+        <div class="month-ytd-row">
+          <label class="month-cb-label" id="ytd-label">
+            <input type="checkbox" id="cb-ytd" onchange="handleYTD(this)">
+            Year to date (Jan – <span id="ytd-month-name">Apr</span>)
+          </label>
+        </div>
+        <!-- Individual months -->
+        <div class="month-grid" id="month-grid"></div>
+        <button class="month-apply-btn" onclick="applyMonthSelection()">Apply</button>
+      </div>
+    </div>
+
+    <!-- Zoom slider -->
+    <div class="zoom-wrap" style="flex:1;margin-bottom:0;">
+      <span class="zoom-label" id="zoom-label"><strong>Y-axis ceiling:</strong>&nbsp; zoom in to see detail</span>
+      <input type="range" id="ymax-slider" min="1" max="10" value="10" step="1"
+        aria-label="Y-axis maximum. Drag left to zoom in."
+        oninput="updateZoom(this.value)">
+      <span class="zoom-vals" id="zoom-vals" aria-live="polite">0 – 48 pts</span>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-wrap">
+    <div class="chart-inner">
+      <canvas id="goalsChart" role="img"
+        aria-label="Line chart showing design team goal progress 2026. Performance bands shown as background zones. See data table below for figures.">
+        Cumulative scores through March — G1:10, G2:9, G4:9, G5:10, G6:6, G8:5, G9:8, G10:1, G11:8, G13:7, G14:8, G16:8, G17:10.
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Performance bands strip below chart -->
+  <div class="perf-bands-wrap" role="region" aria-label="Performance band reference">
+    <span style="font-size:11px;font-family:var(--mono);color:var(--text3);margin-right:4px;text-transform:uppercase;letter-spacing:0.6px;">Performance bands</span>
+    <div class="band-pill" style="background:rgba(74,222,128,0.08);color:#4ade80;">
+      <span class="band-swatch" style="background:rgba(74,222,128,0.25);" aria-hidden="true"></span>
+      <span>Exceptional &nbsp;88–100% &nbsp;(44–48 pts)</span>
+    </div>
+    <div class="band-pill" style="background:rgba(96,165,250,0.08);color:#60a5fa;">
+      <span class="band-swatch" style="background:rgba(96,165,250,0.2);" aria-hidden="true"></span>
+      <span>Good &nbsp;72–87% &nbsp;(36–43 pts)</span>
+    </div>
+    <div class="band-pill" style="background:rgba(251,191,36,0.08);color:#fbbf24;">
+      <span class="band-swatch" style="background:rgba(251,191,36,0.2);" aria-hidden="true"></span>
+      <span>Acceptable &nbsp;52–71% &nbsp;(26–35 pts)</span>
+    </div>
+    <div class="band-pill" style="background:rgba(248,113,113,0.08);color:#f87171;">
+      <span class="band-swatch" style="background:rgba(248,113,113,0.2);" aria-hidden="true"></span>
+      <span>Failure &nbsp;&lt;52% &nbsp;(&lt;26 pts)</span>
+    </div>
+  </div>
+
+  <!-- Caveat note -->
+  <details class="caveat-accordion outer-accordion" id="notes-accordion" style="margin-bottom:20px;">
+    <summary>Notes &amp; methodology — performance bands, sunset goals, median vs. total, projections</summary>
+  <div class="caveat-note" role="note" aria-label="Important caveat on performance band interpretation">
+    <strong>Important caveat on these bands:</strong> Not all low scores represent a failure of execution. A goal scoring 1 or 2 points because of engineering dependencies, stakeholder unavailability, or organisational blockers outside the design team's control tells a very different story from a goal that simply wasn't progressed. Where scores sit in the Failure or Acceptable bands, it is worth distinguishing between <strong>execution failures</strong> (the team did not drive the work) and <strong>external failures</strong> (the team was blocked by factors they could not control). Goal 6 (Swift) in March and Goal 16 (Collab Lab) are examples of the latter. This context should always accompany the numbers when presenting to senior stakeholders.
+    <br><br>
+    <strong>Goal 8 — Roadmap Visibility</strong> was sunset at the end of April 2026 following a strategic decision to cease pursuing it due to a lack of organisational traction. Its historical scores (Jan–Apr) remain in the record and count toward totals for those months. From May onward, Goal 8 is excluded from the max possible calculation, median, and projections. The year-end maximum therefore reflects 12 active goals rather than 13. This is a deliberate strategic decision, not a performance failure, and should be framed as such when presenting to senior stakeholders.
+    <br><br>
+    <strong>What the gold line means in each view — they are not the same measurement:</strong>
+    <br><br>
+    In the <strong>Individual goals</strong> view, the gold line is the <strong>median</strong>: at each month, it finds the goal sitting in the middle of the pack (on that goal's own 0–48 points-for-the-year scale) and plots its value. It answers "is a <em>typical</em> goal in good shape?" Because it's a median, it deliberately ignores how badly the worst-performing goals are doing — a goal stuck at 1 point doesn't drag the median down unless enough other goals are also struggling, since the median only tracks whoever happens to be in the middle. This makes it a more honest single-line summary of overall delivery health than an average would be: with a small team running a spread of goals at very different stages (some just started, some sunset, some blocked by factors outside design's control), a couple of extreme scores at either end could otherwise swing a single average wildly from month to month, whereas the median stays anchored to what's actually typical.
+    <details class="caveat-accordion" id="median-example-accordion">
+      <summary>See a worked example with this month's actual numbers</summary>
+      <div class="accordion-body" id="median-example-body"></div>
+    </details>
+    <br><br>
+    In the <strong>Total accumulated</strong> view, the gold line changes to a completely different calculation: the <strong>team total</strong>, which sums every active goal's actual score and compares it against the combined max-possible across all of them. It answers "of everything that was theoretically achievable, how much did we actually capture?" Unlike the median, every single goal counts here — so a small number of consistently weak or stalled goals (e.g. Goal 9, Goal 16) directly pull this figure down, even though they barely move the median in the other view.
+    <br><br>
+    This is why the two views can land in different performance bands at the same point in time: the median is protected from outliers by design, while the total has no such protection. Treat them as answering different questions rather than expecting them to agree.
+  </div>
+
+  <div class="projection-note" role="note">
+    <strong>Projection methodology</strong> — dashed lines from April onward show the trajectory if current performance is maintained. <span id="proj-note-text">Median monthly gain: <strong id="avg-monthly-note">—</strong> pts/goal/month.</span>
+  </div>
+  </details>
+
+  <div class="data-table-wrap">
+    <details>
+      <summary>Accessible data table — cumulative scores by goal and month</summary>
+      <table class="data-table" aria-label="Cumulative goal scores Jan–Jun 2026">
+        <thead>
+          <tr>
+            <th scope="col">Goal</th><th scope="col">Assignee</th>
+            <th scope="col">Jan score</th><th scope="col">Jan cum.</th>
+            <th scope="col">Feb score</th><th scope="col">Feb cum.</th>
+            <th scope="col">Mar score</th><th scope="col">Mar cum.</th>
+            <th scope="col">Apr score</th><th scope="col">Apr cum.</th>
+            <th scope="col">May score</th><th scope="col">May cum.</th>
+            <th scope="col">Jun score</th><th scope="col">Jun cum.</th>
+            <th scope="col">Proj. Dec</th>
+          </tr>
+        </thead>
+        <tbody id="data-table-body"></tbody>
+      </table>
+    </details>
+  </div>
+
+  <div class="toggles-section" id="toggles-section">
+    <div class="toggles-header">
+      <span id="toggles-label">Toggle individual goals</span>
+      <div class="toggles-actions" role="group" aria-label="Bulk toggle controls">
+        <button class="btn" onclick="setAll(true)"  aria-label="Show all goals">Show all</button>
+        <button class="btn" onclick="setAll(false)" aria-label="Hide all goals">Hide all</button>
+      </div>
+    </div>
+    <div class="toggles-grid" id="toggles" role="group" aria-labelledby="toggles-label"></div>
+  </div>
+
+</main>
+
+<footer role="contentinfo">
+  <span>Design Team Goals Tracker · 2026 · Confidential — Manager Use Only</span>
+  <span>Generated April 2026 · Source: Monthly Goals PDFs</span>
+</footer>
+
+<script>
+// ── Data ──────────────────────────────────────────────────
+const GOALS = [
+  // contributors: everyone who should appear when that person's filter is active
+  {id:'G1', num:1, label:'AI workflows & agents',assignee:'Team',contributors:['CW','AP','CE'],color:'#60a5fa',scores:[4,3,3,3,3,2,null,null,null,null,null,null],dash:[],sunset:false,sunsetMonth:null},
+  {id:'G2', num:2, label:'AIUI',                  assignee:'Team',contributors:['CW'],          color:'#34d399',scores:[1,4,4,3,4,null,null,null,null,null,null,null],dash:[6,3],sunset:false,sunsetMonth:null,pausedMonths:[5]},
+  {id:'G4', num:4, label:'Guidde',                assignee:'AP',  contributors:['AP'],           color:'#fbbf24',scores:[2,3,4,4,3,3,null,null,null,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null},
+  {id:'G5', num:5, label:'Userflow',              assignee:'CW',  contributors:['CW','AP'],      color:'#a78bfa',scores:[4,4,2,3,2,3,null,null,null,null,null,null],dash:[],sunset:false,sunsetMonth:null},
+  {id:'G6', num:6, label:'Swift improvements',    assignee:'Team',contributors:['CW','CE'],      color:'#fb923c',scores:[2,3,1,3,2,2,null,null,null,null,null,null],dash:[8,3,2,3],sunset:false,sunsetMonth:null},
+  {id:'G8', num:8, label:'Roadmap visibility',    assignee:'CW',  contributors:['CW'],           color:'#686878',scores:[3,1,1,null,null,null,null,null,null,null,null,null],dash:[4,4],sunset:true,sunsetMonth:3},
+  {id:'G9', num:9, label:'Notifications vision',  assignee:'CE',  contributors:['CE','CW','AP'], color:'#f472b6',scores:[2,4,2,4,1,1,null,null,null,null,null,null],dash:[6,2],sunset:false,sunsetMonth:null},
+  {id:'G10',num:10,label:'Listening tour',        assignee:'CE',  contributors:['CE'],           color:'#94a3b8',scores:[null,null,1,2,2,2,null,null,null,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null,startMonth:2},
+  {id:'G11',num:11,label:'Validation practice',   assignee:'AP',  contributors:['AP'],           color:'#86efac',scores:[2,3,3,4,3,4,null,null,null,null,null,null],dash:[8,3],sunset:false,sunsetMonth:null},
+  {id:'G13',num:13,label:'Team learning',         assignee:'Team',contributors:['CW','AP','CE'], color:'#c084fc',scores:[2,3,2,4,null,null,null,null,null,null,null,null],dash:[5,2,2,2],sunset:false,sunsetMonth:null,pausedMonths:[4,5]},
+  {id:'G14',num:14,label:'Design visibility',     assignee:'CE',  contributors:['CE','CW','AP'], color:'#2dd4bf',scores:[3,3,2,3,3,4,null,null,null,null,null,null],dash:[4,2],sunset:false,sunsetMonth:null},
+  {id:'G15',num:15,label:'UX maturity survey',    assignee:'CW',  contributors:['CW'],           color:'#fde047',scores:[null,null,null,null,null,4,null,null,null,null,null,null],dash:[2,2],sunset:false,sunsetMonth:null,startMonth:5},
+  {id:'G16',num:16,label:'Collab lab',            assignee:'CW',  contributors:['CW'],           color:'#fb7185',scores:[2,4,2,1,1,1,null,null,null,null,null,null],dash:[10,3],sunset:false,sunsetMonth:null},
+  {id:'G17',num:17,label:'Delight',               assignee:'Team',contributors:['CW','CE','AP'], color:'#38bdf8',scores:[4,3,3,4,4,3,null,null,null,null,null,null],dash:[6,3,2,3],sunset:false,sunsetMonth:null},
+];
+
+const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ACTUAL_MONTHS = 6;
+
+// Today's date — determines YTD and future month disabling
+const TODAY = new Date();
+const CURRENT_MONTH_IDX = TODAY.getMonth(); // 0-based; April 2026 = 3
+
+function cumulative(scores){let t=0;return scores.map(s=>s===null?null:(t+=s,t));}
+function scoreColor(s){return s>=4?'#4ade80':s>=3?'#fbbf24':s>=2?'#fb923c':'#f87171';}
+function scoreBg(s){return s>=4?'#1a3a1a':s>=3?'#3a2e00':s>=2?'#3a1e00':'#3a0a0a';}
+
+// ── Helpers ───────────────────────────────────────────────
+// Active goals for a given month index
+// Excludes: sunset goals after their sunset month, and goals not yet started
+function activeGoalsForMonth(mIdx){
+  return GOALS.filter(g=>{
+    if(g.sunset && mIdx > g.sunsetMonth) return false;
+    if(g.startMonth !== undefined && mIdx < g.startMonth) return false;
+    return true;
+  });
+}
+
+// ── Median (excludes sunset goals from projections) ───────
+function computeActualMedians(){
+  return Array.from({length:12},(_,mIdx)=>{
+    if(mIdx>=ACTUAL_MONTHS)return null;
+    const active=activeGoalsForMonth(mIdx);
+    const vals=active.map(g=>cumulative(g.scores)[mIdx]).filter(v=>v!==null);
+    if(!vals.length)return null;
+    const s=[...vals].sort((a,b)=>a-b),mid=Math.floor(s.length/2);
+    return s.length%2!==0?s[mid]:parseFloat(((s[mid-1]+s[mid])/2).toFixed(1));
+  });
+}
+const actualMedians=computeActualMedians();
+const monthlyGain=parseFloat((actualMedians[ACTUAL_MONTHS-1]/ACTUAL_MONTHS).toFixed(2));
+const lastActual=actualMedians[ACTUAL_MONTHS-1];
+const fullMedian=Array.from({length:12},(_,i)=>{
+  if(i<ACTUAL_MONTHS)return actualMedians[i];
+  return Math.min(48,parseFloat((lastActual+monthlyGain*(i-ACTUAL_MONTHS+1)).toFixed(1)));
+});
+const medianActualData=fullMedian.map((v,i)=>i<ACTUAL_MONTHS?v:null);
+const medianProjectData=fullMedian.map((v,i)=>{if(i===ACTUAL_MONTHS-1)return v;if(i>=ACTUAL_MONTHS)return v;return null;});
+const projectedMedianYE=fullMedian[11];
+
+// ── Team totals (sunset goals excluded from May onward) ───
+const monthlyTotals=Array.from({length:12},(_,mIdx)=>{
+  if(mIdx>=ACTUAL_MONTHS)return null;
+  return activeGoalsForMonth(mIdx).reduce((sum,g)=>sum+(g.scores[mIdx]!==null?g.scores[mIdx]:0),0);
+});
+const cumTotals=(()=>{let t=0;return monthlyTotals.map(v=>v===null?null:(t+=v,t));})();
+
+// Max possible: active goals × 4, sunset goals stop contributing after their sunset month,
+// paused goals (no deliverable due that specific month) excluded from that month's max only
+function isCountedForMax(g,mIdx){
+  if(g.sunset && mIdx > g.sunsetMonth) return false;
+  if(g.startMonth !== undefined && mIdx < g.startMonth) return false;
+  if(g.pausedMonths && g.pausedMonths.includes(mIdx)) return false;
+  return true;
+}
+const maxPerMonth=Array.from({length:12},(_,mIdx)=>GOALS.filter(g=>isCountedForMax(g,mIdx)).length*4);
+const cumMaxPossible=(()=>{let t=0;return maxPerMonth.map(v=>(t+=v,t));})();
+
+const totalMonthlyGain=parseFloat((cumTotals[ACTUAL_MONTHS-1]/ACTUAL_MONTHS).toFixed(1));
+const lastTotalActual=cumTotals[ACTUAL_MONTHS-1];
+const fullTotalActual=cumTotals.map((v,i)=>i<ACTUAL_MONTHS?v:null);
+const fullTotalProj=cumTotals.map((v,i)=>{
+  if(i===ACTUAL_MONTHS-1)return v;
+  if(i>=ACTUAL_MONTHS)return Math.min(cumMaxPossible[11],parseFloat((lastTotalActual+totalMonthlyGain*(i-ACTUAL_MONTHS+1)).toFixed(0)));
+  return null;
+});
+const projectedTotalYE=fullTotalProj[11];
+
+// ── Performance bands ─────────────────────────────────────
+// Active goal count for band scaling (exclude sunset goals from May onward)
+const ACTIVE_GOAL_COUNT=GOALS.filter(g=>!g.sunset).length; // 12 after G8 sunset
+const BANDS=[
+  {label:'Exceptional',min:44,max:48,color:'rgba(74,222,128,0.07)'},
+  {label:'Good',       min:36,max:44,color:'rgba(96,165,250,0.07)'},
+  {label:'Acceptable', min:26,max:36,color:'rgba(251,191,36,0.07)'},
+  {label:'Failure',    min:0, max:26,color:'rgba(248,113,113,0.07)'},
+];
+function scaleBand(b,isTotal,monthCount){
+  if(!isTotal)return{min:b.min*(monthCount/12),max:b.max*(monthCount/12),color:b.color};
+  const scale=ACTIVE_GOAL_COUNT*monthCount/12;
+  return{min:Math.round(b.min*scale),max:Math.round(b.max*scale),color:b.color};
+}
+const BAND_TEXT={Exceptional:'#4ade80',Good:'#60a5fa',Acceptable:'#fbbf24',Failure:'#f87171'};
+const BAND_BG={Exceptional:'#1a3a1a',Good:'#1a2a4a',Acceptable:'#3a2e00',Failure:'#3a0a0a'};
+function bandLabelFor(value,scale){
+  for(const b of BANDS){ if(value>=b.min*scale) return b.label; }
+  return 'Failure';
+}
+
+// ── Header stats ──────────────────────────────────────────
+document.getElementById('avg-monthly-note').textContent=monthlyGain.toFixed(2);
+document.getElementById('stat-actual').textContent=lastActual??'—';
+document.getElementById('stat-projected').textContent=projectedMedianYE!==null?projectedMedianYE.toFixed(1):'—';
+const lastIdx=ACTUAL_MONTHS-1;
+const tiMonthsEl=document.getElementById('ti-months');
+for(let mIdx=0;mIdx<ACTUAL_MONTHS;mIdx++){
+  const item=document.createElement('div');
+  item.className='total-info-item';
+  const pct=monthlyTotals[mIdx]!==null?Math.round(monthlyTotals[mIdx]/maxPerMonth[mIdx]*100)+'%':'—';
+  item.innerHTML=`<span class="ti-val">${pct}</span><span class="ti-lbl">${MONTH_LABELS[mIdx]} (${monthlyTotals[mIdx]??'—'}/${maxPerMonth[mIdx]} pts)</span>`;
+  tiMonthsEl.appendChild(item);
+}
+document.getElementById('ti-pct').textContent=cumTotals[lastIdx]!==null?Math.round(cumTotals[lastIdx]/cumMaxPossible[lastIdx]*100)+'%':'—';
+document.getElementById('ti-pct-lbl').textContent=`Cumulative % of max (${MONTH_LABELS[lastIdx]})`;
+document.getElementById('ti-proj').textContent=projectedTotalYE??'—';
+
+// ── Median worked example (uses latest actual month's real data) ──
+(function(){
+  const mIdx=ACTUAL_MONTHS-1;
+  const active=activeGoalsForMonth(mIdx).filter(g=>!(g.pausedMonths&&g.pausedMonths.includes(mIdx)));
+  const rows=active.map(g=>({num:g.num,label:g.label,cum:cumulative(g.scores)[mIdx]})).filter(r=>r.cum!==null);
+  rows.sort((a,b)=>a.cum-b.cum);
+  const vals=rows.map(r=>r.cum);
+  const n=vals.length;
+  const mid=Math.floor(n/2);
+  const median=n%2!==0?vals[mid]:parseFloat(((vals[mid-1]+vals[mid])/2).toFixed(1));
+  const sum=vals.reduce((a,b)=>a+b,0);
+  const avg=parseFloat((sum/n).toFixed(1));
+  const monthName=MONTH_LABELS[mIdx];
+  const medianGoals=n%2!==0?[rows[mid]]:[rows[mid-1],rows[mid]];
+  const medianGoalNames=medianGoals.map(r=>`G${r.num} (${r.cum})`).join(' & ');
+  let html=`<p style="margin:8px 0;">Lining up every active, non-paused goal by ${monthName}'s cumulative score, lowest to highest:</p>`;
+  html+=`<table><thead><tr><th>Goal</th><th>Cumulative score</th></tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    const isMedianRow=medianGoals.some(m=>m.num===r.num);
+    html+=`<tr style="${isMedianRow?'background:rgba(232,168,56,0.12);':''}"><td>G${r.num} — ${r.label}</td><td>${r.cum}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  html+=`<p style="margin:8px 0;"><strong>Median</strong> = the middle value${n%2===0?` (average of the two middle goals, ${medianGoalNames})`:` (${medianGoalNames})`} = <strong style="color:#e8a838;">${median}</strong></p>`;
+  html+=`<p style="margin:8px 0;"><strong>Average</strong> (sum of all ${n} ÷ ${n}) = <strong>${avg}</strong></p>`;
+  const diff=Math.abs(median-avg);
+  html+=`<p style="margin:8px 0;">${diff>=2?`The gap between them (${diff.toFixed(1)} pts) shows the median is staying clear of the goals bunched at the low end of this list — they don't drag it down the way they would an average.`:`The median and average are close this month, which suggests scores are fairly evenly spread rather than clustered at either end.`}</p>`;
+  document.getElementById('median-example-body').innerHTML=html;
+})();
+
+// ── Dataset indices ───────────────────────────────────────
+const MAX_INDIV_IDX=GOALS.length;
+const MED_ACT_IDX=GOALS.length+1;
+const MED_PROJ_IDX=GOALS.length+2;
+const TOT_ACT_IDX=GOALS.length+3;
+const TOT_PROJ_IDX=GOALS.length+4;
+const TOT_MAX_IDX=GOALS.length+5;
+
+// Carries the cumulative total flat through months where an active goal simply has
+// no score (paused, or data not yet captured) — only breaks the line before the
+// goal's first real score (not started) or after a sunset goal's sunset month.
+function cumulativeForLine(g){
+  let t=0,started=false;
+  return g.scores.map((s,i)=>{
+    if(g.sunset && i>g.sunsetMonth) return null;
+    if(i>=ACTUAL_MONTHS) return null;
+    if(s!==null){t+=s;started=true;return t;}
+    return started?t:null;
+  });
+}
+
+// ── Datasets ──────────────────────────────────────────────
+const datasets=GOALS.map(g=>{
+  const isSunset=g.sunset;
+  const lineColor=isSunset?'#444450':g.color;
+  const lineAlpha=isSunset?'18':'12';
+  const lineData=cumulativeForLine(g);
+  return {
+    label:`G${g.num} — ${g.label}${isSunset?' [sunset]':''}`,
+    data:lineData,
+    borderColor:lineColor,
+    backgroundColor:lineColor+lineAlpha,
+    borderDash:isSunset?[3,4]:g.dash,
+    borderWidth:isSunset?1.5:2,
+    pointRadius:g.scores.map(s=>s!==null?5:0),
+    pointHoverRadius:8,
+    pointStyle:isSunset?'crossRot':'circle',
+    pointBackgroundColor:g.scores.map(s=>s===null?'transparent':(isSunset?'#555566':scoreColor(s))),
+    pointBorderColor:g.scores.map(s=>s===null?'transparent':lineColor),
+    pointBorderWidth:1.5,spanGaps:false,tension:0.3,hidden:false,
+  };
+});
+
+datasets.push({label:'Max possible (per goal)',data:Array.from({length:12},(_,i)=>4*(i+1)),borderColor:'#4a4a6a',borderDash:[4,3],borderWidth:1.5,pointRadius:0,tension:0,hidden:false,fill:false});
+datasets.push({label:'Median (actual)',data:medianActualData,borderColor:'#e8a838',borderDash:[],borderWidth:3,pointRadius:medianActualData.map(v=>v!==null?6:0),pointStyle:'rectRot',pointBackgroundColor:'#e8a838',pointBorderColor:'#c8880a',pointBorderWidth:2,tension:0.3,hidden:false,fill:false,spanGaps:false});
+datasets.push({label:'Median (projected)',data:medianProjectData,borderColor:'#e8a838',borderDash:[6,4],borderWidth:2,pointRadius:medianProjectData.map((v,i)=>(v!==null&&i>=ACTUAL_MONTHS)?4:0),pointStyle:'rectRot',pointBackgroundColor:'rgba(232,168,56,0.4)',pointBorderColor:'#e8a838',pointBorderWidth:1.5,tension:0.3,hidden:false,fill:false,spanGaps:false});
+datasets.push({label:'Team total (actual)',data:fullTotalActual,borderColor:'#7c9eff',borderDash:[],borderWidth:3,pointRadius:fullTotalActual.map(v=>v!==null?6:0),pointStyle:'circle',pointBackgroundColor:'#7c9eff',pointBorderColor:'#5070cc',pointBorderWidth:2,tension:0.3,hidden:true,fill:false,spanGaps:false});
+datasets.push({label:'Team total (projected)',data:fullTotalProj,borderColor:'#7c9eff',borderDash:[6,4],borderWidth:2,pointRadius:fullTotalProj.map((v,i)=>(v!==null&&i>=ACTUAL_MONTHS)?4:0),pointStyle:'circle',pointBackgroundColor:'rgba(124,158,255,0.4)',pointBorderColor:'#7c9eff',pointBorderWidth:1.5,tension:0.3,hidden:true,fill:false,spanGaps:false});
+datasets.push({label:'Max possible (team total)',data:cumMaxPossible,borderColor:'#4a4a6a',borderDash:[4,3],borderWidth:1.5,pointRadius:0,tension:0,hidden:true,fill:false});
+
+// ── Chart ─────────────────────────────────────────────────
+let visibleMonths=Array.from({length:12},(_,i)=>true); // all visible by default
+let currentView='individual';
+
+const chart=new Chart(document.getElementById('goalsChart'),{
+  type:'line',
+  data:{labels:MONTH_LABELS,datasets},
+  options:{
+    responsive:true,maintainAspectRatio:false,animation:{duration:260},
+    interaction:{mode:'nearest',intersect:true},
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'#1e1e2e',borderColor:'rgba(255,255,255,0.14)',borderWidth:1,
+        titleColor:'#a0a0b4',bodyColor:'#f0f0f8',padding:14,
+        displayColors:true,boxWidth:10,boxHeight:10,
+        callbacks:{
+          title:ctx=>{
+            if(!ctx.length)return'';
+            const item=ctx[0];
+            const mIdx=item.dataIndex;
+            const isProj=mIdx>=ACTUAL_MONTHS;
+            const dsIdx=item.datasetIndex;
+            if(dsIdx>=MAX_INDIV_IDX){return isProj?`${MONTH_LABELS[mIdx]} (projected)`:MONTH_LABELS[mIdx];}
+            const g=GOALS[dsIdx];
+            return`G${g.num} — ${g.label}${isProj?' (projected)':''}`;
+          },
+          beforeBody:ctx=>{
+            if(!ctx.length)return[];
+            const item=ctx[0];
+            const dsIdx=item.datasetIndex;
+            if(dsIdx>=MAX_INDIV_IDX)return[];
+            const g=GOALS[dsIdx];
+            const assigneeMap={CW:'Craig Wetherall',AP:'Adrian Paylor',CE:'Chukwuka Ezeoke',Team:'Team'};
+            const mIdx=item.dataIndex;
+            const monthName=MONTH_LABELS[mIdx];
+            const lines=[];
+            if(g.sunset) lines.push(`  ⚑ Sunset — goal closed end of April 2026`);
+            lines.push(`  Assignee: ${assigneeMap[g.assignee]||g.assignee}  ·  ${monthName}`);
+            if(g.startMonth!==undefined) lines.push(`  Active from: ${MONTH_LABELS[g.startMonth]} (inactive prior months)`);
+            // Show other contributors if any beyond assignee
+            const otherContribs=g.contributors.filter(c=>c!==g.assignee).map(c=>assigneeMap[c]||c);
+            if(otherContribs.length) lines.push(`  Also contributed: ${otherContribs.join(', ')}`);
+            lines.push('');
+            return lines;
+          },
+          label:ctx=>{
+            const v=ctx.parsed.y;
+            if(v===null)return null;
+            const dsIdx=ctx.datasetIndex;
+            const mIdx=ctx.dataIndex;
+            if(dsIdx===MAX_INDIV_IDX)return`  Max possible at this point: ${v} pts`;
+            if(dsIdx===MED_ACT_IDX||dsIdx===MED_PROJ_IDX)return`  Median trajectory: ${v} pts`;
+            if(dsIdx===TOT_ACT_IDX||dsIdx===TOT_PROJ_IDX)return`  Team total: ${v} pts`;
+            if(dsIdx===TOT_MAX_IDX)return`  Team max possible: ${v} pts`;
+            const g=GOALS[dsIdx];
+            const isProj=mIdx>=ACTUAL_MONTHS;
+            const lines=[];
+            lines.push(`  Cumulative score: ${v} pts`);
+            if(!isProj&&g.scores[mIdx]!==null){
+              const s=g.scores[mIdx];
+              const band=s>=4?'On track':s>=3?'Monitor':s>=2?'At risk':'Critical';
+              lines.push(`  This month: ${s} pts — ${band}`);
+            }
+            const maxSoFar=4*(mIdx+1);
+            const pct=Math.round(v/maxSoFar*100);
+            lines.push(`  ${pct}% of max possible at this point`);
+            return lines;
+          },
+          afterBody:ctx=>{
+            if(!ctx.length)return[];
+            const item=ctx[0];
+            const dsIdx=item.datasetIndex;
+            const mIdx=item.dataIndex;
+            if(dsIdx>=MAX_INDIV_IDX||mIdx>=ACTUAL_MONTHS)return[];
+            const g=GOALS[dsIdx];
+            const cum=cumulative(g.scores);
+            const v=cum[mIdx];
+            if(v===null)return[];
+            const projected=Math.min(48,parseFloat((v+monthlyGain*(11-mIdx)).toFixed(1)));
+            const band=projected>=44?'Exceptional':projected>=36?'Good':projected>=26?'Acceptable':'Failure (needs attention)';
+            return['',`  Proj. year-end: ${projected} pts → ${band}`];
+          }
+        },
+        filter:item=>item.parsed.y!==null&&!item.dataset.hidden,
+      }
+    },
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6a6a8a',font:{size:12,family:'DM Mono'},autoSkip:false,maxRotation:0}},
+      y:{min:0,max:48,grid:{color:'rgba(255,255,255,0.05)'},
+        ticks:{color:'#6a6a8a',font:{size:11,family:'DM Mono'},stepSize:4,callback:v=>v},
+        title:{display:true,text:'Cumulative points',color:'#6a6a8a',font:{size:11,family:'DM Mono'}}
+      }
+    }
+  }
+});
+
+// ── Plugins ───────────────────────────────────────────────
+// Projection shade
+Chart.register({
+  id:'projShade',
+  beforeDraw(ch){
+    const{ctx,chartArea,scales}=ch;if(!chartArea)return;
+    const xStart=scales.x.getPixelForValue(ACTUAL_MONTHS-0.5);
+    ctx.save();
+    ctx.fillStyle='rgba(100,120,255,0.03)';
+    ctx.fillRect(xStart,chartArea.top,chartArea.right-xStart,chartArea.bottom-chartArea.top);
+    ctx.strokeStyle='rgba(124,158,255,0.15)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(xStart,chartArea.top);ctx.lineTo(xStart,chartArea.bottom);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(124,158,255,0.4)';ctx.font='11px DM Mono,monospace';ctx.textAlign='left';
+    ctx.fillText('projected →',xStart+6,chartArea.top+14);
+    ctx.restore();
+  }
+});
+
+// Performance bands
+Chart.register({
+  id:'perfBands',
+  beforeDatasetsDraw(ch){
+    const{ctx,chartArea,scales}=ch;if(!chartArea)return;
+    const isTotal=currentView==='total';
+    const monthCount=visibleMonths.filter(Boolean).length||12;
+    ctx.save();
+    BANDS.forEach(b=>{
+      const sb=scaleBand(b,isTotal,monthCount);
+      const yTop=scales.y.getPixelForValue(Math.min(sb.max,scales.y.max));
+      const yBot=scales.y.getPixelForValue(Math.max(sb.min,scales.y.min));
+      if(yTop>=yBot)return;
+      ctx.fillStyle=b.color;
+      ctx.fillRect(chartArea.left,yTop,chartArea.right-chartArea.left,yBot-yTop);
+    });
+    ctx.restore();
+  }
+});
+
+// ── Start marker plugin — marks goals that began mid-year ─
+Chart.register({
+  id:'startMarker',
+  afterDatasetsDraw(ch){
+    const{ctx,chartArea,scales}=ch;if(!chartArea)return;
+    GOALS.forEach((g,i)=>{
+      if(g.startMonth===undefined)return;
+      const ds=ch.data.datasets[i];
+      if(ds.hidden)return;
+      const cum=cumulative(g.scores);
+      const val=cum[g.startMonth];
+      if(val===null)return;
+      const xPx=scales.x.getPixelForValue(g.startMonth);
+      const yPx=scales.y.getPixelForValue(val);
+      ctx.save();
+      // Dashed vertical line from top of chart to point
+      ctx.strokeStyle='rgba(148,163,184,0.35)';
+      ctx.lineWidth=1;
+      ctx.setLineDash([2,3]);
+      ctx.beginPath();
+      ctx.moveTo(xPx,chartArea.top+20);
+      ctx.lineTo(xPx,yPx-10);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // "starts" label at top
+      ctx.fillStyle='rgba(148,163,184,0.6)';
+      ctx.font='10px DM Mono,monospace';
+      ctx.textAlign='center';
+      ctx.fillText('starts',xPx,chartArea.top+18);
+      ctx.restore();
+    });
+  }
+});
+
+chart.update();
+
+// ── Month selector ────────────────────────────────────────
+const ytdMonthName=MONTH_LABELS[CURRENT_MONTH_IDX];
+document.getElementById('ytd-month-name').textContent=ytdMonthName;
+
+const monthGrid=document.getElementById('month-grid');
+MONTH_LABELS.forEach((m,i)=>{
+  const isFuture=i>CURRENT_MONTH_IDX;
+  const lbl=document.createElement('label');
+  lbl.className='month-cb-label checked'+(isFuture?' future':'');
+  lbl.setAttribute('aria-label',`${m}${isFuture?' (future, unavailable)':''}`);
+  lbl.innerHTML=`<input type="checkbox" data-month="${i}" ${isFuture?'disabled':''} checked onchange="handleMonthCb()">${m}`;
+  monthGrid.appendChild(lbl);
+});
+
+function toggleMonthDropdown(){
+  const trigger=document.getElementById('month-trigger');
+  const dd=document.getElementById('month-dropdown');
+  const open=dd.classList.toggle('open');
+  trigger.classList.toggle('open',open);
+  trigger.setAttribute('aria-expanded',String(open));
+}
+// Close dropdown on outside click
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('month-selector-wrap');
+  if(!wrap.contains(e.target)){
+    document.getElementById('month-dropdown').classList.remove('open');
+    document.getElementById('month-trigger').classList.remove('open');
+    document.getElementById('month-trigger').setAttribute('aria-expanded','false');
+  }
+});
+
+function handleYTD(cb){
+  const cbs=monthGrid.querySelectorAll('input[type=checkbox]');
+  if(cb.checked){
+    cbs.forEach((c,i)=>{
+      if(i<=CURRENT_MONTH_IDX){c.checked=true;c.closest('label').classList.add('checked');}
+      else{c.checked=false;c.closest('label').classList.remove('checked');}
+    });
+  }
+}
+
+function handleMonthCb(){
+  // Uncheck YTD if manual change
+  document.getElementById('cb-ytd').checked=false;
+}
+
+function selectAllMonths(){
+  monthGrid.querySelectorAll('input[type=checkbox]:not([disabled])').forEach(c=>{c.checked=true;c.closest('label').classList.add('checked');});
+  document.getElementById('cb-ytd').checked=false;
+}
+
+function clearAllMonths(){
+  monthGrid.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;c.closest('label').classList.remove('checked');});
+  document.getElementById('cb-ytd').checked=false;
+}
+
+function applyMonthSelection(){
+  const cbs=monthGrid.querySelectorAll('input[type=checkbox]');
+  visibleMonths=Array.from(cbs).map(c=>c.checked);
+  const selected=MONTH_LABELS.filter((_,i)=>visibleMonths[i]);
+
+  // Update chart labels and filter data
+  const newLabels=MONTH_LABELS.filter((_,i)=>visibleMonths[i]);
+  chart.data.labels=newLabels;
+
+  // Remap each dataset to only the selected month indices
+  datasets.forEach((ds,dsIdx)=>{
+    const original=getOriginalData(dsIdx);
+    chart.data.datasets[dsIdx].data=original.filter((_,i)=>visibleMonths[i]);
+    // Remap point arrays
+    if(chart.data.datasets[dsIdx].pointRadius&&Array.isArray(chart.data.datasets[dsIdx].pointRadius)){
+      chart.data.datasets[dsIdx].pointRadius=chart.data.datasets[dsIdx].pointRadius.filter?
+        getOriginalPointRadius(dsIdx).filter((_,i)=>visibleMonths[i]):
+        chart.data.datasets[dsIdx].pointRadius;
+    }
+  });
+
+  // Update trigger label
+  const label=selected.length===12?'Months: all':
+    selected.length===0?'Months: none':
+    selected.length<=4?'Months: '+selected.join(', '):`Months: ${selected.length} selected`;
+  document.getElementById('month-trigger-label').textContent=label;
+
+  // Close dropdown
+  document.getElementById('month-dropdown').classList.remove('open');
+  document.getElementById('month-trigger').classList.remove('open');
+  document.getElementById('month-trigger').setAttribute('aria-expanded','false');
+
+  // Reset zoom to fit
+  updateZoom(document.getElementById('ymax-slider').value);
+  chart.update();
+}
+
+// Store original data arrays for remapping
+const originalData=datasets.map(ds=>[...ds.data]);
+const originalPointRadius=datasets.map(ds=>Array.isArray(ds.pointRadius)?[...ds.pointRadius]:null);
+function getOriginalData(idx){return originalData[idx];}
+function getOriginalPointRadius(idx){return originalPointRadius[idx]||[];}
+
+// ── Y-axis zoom ───────────────────────────────────────────
+const ZOOM_LEVELS_INDIV=[6,8,10,12,14,16,20,24,32,40,48];
+const ZOOM_LEVELS_TOTAL=[50,80,100,130,160,200,260,320,400,500,600];
+
+function updateZoom(val){
+  const levels=currentView==='individual'?ZOOM_LEVELS_INDIV:ZOOM_LEVELS_TOTAL;
+  const maxVal=levels[val-1];
+  chart.options.scales.y.max=maxVal;
+  const isIndiv=currentView==='individual';
+  const step=isIndiv?(maxVal<=12?1:maxVal<=24?2:4):(maxVal<=100?10:maxVal<=300?20:50);
+  chart.options.scales.y.ticks.stepSize=step;
+  chart.options.scales.y.ticks.callback=v=>v;
+  chart.update();
+  document.getElementById('zoom-vals').textContent=`0 – ${maxVal} pts`;
+  const isMax=val==10;
+  document.getElementById('zoom-label').innerHTML=`<strong>Y-axis ceiling:</strong>&nbsp; ${isMax?'full range':`zoomed to ${maxVal} pts`}`;
+}
+
+// ── View switching ────────────────────────────────────────
+function switchView(view,clickedBtn){
+  currentView=view;
+  document.getElementById('btn-individual').setAttribute('aria-pressed',String(view==='individual'));
+  document.getElementById('btn-total').setAttribute('aria-pressed',String(view==='total'));
+  const isIndiv=view==='individual';
+  GOALS.forEach((_,i)=>{chart.data.datasets[i].hidden=!isIndiv;});
+  chart.data.datasets[MAX_INDIV_IDX].hidden=!isIndiv;
+  chart.data.datasets[MED_ACT_IDX].hidden=!isIndiv;
+  chart.data.datasets[MED_PROJ_IDX].hidden=!isIndiv;
+  chart.data.datasets[TOT_ACT_IDX].hidden=isIndiv;
+  chart.data.datasets[TOT_PROJ_IDX].hidden=isIndiv;
+  chart.data.datasets[TOT_MAX_IDX].hidden=isIndiv;
+  document.getElementById('toggles-section').style.display=isIndiv?'':'none';
+  document.getElementById('assignee-controls').style.display=isIndiv?'':'none';
+  document.getElementById('total-info').classList.toggle('visible',!isIndiv);
+  document.getElementById('key-median-label').textContent=isIndiv?'Median (actual → projected)':'Team total (actual → projected)';
+  document.getElementById('stat-max').textContent=isIndiv?'48':cumMaxPossible[11];
+  document.getElementById('stat-max-lbl').textContent=isIndiv?'Max possible':'Max possible (total)';
+  document.getElementById('stat-actual').textContent=isIndiv?(lastActual??'—'):(lastTotalActual??'—');
+  document.getElementById('stat-actual-lbl').textContent=isIndiv?'Median cum. (Mar)':'Total cum. (Mar)';
+  document.getElementById('stat-projected').textContent=isIndiv?(projectedMedianYE!==null?projectedMedianYE.toFixed(1):'—'):(projectedTotalYE??'—');
+  document.getElementById('stat-projected-lbl').textContent=isIndiv?'Projected year-end':'Projected Dec total';
+  document.getElementById('proj-note-text').innerHTML=isIndiv?`Median monthly gain: <strong>${monthlyGain.toFixed(2)}</strong> pts/goal/month.`:`Team total monthly gain: <strong>${totalMonthlyGain}</strong> pts/month.`;
+  chart.options.scales.y.title.text=isIndiv?'Cumulative points':'Total cumulative points (all goals)';
+  const slider=document.getElementById('ymax-slider');
+  slider.value=10;
+  chart.options.scales.y.max=isIndiv?48:ZOOM_LEVELS_TOTAL[9];
+  chart.options.scales.y.ticks.stepSize=isIndiv?4:50;
+  document.getElementById('zoom-vals').textContent=`0 – ${isIndiv?48:ZOOM_LEVELS_TOTAL[9]} pts`;
+  document.getElementById('zoom-label').innerHTML='<strong>Y-axis ceiling:</strong>&nbsp; full range';
+  chart.update();
+}
+
+// ── Data table ────────────────────────────────────────────
+const tbody=document.getElementById('data-table-body');
+GOALS.forEach(g=>{
+  const cum=cumulative(g.scores);
+  const lastCum=cum[ACTUAL_MONTHS-1]??0;
+  const projDec=Math.min(48,parseFloat((lastCum+monthlyGain*(11-(ACTUAL_MONTHS-1))).toFixed(1)));
+  const tr=document.createElement('tr');
+  function sc(raw,c){
+    if(raw===null)return`<td style="color:var(--text3);">—</td><td style="color:var(--text3);">—</td>`;
+    return`<td class="score-cell"><span class="score-pill" style="background:${scoreBg(raw)};color:${scoreColor(raw)};">${raw}</span></td><td style="font-weight:500;">${c}</td>`;
+  }
+  let cells='';
+  for(let m=0;m<ACTUAL_MONTHS;m++){cells+=sc(g.scores[m],cum[m]);}
+  const projBand=bandLabelFor(projDec,1);
+  tr.innerHTML=`<th scope="row" style="color:var(--text);font-weight:500;">G${g.num} — ${g.label}</th><td style="color:var(--text2);">${g.assignee}</td>${cells}<td class="score-cell"><span class="score-pill" style="background:${BAND_BG[projBand]};color:${BAND_TEXT[projBand]};font-style:italic;" title="${projBand}">${projDec}</span></td>`;
+  tbody.appendChild(tr);
+});
+
+const totTr=document.createElement('tr');
+totTr.style.borderTop='2px solid rgba(124,158,255,0.3)';
+{
+  let totCells='';
+  for(let m=0;m<ACTUAL_MONTHS;m++){
+    totCells+=`<td class="score-cell"><span class="score-pill" style="background:#1a1a3a;color:#7c9eff;">${monthlyTotals[m]??'—'}</span></td><td style="color:#7c9eff;font-weight:500;">${cumTotals[m]??'—'}</td>`;
+  }
+  const totProjBand=projectedTotalYE!==null?bandLabelFor(projectedTotalYE,ACTIVE_GOAL_COUNT):null;
+  totTr.innerHTML=`<th scope="row" style="color:#7c9eff;font-weight:500;">Team total</th><td style="color:var(--text3);">all</td>${totCells}<td class="score-cell">${totProjBand?`<span class="score-pill" style="background:${BAND_BG[totProjBand]};color:${BAND_TEXT[totProjBand]};font-style:italic;" title="${totProjBand}">${projectedTotalYE}</span>`:'—'}</td>`;
+}
+tbody.appendChild(totTr);
+
+const medTr=document.createElement('tr');
+medTr.style.borderTop='2px solid rgba(232,168,56,0.3)';
+{
+  let medCells='';
+  for(let m=0;m<ACTUAL_MONTHS;m++){
+    medCells+=`<td class="score-cell"><span class="score-pill" style="background:#3a2a00;color:#e8a838;">${actualMedians[m]??'—'}</span></td><td style="color:#e8a838;font-weight:500;">${actualMedians[m]??'—'}</td>`;
+  }
+  const medProjBand=projectedMedianYE!==null?bandLabelFor(projectedMedianYE,1):null;
+  medTr.innerHTML=`<th scope="row" style="color:#e8a838;font-weight:500;">Median</th><td style="color:var(--text3);">all goals</td>${medCells}<td class="score-cell">${medProjBand?`<span class="score-pill" style="background:${BAND_BG[medProjBand]};color:${BAND_TEXT[medProjBand]};font-style:italic;" title="${medProjBand}">${projectedMedianYE.toFixed(1)}</span>`:'—'}</td>`;
+}
+tbody.appendChild(medTr);
+
+// ── Goal toggle buttons ───────────────────────────────────
+const togglesEl=document.getElementById('toggles');
+GOALS.forEach((g,i)=>{
+  const latestScore=[...g.scores.slice(0,ACTUAL_MONTHS)].reverse().find(s=>s!==null)??null;
+  const cumMar=g.scores.slice(0,ACTUAL_MONTHS).filter(s=>s!==null).reduce((a,b)=>a+b,0);
+  const sc=latestScore!==null?scoreColor(latestScore):'#686878';
+  const bg=latestScore!==null?scoreBg(latestScore):'transparent';
+  const sw=g.dash.length?`background:none;border-top:2.5px dashed ${g.color};`:`background:${g.color};`;
+  const btn=document.createElement('button');
+  btn.className='toggle-btn';btn.setAttribute('aria-pressed','true');
+  const startNote=g.startMonth!==undefined?` Began ${MONTH_LABELS[g.startMonth]}.`:'';
+    btn.setAttribute('aria-label',`Toggle G${g.num} ${g.label}, visible. ${MONTH_LABELS[ACTUAL_MONTHS-1]} cumulative: ${cumMar}pts.${startNote}`);
+  btn.dataset.index=i;btn.dataset.assignee=g.assignee;
+  btn.innerHTML=`<span class="goal-id" aria-hidden="true">G${g.num}</span><span class="swatch" style="${sw}" aria-hidden="true"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g.label}</span><span class="score-badge" style="background:${bg};color:${sc};" aria-hidden="true">${cumMar}pts</span>`;
+  btn.addEventListener('click',()=>{
+    const ds=chart.data.datasets[i];ds.hidden=!ds.hidden;const vis=!ds.hidden;
+    btn.setAttribute('aria-pressed',String(vis));
+    btn.setAttribute('aria-label',`Toggle G${g.num} ${g.label}, ${vis?'visible':'hidden'}. ${MONTH_LABELS[ACTUAL_MONTHS-1]} cumulative: ${cumMar}pts.`);
+    chart.update();
+  });
+  togglesEl.appendChild(btn);
+});
+
+function addRefToggle(label,indices,color){
+  const btn=document.createElement('button');btn.className='toggle-btn';
+  btn.setAttribute('aria-pressed','true');btn.setAttribute('aria-label',`Toggle ${label}, visible.`);
+  btn.innerHTML=`<span class="goal-id" aria-hidden="true">ref</span><svg width="22" height="4" viewBox="0 0 22 4" aria-hidden="true" style="flex-shrink:0;"><line x1="0" y1="2" x2="22" y2="2" stroke="${color}" stroke-width="2" stroke-dasharray="5 3"/></svg><span style="flex:1;">${label}</span>`;
+  btn.addEventListener('click',()=>{
+    const vis=chart.data.datasets[indices[0]].hidden;
+    indices.forEach(idx=>{chart.data.datasets[idx].hidden=!vis;});
+    btn.setAttribute('aria-pressed',String(vis));
+    btn.setAttribute('aria-label',`Toggle ${label}, ${vis?'visible':'hidden'}.`);
+    chart.update();
+  });
+  togglesEl.appendChild(btn);
+}
+addRefToggle('Max possible',[MAX_INDIV_IDX],'#5a5a7a');
+addRefToggle('Median (actual + projected)',[MED_ACT_IDX,MED_PROJ_IDX],'#e8a838');
+
+function setAll(visible){
+  GOALS.forEach((g,i)=>{
+    chart.data.datasets[i].hidden=!visible;
+    const btn=togglesEl.children[i];
+    const cumMar=g.scores.slice(0,ACTUAL_MONTHS).filter(s=>s!==null).reduce((a,b)=>a+b,0);
+    btn.setAttribute('aria-pressed',String(visible));
+    btn.setAttribute('aria-label',`Toggle G${g.num} ${g.label}, ${visible?'visible':'hidden'}. ${MONTH_LABELS[ACTUAL_MONTHS-1]} cumulative: ${cumMar}pts.`);
+  });
+  chart.update();
+}
+
+function filterAssignee(assignee,clickedBtn){
+  document.querySelectorAll('#assignee-controls .btn').forEach(b=>b.setAttribute('aria-pressed','false'));
+  clickedBtn.setAttribute('aria-pressed','true');
+  GOALS.forEach((g,i)=>{
+    // Show if 'all', or if person is named assignee, or contributed to the goal
+    const show=assignee==='all'||g.assignee===assignee||g.contributors.includes(assignee);
+    chart.data.datasets[i].hidden=!show;
+    const btn=togglesEl.children[i];
+    const cumMar=g.scores.slice(0,ACTUAL_MONTHS).filter(s=>s!==null).reduce((a,b)=>a+b,0);
+    btn.setAttribute('aria-pressed',String(show));
+    btn.setAttribute('aria-label',`Toggle G${g.num} ${g.label}, ${show?'visible':'hidden'}. ${MONTH_LABELS[ACTUAL_MONTHS-1]} cumulative: ${cumMar}pts.`);
+  });
+  chart.update();
+}
+</script>
+</body>
+</html>
