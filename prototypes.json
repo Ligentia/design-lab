@@ -1,5 +1,17 @@
 [
   {
+    "id": "stack-master-v1",
+    "title": "Stack Master V1",
+    "description": "",
+    "creator": "Craig",
+    "date": "2026-07-03",
+    "tags": [
+      "exploration",
+      "animation"
+    ],
+    "folder": "prototypes/stack-master-v1"
+  },
+  {
     "id": "design-team-goal-progress",
     "title": "Design Team Goal Progress",
     "description": "Visual illustrations of the design team's progress through the year towards our team goals.",
