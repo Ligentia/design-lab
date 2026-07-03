@@ -412,8 +412,8 @@ canvas#game {
   <div class="section-label">Select Level</div>
   <div class="level-select" id="levelSelect">
     <button class="level-btn active" data-level="1">Level 1<small>slow · 1.0×</small></button>
-    <button class="level-btn" data-level="2">Level 2<small>med · 2.0×</small></button>
-    <button class="level-btn" data-level="3">Level 3<small>fast · 3.0×</small></button>
+    <button class="level-btn" data-level="2">Level 2<small>med · 1.5×</small></button>
+    <button class="level-btn" data-level="3">Level 3<small>fast · 2.0×</small></button>
   </div>
   <button class="start-btn" id="startBtn">START</button>
   <div class="leaderboard">
@@ -484,8 +484,8 @@ const PIECES = {
 const PIECE_WEIGHTS = { T1:18, T2:15, T3:10, T4:14, T5:8, T6:8, F1:14, F3:8, F4:5 };
 const LEVELS = {
   1: { baseInterval: 350, multiplier: 1.0 },
-  2: { baseInterval: 250, multiplier: 2.0 },
-  3: { baseInterval: 175, multiplier: 3.0 },
+  2: { baseInterval: 250, multiplier: 1.5 },
+  3: { baseInterval: 175, multiplier: 2.0 },
 };
 const SPEEDUP_STEP_SEC = 15;
 const SPEEDUP_FACTOR = 0.85;
@@ -622,7 +622,7 @@ function landPiece(piece) {
     bonuses.sort((a, b) => b - a);
     playRowBonus(bonuses[0]);
     bonuses.forEach((pts, i) => showBonusPopup(pts, i * 130));
-    session.elapsedMs = Math.max(0, session.elapsedMs - bonuses.length * 5000);
+    session.elapsedMs = Math.max(0, session.elapsedMs - bonuses.length * 2000);
     flashTimer();
   }
   session.dropCraneRetract = { t: 0, duration: 200, piece };
