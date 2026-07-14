@@ -464,6 +464,7 @@ canvas#game {
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
 
@@ -494,6 +495,13 @@ const GAME_DURATION_SEC = 60;
 const REMOVAL_INTERVAL_SEC = 10;
 const HS_KEY = 'stackmaster.highscores';
 const HS_LIMIT = 20;
+
+/* ===== SUPABASE ===== */
+/* Replace these two values with your own project's URL and anon (public) key. */
+const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const CRANE_MARGIN_ROWS = 3;
 const MUTE_KEY = 'stackmaster.muted';
 const SFX_VOL = 1.0;
@@ -504,6 +512,7 @@ let session = null;
 let nextPieceId = 1;
 let audioCtx = null;
 let pendingHighScore = null;
+let highScores = [];  // local cache of the shared leaderboard
 
 function newSession(level) {
   return {
@@ -1386,41 +1395,55 @@ function updateHUD() {
   document.getElementById('levelVal').textContent = session.level;
 }
 
-/* ===== HIGH SCORES ===== */
-function loadHighScores() {
+/* ===== HIGH SCORES (shared, via Supabase) ===== */
+/* Pulls the top HS_LIMIT scores into the local `highScores` cache. Read checks
+   and rendering run against the cache so the rest of the game stays synchronous. */
+async function refreshHighScores() {
   try {
-    const raw = localStorage.getItem(HS_KEY);
-    if (!raw) return [];
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr)) return [];
-    return arr.slice(0, HS_LIMIT);
-  } catch { return []; }
+    const { data, error } = await sb
+      .from('high_scores')
+      .select('name, score, level')
+      .order('score', { ascending: false })
+      .limit(HS_LIMIT);
+    if (error) throw error;
+    highScores = data || [];
+  } catch (e) {
+    console.warn('Could not load high scores:', e);
+    // Keep whatever is already cached rather than blanking the board.
+  }
+  return highScores;
 }
-function saveHighScores(scores) {
-  try { localStorage.setItem(HS_KEY, JSON.stringify(scores.slice(0, HS_LIMIT))); } catch {}
-}
+
 function qualifiesForHighScore(score) {
   if (score <= 0) return false;
-  const scores = loadHighScores();
-  if (scores.length < HS_LIMIT) return true;
-  return score > scores[scores.length - 1].score;
+  if (highScores.length < HS_LIMIT) return true;
+  return score > highScores[highScores.length - 1].score;
 }
-function addHighScore(name, score, level) {
-  const scores = loadHighScores();
-  scores.push({ name, score, level });
-  scores.sort((a, b) => b.score - a.score);
-  saveHighScores(scores.slice(0, HS_LIMIT));
+
+async function addHighScore(name, score, level) {
+  try {
+    const { error } = await sb.from('high_scores').insert({ name, score, level });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('Could not save high score:', e);
+  }
 }
+
 function renderLeaderboard() {
   const t = document.getElementById('leaderboardTable');
-  const scores = loadHighScores();
-  if (scores.length === 0) {
+  if (highScores.length === 0) {
     t.innerHTML = '<tr><td colspan="4" class="empty">No scores yet — be the first!</td></tr>';
     return;
   }
-  t.innerHTML = scores.map((s, i) =>
+  t.innerHTML = highScores.map((s, i) =>
     `<tr><td>${i+1}</td><td>${escapeHtml(s.name)}</td><td>${s.score}</td><td>L${s.level}</td></tr>`
   ).join('');
+}
+
+async function refreshAndRenderLeaderboard() {
+  renderLeaderboard();        // show cached board instantly
+  await refreshHighScores();  // fetch latest from the server
+  renderLeaderboard();        // re-render with fresh data
 }
 
 /* ===== GAME FLOW ===== */
@@ -1477,7 +1500,7 @@ function goToStart() {
   stopGameMusic();
   session = null;
   pendingHighScore = null;
-  renderLeaderboard();
+  refreshAndRenderLeaderboard();
   document.body.dataset.screen = 'start';
   startMusic();
 }
@@ -1637,10 +1660,10 @@ function bindScreens() {
     startGame(level);
   });
   document.getElementById('gameoverContinueBtn').addEventListener('click', continueFromGameover);
-  document.getElementById('saveNameBtn').addEventListener('click', () => {
+  document.getElementById('saveNameBtn').addEventListener('click', async () => {
     let name = (document.getElementById('nameInput').value || '').trim().slice(0, 20);
     if (!name) name = 'ANONYMOUS';
-    if (pendingHighScore) addHighScore(name, pendingHighScore.score, pendingHighScore.level);
+    if (pendingHighScore) await addHighScore(name, pendingHighScore.score, pendingHighScore.level);
     goToStart();
   });
   document.getElementById('nameInput').addEventListener('keydown', (e) => {
@@ -1677,7 +1700,7 @@ function armFirstGesture() {
 function init() {
   muted = loadMuted();
   buildLogo();
-  renderLeaderboard();
+  refreshAndRenderLeaderboard();
   renderMuteBtn();
   document.getElementById('muteBtn').addEventListener('click', (e) => { e.preventDefault(); toggleMute(); });
   bindScreens();
