@@ -1,5 +1,16 @@
 [
   {
+    "id": "ux-maturity-survey",
+    "title": "UX Maturity Survey",
+    "description": "This is the survey Craig is using to baseline twenty twenty six UX maturity based on the NNG scale.",
+    "creator": "Craig",
+    "date": "2026-07-20",
+    "tags": [
+      "design team"
+    ],
+    "folder": "prototypes/ux-maturity-survey"
+  },
+  {
     "id": "stack-master-v1",
     "title": "Stack Master V1",
     "description": "",
