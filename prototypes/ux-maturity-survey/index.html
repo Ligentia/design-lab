@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Maturity Survey — Ligentia Design Team</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f7f7f8;
+      --color-bg-tertiary: #efefef;
+      --color-text: #111111;
+      --color-text-secondary: #555555;
+      --color-text-tertiary: #999999;
+      --color-border: #e0e0e0;
+      --color-border-light: #ebebeb;
+      --color-accent: #185FA5;
+      --color-accent-bg: #E6F1FB;
+      --color-accent-text: #0C447C;
+      --color-success: #1a7f4b;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1a1a1a;
+        --color-bg-secondary: #242424;
+        --color-bg-tertiary: #2e2e2e;
+        --color-text: #f0f0f0;
+        --color-text-secondary: #aaaaaa;
+        --color-text-tertiary: #666666;
+        --color-border: #333333;
+        --color-border-light: #2a2a2a;
+        --color-accent: #4A90D9;
+        --color-accent-bg: #0C2A44;
+        --color-accent-text: #8DC4F0;
+      }
+    }
+
+    html { font-size: 16px; }
+    body { font-family: var(--font); background: var(--color-bg); color: var(--color-text); line-height: 1.5; padding: 0; }
+
+    .page-wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    /* Header */
+    .survey-header { margin-bottom: 2rem; }
+    .survey-header h1 { font-size: 22px; font-weight: 600; margin-bottom: 2px; }
+    .survey-header .meta { font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+    .survey-header .sub { font-size: 13px; color: var(--color-text-secondary); }
+
+    /* Intro box */
+    .intro-box { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .intro-box p { font-size: 14px; color: var(--color-text-secondary); line-height: 1.65; margin-bottom: 0.75rem; }
+    .intro-box p:last-child { margin-bottom: 0; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 0.875rem; }
+    .badge-screener { background: var(--color-accent-bg); color: var(--color-accent-text); }
+    .badge-a { background: #E6F1FB; color: #0C447C; }
+    .badge-b { background: #E1F5EE; color: #085041; }
+    .badge-c { background: #EEEDFE; color: #3C3489; }
+    .badge-d { background: #FAEEDA; color: #633806; }
+    .badge-open { background: var(--color-bg-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+    .badge-new { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--color-accent-bg); color: var(--color-accent-text); padding: 1px 5px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+    @media (prefers-color-scheme: dark) {
+      .badge-a { background: #0C2A44; color: #8DC4F0; }
+      .badge-b { background: #063325; color: #7ED4B8; }
+      .badge-c { background: #1e1a44; color: #B8B4F0; }
+      .badge-d { background: #3a1e05; color: #F5C07A; }
+    }
+
+    /* Section headers */
+    .section-head { margin-bottom: 1.25rem; }
+    .section-head h2 { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+    .section-head p { font-size: 13px; color: var(--color-text-secondary); }
+
+    /* Divider */
+    .divider { border: none; border-top: 1px solid var(--color-border-light); margin: 2.25rem 0 1.75rem; }
+
+    /* Question cards */
+    .q-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 0.875rem; }
+    .q-card.new-q { border-left: 3px solid var(--color-accent); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+    .q-num { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); margin-bottom: 4px; letter-spacing: 0.02em; }
+    .q-text { font-size: 15px; font-weight: 500; line-height: 1.5; margin-bottom: 1rem; }
+    .q-hint { font-size: 12px; color: var(--color-text-secondary); font-style: italic; margin-top: -0.5rem; margin-bottom: 0.75rem; }
+
+    /* Multiple choice */
+    .mc-list { display: flex; flex-direction: column; gap: 5px; }
+    .mc-opt { padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 13px; background: var(--color-bg); color: var(--color-text); transition: border-color 0.12s; user-select: none; }
+    .mc-opt:hover { border-color: var(--color-accent); }
+    .mc-opt.selected { border-color: var(--color-accent); background: var(--color-accent-bg); color: var(--color-accent-text); font-weight: 500; }
+
+    /* Likert */
+    .likert-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .likert-opt { padding: 7px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 13px; background: var(--color-bg); color: var(--color-text); transition: border-color 0.12s; user-select: none; white-space: nowrap; }
+    .likert-opt:hover { border-color: var(--color-accent); }
+    .likert-opt.selected { border-color: var(--color-accent); background: var(--color-accent-bg); color: var(--color-accent-text); font-weight: 500; }
+    .likert-opt.na-opt { color: var(--color-text-tertiary); font-size: 12px; }
+    .likert-opt.na-opt.selected { border-color: var(--color-border); background: var(--color-bg-tertiary); color: var(--color-text-secondary); font-weight: normal; }
+
+    /* Notes */
+    .notes-wrap { margin-top: 1rem; padding-top: 0.875rem; border-top: 1px solid var(--color-border-light); }
+    .notes-label { font-size: 11px; color: var(--color-text-tertiary); font-weight: 500; letter-spacing: 0.02em; margin-bottom: 4px; }
+    .notes-input { width: 100%; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); padding: 8px 10px; font-size: 13px; font-family: var(--font); color: var(--color-text); background: var(--color-bg); resize: vertical; min-height: 58px; line-height: 1.5; transition: border-color 0.12s; }
+    .notes-input:focus { outline: none; border-color: var(--color-border); }
+    .open-input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 10px 12px; font-size: 14px; font-family: var(--font); color: var(--color-text); background: var(--color-bg); resize: vertical; min-height: 90px; line-height: 1.5; transition: border-color 0.12s; }
+    .open-input:focus { outline: none; border-color: var(--color-accent); }
+
+    /* Action row */
+    .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 2rem; }
+    .btn-primary { padding: 10px 24px; background: var(--color-text); color: var(--color-bg); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: opacity 0.15s; }
+    .btn-primary:hover { opacity: 0.8; }
+    .btn-secondary { padding: 10px 18px; background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 14px; cursor: pointer; font-family: var(--font); color: var(--color-text-secondary); transition: border-color 0.12s, color 0.12s; }
+    .btn-secondary:hover { border-color: var(--color-text-secondary); color: var(--color-text); }
+    .copy-confirm { font-size: 12px; color: var(--color-success); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .copy-confirm.show { opacity: 1; }
+
+    /* Score section */
+    .score-section { display: none; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 2rem; }
+    .score-section.visible { display: block; }
+    .score-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+    .score-overall { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+    .score-stage { font-size: 14px; color: var(--color-text-secondary); margin: 4px 0 1.5rem; }
+    .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .dim-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.875rem 1rem; }
+    .dim-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; font-weight: 500; }
+    .dim-val { font-size: 20px; font-weight: 600; }
+    .dim-bar-wrap { height: 3px; background: var(--color-border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .dim-bar { height: 100%; border-radius: 2px; background: var(--color-accent); transition: width 0.7s ease; }
+    .dim-flag { font-size: 11px; color: var(--color-text-tertiary); font-style: italic; margin-top: 3px; }
+    .nng-table { margin-top: 1.25rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.75; border-top: 1px solid var(--color-border-light); padding-top: 1rem; }
+    .nng-table .nng-title { font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 4px; }
+    .nng-table span { color: var(--color-text); font-weight: 600; }
+
+    /* Print styles */
+    @media print {
+      :root {
+        --color-bg: #ffffff;
+        --color-bg-secondary: #f9f9f9;
+        --color-bg-tertiary: #efefef;
+        --color-text: #000000;
+        --color-text-secondary: #444444;
+        --color-text-tertiary: #888888;
+        --color-border: #cccccc;
+        --color-border-light: #e5e5e5;
+        --color-accent: #185FA5;
+        --color-accent-bg: #E6F1FB;
+        --color-accent-text: #0C447C;
+      }
+      html { font-size: 10pt; }
+      body { background: #fff; color: #000; }
+      .page-wrap { padding: 0; max-width: 100%; }
+      .action-row, .copy-confirm { display: none !important; }
+      .survey-header { margin-bottom: 14pt; }
+      .survey-header h1 { font-size: 16pt; }
+      .intro-box { padding: 8pt 10pt; margin-bottom: 12pt; }
+      .intro-box p { font-size: 8.5pt; }
+      .q-card { padding: 8pt 10pt; margin-bottom: 6pt; page-break-inside: avoid; }
+      .q-text { font-size: 10pt; margin-bottom: 6pt; }
+      .q-num { font-size: 8pt; }
+      .likert-wrap { gap: 4pt; }
+      .likert-opt { padding: 4pt 7pt; font-size: 8.5pt; }
+      .mc-opt { padding: 4pt 7pt; font-size: 8.5pt; margin-bottom: 3pt; }
+      .likert-opt.selected, .mc-opt.selected { border: 1.5pt solid #185FA5; background: #E6F1FB; color: #0C447C; }
+      .notes-wrap { padding-top: 5pt; margin-top: 6pt; }
+      .notes-label { font-size: 8pt; }
+      .notes-input { font-size: 8.5pt; min-height: 36pt; padding: 4pt 6pt; }
+      .open-input { font-size: 9pt; min-height: 44pt; padding: 5pt 7pt; }
+      .divider { margin: 12pt 0 10pt; }
+      .section-head { margin-bottom: 8pt; }
+      .section-head h2 { font-size: 12pt; }
+      .section-head p { font-size: 8.5pt; }
+      .score-section { display: block !important; page-break-before: always; padding: 12pt; }
+      .score-section h3 { font-size: 12pt; }
+      .score-overall { font-size: 24pt; }
+      .score-stage { font-size: 9pt; }
+      .dim-val { font-size: 14pt; }
+      .dim-label { font-size: 8.5pt; }
+      .dim-flag { font-size: 8pt; }
+      .dim-bar-wrap { display: none; }
+      .nng-table { font-size: 8.5pt; }
+      .badge-a { background: #E6F1FB !important; color: #0C447C !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-b { background: #E1F5EE !important; color: #085041 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-c { background: #EEEDFE !important; color: #3C3489 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-d { background: #FAEEDA !important; color: #633806 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .likert-opt.selected, .mc-opt.selected { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="survey-header">
+    <h1>UX maturity survey</h1>
+    <p class="meta">Ligentia design team &middot; Annual benchmark &middot; v4</p>
+    <p class="sub">19 questions &middot; ~10 minutes</p>
+  </header>
+
+  <div class="intro-box">
+    <p>This survey helps us understand how design work is perceived and integrated across the organisation. Your answers are used to track our progress and identify where we can improve.</p>
+    <p>The survey takes around 10 minutes. Some questions may not reflect your day-to-day experience with the design team &mdash; where that&rsquo;s the case, please select <strong>Not applicable</strong> rather than guessing. These responses are just as useful: they help us understand where our work isn&rsquo;t visible across the organisation.</p>
+    <p>There are no right or wrong answers.</p>
+  </div>
+
+  <!-- SCREENER -->
+  <div class="badge badge-screener">Screener</div>
+  <div class="section-head">
+    <h2>About your role</h2>
+    <p>These questions help us understand your context before we look at your responses.</p>
+  </div>
+
+  <div class="q-card" data-q="s1">
+    <div class="q-num">S1</div>
+    <div class="q-text">How often do you work directly with the design team?</div>
+    <div class="mc-list">
+      <div class="mc-opt" onclick="selectMC(this,'s1','daily')">Daily or near-daily</div>
+      <div class="mc-opt" onclick="selectMC(this,'s1','weekly')">Several times a week</div>
+      <div class="mc-opt" onclick="selectMC(this,'s1','monthly')">A few times a month</div>
+      <div class="mc-opt" onclick="selectMC(this,'s1','rarely')">Rarely &mdash; only occasionally</div>
+      <div class="mc-opt" onclick="selectMC(this,'s1','never')">Never or not yet</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-s1" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="s2">
+    <div class="q-num">S2</div>
+    <div class="q-text">What best describes your role?</div>
+    <div class="mc-list">
+      <div class="mc-opt" onclick="selectMC(this,'s2','pm')">Product management / strategy</div>
+      <div class="mc-opt" onclick="selectMC(this,'s2','eng')">Engineering / development</div>
+      <div class="mc-opt" onclick="selectMC(this,'s2','ba')">Business analysis</div>
+      <div class="mc-opt" onclick="selectMC(this,'s2','qa')">QA / testing</div>
+      <div class="mc-opt" onclick="selectMC(this,'s2','cx')">Customer experience / support</div>
+      <div class="mc-opt" onclick="selectMC(this,'s2','other')">Other</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-s2" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="s3">
+    <div class="q-num">S3</div>
+    <div class="q-text">When you collaborate with design, what does that typically involve?</div>
+    <p class="q-hint">Select all that apply.</p>
+    <div class="mc-list">
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','review')">Reviewing designs or prototypes</div>
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','requirements')">Sharing requirements or user problems</div>
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','research')">Participating in user research or testing</div>
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','handoff')">Receiving design handoff for build</div>
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','planning')">Being involved in planning or prioritisation</div>
+      <div class="mc-opt multi" onclick="toggleMulti(this,'s3','none')">None of the above</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-s3" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DIMENSION A -->
+  <div class="badge badge-a">A &mdash; Research &amp; insight</div>
+  <div class="section-head">
+    <h2>Research &amp; insight</h2>
+    <p>How design uses evidence about user needs to inform decisions.</p>
+  </div>
+
+  <div class="q-card" data-q="a1" data-dim="a">
+    <div class="q-num">A1</div>
+    <div class="q-text">When design work is presented to you, does it feel grounded in real user needs rather than assumptions?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'a1',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a1',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a1',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a1',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a1',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'a1','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-a1" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="a2" data-dim="a">
+    <div class="q-num">A2</div>
+    <div class="q-text">Are findings from user research or testing shared in a way that your team can understand and act on?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'a2',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a2',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a2',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a2',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a2',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'a2','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-a2" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="a3" data-dim="a">
+    <div class="q-num">A3</div>
+    <div class="q-text">When design raises evidence about user behaviour or problems, does it influence what gets built or changed?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'a3',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a3',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a3',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a3',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a3',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'a3','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-a3" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card new-q" data-q="a4" data-dim="a">
+    <div class="q-num">A4 <span class="badge-new">New</span></div>
+    <div class="q-text">Does the design team proactively seek out user feedback and insight, or does research tend to happen only when a specific problem is raised?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'a4',1)">1 &mdash; Only when asked</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a4',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a4',3)">3 &mdash; Mixed</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a4',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'a4',5)">5 &mdash; Proactively</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'a4','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-a4" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DIMENSION B -->
+  <div class="badge badge-b">B &mdash; Design process &amp; collaboration</div>
+  <div class="section-head">
+    <h2>Design process &amp; collaboration</h2>
+    <p>How design works with other teams day to day.</p>
+  </div>
+
+  <div class="q-card" data-q="b1" data-dim="b">
+    <div class="q-num">B1</div>
+    <div class="q-text">Do you have a clear understanding of how the design team fits into our product development process?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'b1',1)">1 &mdash; Not at all</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b1',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b1',3)">3 &mdash; Somewhat</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b1',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b1',5)">5 &mdash; Very clearly</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'b1','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-b1" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="b2" data-dim="b">
+    <div class="q-num">B2</div>
+    <div class="q-text">Is design involved early enough in discussions &mdash; before decisions are made &mdash; rather than being brought in to validate something already decided?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'b2',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b2',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b2',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b2',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b2',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'b2','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-b2" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="b3" data-dim="b">
+    <div class="q-num">B3</div>
+    <div class="q-text">When design decisions are made or changed, are the reasons clearly communicated to your team?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'b3',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b3',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b3',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b3',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b3',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'b3','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-b3" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="b4" data-dim="b">
+    <div class="q-num">B4</div>
+    <div class="q-text">Is it easy for your team to give feedback on design work during the design process &mdash; not just at the end?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'b4',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b4',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b4',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b4',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'b4',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'b4','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-b4" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DIMENSION C -->
+  <div class="badge badge-c">C &mdash; Output &amp; communication</div>
+  <div class="section-head">
+    <h2>Output &amp; communication</h2>
+    <p>How design shares its work and makes it accessible to other teams.</p>
+  </div>
+
+  <div class="q-card" data-q="c1" data-dim="c">
+    <div class="q-num">C1</div>
+    <div class="q-text">Do you have a clear sense of what the design team is currently working on?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'c1',1)">1 &mdash; Not at all</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c1',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c1',3)">3 &mdash; Somewhat</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c1',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c1',5)">5 &mdash; Very clearly</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'c1','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-c1" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="c2" data-dim="c">
+    <div class="q-num">C2</div>
+    <div class="q-text">When design work is handed over to engineering or QA, is it clear and complete enough to work from without significant back-and-forth?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'c2',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c2',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c2',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c2',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c2',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'c2','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-c2" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="c3" data-dim="c">
+    <div class="q-num">C3</div>
+    <div class="q-text">Does the design team clearly communicate the reasoning behind its decisions &mdash; not just what was designed, but why?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'c3',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c3',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c3',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c3',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c3',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'c3','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-c3" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card new-q" data-q="c4" data-dim="c">
+    <div class="q-num">C4 <span class="badge-new">New</span></div>
+    <div class="q-text">How closely does the finished product reflect what the design team specified?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'c4',1)">1 &mdash; Rarely matches</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c4',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c4',3)">3 &mdash; Partially</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c4',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'c4',5)">5 &mdash; Closely matches</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'c4','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-c4" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DIMENSION D -->
+  <div class="badge badge-d">D &mdash; Influence &amp; strategy</div>
+  <div class="section-head">
+    <h2>Influence &amp; strategy</h2>
+    <p>How much design shapes product direction, not just delivery.</p>
+  </div>
+
+  <div class="q-card" data-q="d1" data-dim="d">
+    <div class="q-num">D1</div>
+    <div class="q-text">Does design have a visible role in shaping what gets built &mdash; not just how it looks or works?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'d1',1)">1 &mdash; Rarely</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d1',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d1',3)">3 &mdash; Sometimes</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d1',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d1',5)">5 &mdash; Consistently</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'d1','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-d1" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="d2" data-dim="d">
+    <div class="q-num">D2</div>
+    <div class="q-text">When the product is reactive or changes direction quickly, does design adapt and remain a useful contributor &mdash; or does it get left behind?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'d2',1)">1 &mdash; Gets left behind</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d2',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d2',3)">3 &mdash; Mixed</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d2',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d2',5)">5 &mdash; Adapts well</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'d2','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-d2" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card" data-q="d3" data-dim="d">
+    <div class="q-num">D3</div>
+    <div class="q-text">Overall, do you feel the design team is valued as a strategic contributor &mdash; not just a production resource?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'d3',1)">1 &mdash; Not at all</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d3',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d3',3)">3 &mdash; Somewhat</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d3',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d3',5)">5 &mdash; Strongly yes</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'d3','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-d3" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <div class="q-card new-q" data-q="d4" data-dim="d">
+    <div class="q-num">D4 <span class="badge-new">New</span></div>
+    <div class="q-text">Does your team proactively bring design into discussions, or does design involvement tend to be initiated by the design team itself?</div>
+    <div class="likert-wrap">
+      <div class="likert-opt" onclick="selectLikert(this,'d4',1)">1 &mdash; Design always initiates</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d4',2)">2</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d4',3)">3 &mdash; Mixed</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d4',4)">4</div>
+      <div class="likert-opt" onclick="selectLikert(this,'d4',5)">5 &mdash; We always pull design in</div>
+      <div class="likert-opt na-opt" onclick="selectLikert(this,'d4','na')">N/A</div>
+    </div>
+    <div class="notes-wrap"><div class="notes-label">Notes</div><textarea class="notes-input" id="notes-d4" placeholder="Optional..."></textarea></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- OPEN QUESTIONS -->
+  <div class="badge badge-open">Open questions</div>
+  <div class="section-head">
+    <h2>Your perspective</h2>
+    <p>Discussion prompts &mdash; short answers are fine, or we can discuss.</p>
+  </div>
+
+  <div class="q-card" data-q="o1">
+    <div class="q-num">O1</div>
+    <div class="q-text">What does the design team do well in how it works with you?</div>
+    <textarea class="open-input" id="o1" placeholder="Notes from discussion..."></textarea>
+  </div>
+
+  <div class="q-card" data-q="o2">
+    <div class="q-num">O2</div>
+    <div class="q-text">What would make design more useful or effective in your day-to-day work?</div>
+    <textarea class="open-input" id="o2" placeholder="Notes from discussion..."></textarea>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="action-row">
+    <button class="btn-primary" onclick="calcScores()">Calculate scores</button>
+    <button class="btn-secondary" onclick="copyResults()">Copy as text</button>
+    <button class="btn-secondary" onclick="window.print()">Save as PDF</button>
+    <span class="copy-confirm" id="copy-confirm">Copied to clipboard</span>
+  </div>
+
+  <!-- SCORE SECTION -->
+  <div class="score-section" id="score-section">
+    <h3>Results summary</h3>
+    <div class="score-overall" id="overall-score">&mdash;</div>
+    <div class="score-stage" id="stage-label">Overall maturity score</div>
+    <div class="dim-grid">
+      <div class="dim-card">
+        <div class="dim-label">A &mdash; Research &amp; insight</div>
+        <div class="dim-val" id="score-a">&mdash;</div>
+        <div class="dim-bar-wrap"><div class="dim-bar" id="bar-a" style="width:0%"></div></div>
+        <div class="dim-flag" id="na-a"></div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-label">B &mdash; Process &amp; collaboration</div>
+        <div class="dim-val" id="score-b">&mdash;</div>
+        <div class="dim-bar-wrap"><div class="dim-bar" id="bar-b" style="width:0%"></div></div>
+        <div class="dim-flag" id="na-b"></div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-label">C &mdash; Output &amp; communication</div>
+        <div class="dim-val" id="score-c">&mdash;</div>
+        <div class="dim-bar-wrap"><div class="dim-bar" id="bar-c" style="width:0%"></div></div>
+        <div class="dim-flag" id="na-c"></div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-label">D &mdash; Influence &amp; strategy</div>
+        <div class="dim-val" id="score-d">&mdash;</div>
+        <div class="dim-bar-wrap"><div class="dim-bar" id="bar-d" style="width:0%"></div></div>
+        <div class="dim-flag" id="na-d"></div>
+      </div>
+    </div>
+    <div class="nng-table">
+      <div class="nng-title">NN/g stage mapping</div>
+      <div>1.0&ndash;1.4 &rarr; <span>Stage 1</span> &mdash; absent UX practice</div>
+      <div>1.5&ndash;2.4 &rarr; <span>Stage 2</span> &mdash; limited, ad hoc, hero-driven</div>
+      <div>2.5&ndash;3.4 &rarr; <span>Stage 3</span> &mdash; emergent, inconsistently applied</div>
+      <div>3.5&ndash;4.2 &rarr; <span>Stage 4</span> &mdash; structured, cross-functional buy-in</div>
+      <div>4.3&ndash;4.7 &rarr; <span>Stage 5</span> &mdash; integrated, evidence-driven culture</div>
+      <div>4.8&ndash;5.0 &rarr; <span>Stage 6</span> &mdash; user-driven at organisational level</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const responses = {};
+  const multiSelections = {};
+  const allQIds = ['s1','s2','s3','a1','a2','a3','a4','b1','b2','b3','b4','c1','c2','c3','c4','d1','d2','d3','d4'];
+  const qLabels = {
+    s1:'S1 — Interaction frequency', s2:'S2 — Role', s3:'S3 — Collaboration type',
+    a1:'A1 — Grounded in user needs', a2:'A2 — Research findings shared', a3:'A3 — Evidence influences decisions', a4:'A4 — Proactive research',
+    b1:'B1 — Understanding of design process', b2:'B2 — Early involvement', b3:'B3 — Decision communication', b4:'B4 — Feedback access',
+    c1:'C1 — Visibility of work', c2:'C2 — Handoff quality', c3:'C3 — Decision rationale', c4:'C4 — Implementation fidelity',
+    d1:'D1 — Strategic role', d2:'D2 — Adaptability', d3:'D3 — Strategic value', d4:'D4 — Advocacy'
+  };
+
+  function selectMC(el, q, val) {
+    const card = el.closest('[data-q]');
+    card.querySelectorAll('.mc-opt:not(.multi)').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    responses[q] = val;
+  }
+
+  function toggleMulti(el, q, val) {
+    el.classList.toggle('selected');
+    if (!multiSelections[q]) multiSelections[q] = new Set();
+    if (el.classList.contains('selected')) { multiSelections[q].add(val); } else { multiSelections[q].delete(val); }
+  }
+
+  function selectLikert(el, q, val) {
+    const wrap = el.closest('.likert-wrap');
+    wrap.querySelectorAll('.likert-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    responses[q] = val;
+  }
+
+  function calcDim(keys) {
+    const scored = keys.filter(k => responses[k] !== undefined && responses[k] !== 'na');
+    const naCount = keys.filter(k => responses[k] === 'na').length;
+    const unanswered = keys.filter(k => responses[k] === undefined).length;
+    if (scored.length < 2) return { score: null, naCount, unanswered };
+    const avg = scored.reduce((s, k) => s + responses[k], 0) / scored.length;
+    return { score: Math.round(avg * 10) / 10, naCount, unanswered };
+  }
+
+  function calcScores() {
+    const dims = { a:['a1','a2','a3','a4'], b:['b1','b2','b3','b4'], c:['c1','c2','c3','c4'], d:['d1','d2','d3','d4'] };
+    let validDims = 0, total = 0;
+    for (const [dim, keys] of Object.entries(dims)) {
+      const result = calcDim(keys);
+      const el = document.getElementById('score-'+dim);
+      const bar = document.getElementById('bar-'+dim);
+      const naEl = document.getElementById('na-'+dim);
+      if (result.score !== null) {
+        el.textContent = result.score.toFixed(1)+' / 5';
+        bar.style.width = (result.score / 5 * 100)+'%';
+        validDims++; total += result.score;
+      } else {
+        el.textContent = 'Insufficient data';
+        bar.style.width = '0%';
+      }
+      const flags = [];
+      if (result.naCount > 0) flags.push(result.naCount+' N/A');
+      if (result.unanswered > 0) flags.push(result.unanswered+' unanswered');
+      naEl.textContent = flags.length ? flags.join(' · ') : '';
+    }
+    const overallEl = document.getElementById('overall-score');
+    const stageEl = document.getElementById('stage-label');
+    if (validDims > 0) {
+      const overall = Math.round((total / validDims) * 10) / 10;
+      overallEl.textContent = overall.toFixed(1)+' / 5';
+      let stage = '';
+      if (overall < 1.5) stage = 'Approximately NN/g Stage 1 — absent';
+      else if (overall < 2.5) stage = 'Approximately NN/g Stage 2 — limited';
+      else if (overall < 3.5) stage = 'Approximately NN/g Stage 3 — emergent';
+      else if (overall < 4.3) stage = 'Approximately NN/g Stage 4 — structured';
+      else if (overall < 4.8) stage = 'Approximately NN/g Stage 5 — integrated';
+      else stage = 'Approximately NN/g Stage 6 — user-driven';
+      stageEl.textContent = stage;
+    } else {
+      overallEl.textContent = '—';
+      stageEl.textContent = 'Not enough data to score';
+    }
+    document.getElementById('score-section').classList.add('visible');
+    document.getElementById('score-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function copyResults() {
+    const dims = { a:'Research & insight', b:'Process & collaboration', c:'Output & communication', d:'Influence & strategy' };
+    let txt = 'UX Maturity Survey — Ligentia Design Team\n';
+    txt += '==========================================\n\n';
+    txt += 'Overall: '+document.getElementById('overall-score').textContent+'\n';
+    txt += document.getElementById('stage-label').textContent+'\n\n';
+    txt += 'Dimension scores:\n';
+    for (const [k, label] of Object.entries(dims)) {
+      txt += '  '+label+': '+document.getElementById('score-'+k).textContent;
+      const na = document.getElementById('na-'+k).textContent;
+      if (na) txt += ' ('+na+')';
+      txt += '\n';
+    }
+    txt += '\nQuestion notes:\n';
+    let hasNotes = false;
+    for (const id of allQIds) {
+      const note = document.getElementById('notes-'+id);
+      if (note && note.value.trim()) {
+        txt += '  '+(qLabels[id]||id)+': '+note.value.trim()+'\n';
+        hasNotes = true;
+      }
+    }
+    if (!hasNotes) txt += '  None recorded\n';
+    txt += '\nOpen responses:\n';
+    const o1 = document.getElementById('o1').value;
+    const o2 = document.getElementById('o2').value;
+    txt += '  O1 — What works well: '+(o1.trim()||'Not recorded')+'\n';
+    txt += '  O2 — Improvements: '+(o2.trim()||'Not recorded')+'\n';
+    navigator.clipboard.writeText(txt).then(() => {
+      const confirm = document.getElementById('copy-confirm');
+      confirm.classList.add('show');
+      setTimeout(() => confirm.classList.remove('show'), 2000);
+    }).catch(() => alert('Copy failed — please copy manually.'));
+  }
+</script>
+</body>
+</html>
