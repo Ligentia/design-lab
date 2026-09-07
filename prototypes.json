@@ -1,5 +1,16 @@
 [
   {
+    "id": "ligentia-design-function-report-september-2026",
+    "title": "Ligentia Design Function Report September 2026",
+    "description": "This site seeks to provide an insight into the Ligentia Design teams operations. It covers how design currently operates, what the function has delivered, where its time goes, the tooling position, and where design could contribute more with support.",
+    "creator": "Craig",
+    "date": "2026-09-07",
+    "tags": [
+      "design team"
+    ],
+    "folder": "prototypes/ligentia-design-function-report-september-2026"
+  },
+  {
     "id": "notifications-wayfinder",
     "title": "Notifications - Wayfinder",
     "description": "This is the page that had some prototyped concept interactions",
