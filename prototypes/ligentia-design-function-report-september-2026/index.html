@@ -401,6 +401,10 @@ td.detail{color:var(--color-smoke)}
 .t-what{width:36%}
 .t-status{width:38%}
 
+tbody td .cell-list{list-style:none;margin:0;padding:0;max-width:none}
+tbody td .cell-list li{margin:0 0 var(--spacing-8);padding:0}
+tbody td .cell-list li:last-child{margin-bottom:0}
+
 .dot{
   display:inline-block;width:6px;height:6px;border-radius:var(--radius-tags);
   margin-right:var(--spacing-8);vertical-align:2px;flex:none;
@@ -966,7 +970,12 @@ tr.ns:hover .ns-cue,tr.ns:focus-visible .ns-cue{opacity:1;color:var(--color-ink)
             <tr>
               <td class="lead"><span class="num">02</span> AI in the UI (AIUI)</td>
               <td class="detail">Identifying where AI insight and guidance could help users navigate Ligentix's complexity. Not a chat interface</td>
-              <td><span class="dot paused"></span>Paused since June, having exited on a high with notification AI prototypes added to the Design Lab</td>
+              <td>
+                <ul class="cell-list">
+                  <li><span class="dot paused"></span>Paused since June, having exited on a high with notification AI prototypes added to the Design Lab</li>
+                  <li><a href="https://doc.clickup.com/9005085057/p/h/8cbxcc1-18652/c000fe9ab25790c/8cbxcc1-18652" target="_blank" rel="noopener">The AI in the UI proposal presented to product</a></li>
+                </ul>
+              </td>
             </tr>
             <tr>
               <td class="lead"><span class="num">03</span> Adaptive and context-aware experiences</td>
@@ -1052,6 +1061,7 @@ tr.ns:hover .ns-cue,tr.ns:focus-visible .ns-cue{opacity:1;color:var(--color-ink)
 
     <p>Views is a phased programme of work, defined by a collaborative design and front-end engineering workshop, giving users control over how data is presented to them within the platform. This type of functionality is frequently fed back as one of the biggest friction points for users. However getting this prioritised remains challenging.</p>
     <p>The first release would introduce column visibility, ordering, and aliases, allowing users to surface the data most relevant to their role and hide what is not. Subsequent releases are planned to introduce more granular, in-context configuration options, with the intention of rolling the full Views capability across all modules via the design system.</p>
+    <p><a href="https://doc.clickup.com/9005085057/p/h/8cbxcc1-19592/90bd06913f370ec" target="_blank" rel="noopener">Views: the proposed release plan presented to product</a></p>
 
     <div class="next">
       <div class="next-label">Next step</div>
