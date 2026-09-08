@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
       <input
         class="search-input"
         type="search"
-        placeholder="Search prototypes…"
+        [placeholder]="placeholder"
         [(ngModel)]="value"
         (ngModelChange)="onInput($event)"
       />
@@ -52,6 +52,7 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class SearchBarComponent {
+  @Input() placeholder = 'Search prototypes…';
   @Output() searched = new EventEmitter<string>();
   value = '';
   private debounce: ReturnType<typeof setTimeout> | null = null;

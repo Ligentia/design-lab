@@ -11,8 +11,9 @@ Internal tool for the Ligentix product design team to centralise, browse, and sh
 - **Browse prototypes** — card grid with live scaled-down iframe previews, text search, tag filtering, and creator filtering (each filter row has an "All" chip, selected by default; creator + tag + search combine)
 - **Shareable links** — each prototype has a full-screen detail page at `/prototype/:id` with metadata, an iframe preview, and a one-click copy link
 - **Add prototypes via UI** — drag-and-drop an HTML file, fill in the form, and it uploads to GitHub automatically
+- **Folders** — group prototypes into named, shareable folders (e.g. by module or product area); a Folders tab with folder cards and a folder page at `/folder/:id`
 - **Reference assets** — separate Assets tab for SVGs, HTML templates, and Angular components
-- **No server** — GitHub Contents API is the backend; all data lives in `prototypes.json` and `assets.json`
+- **No server** — GitHub Contents API is the backend; all data lives in `prototypes.json`, `assets.json`, and `collections.json`
 
 ---
 
@@ -99,6 +100,21 @@ node scripts/add-asset.mjs \
   --file "assets/ligentix-logo.svg" \
   --type svg
 ```
+
+---
+
+## Organising with folders
+
+Folders group prototypes so related work (a module, a product area, a review) can be browsed and shared together.
+
+1. Go to the **Folders** tab and click **Add folder**.
+2. Give it a name (and optional description), pick a creator, then tick the prototypes to include from the searchable list.
+3. The folder appears as a card showing how many prototypes it holds; click it to open the folder page (`/folder/:id`) listing those prototypes. Use **Edit folder** to add/remove members.
+
+Notes:
+- **Many-to-many** — a prototype can live in several folders at once. Folders only *reference* prototypes; nothing is moved or copied, and deleting a folder never deletes the prototypes inside it.
+- **Flat** — folders don't nest (no subfolders) in this version.
+- Membership lives in `collections.json` (created automatically on the first save); the prototype files and `prototypes.json` are untouched.
 
 ---
 

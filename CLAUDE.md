@@ -28,11 +28,13 @@ GitHub repo (source of truth)
 - `/` — prototype dashboard (card grid, tag filter, search)
 - `/prototype/:id` — full-screen detail page (metadata + iframe preview + shareable link)
 - `/assets` — reference assets area (SVGs, HTML templates, Angular components)
+- `/folders` — folders (collections) list; `/folder/:id` — folder page listing its prototypes
 
 ## Key files
-- `src/app/core/services/github.service.ts` — GitHub API read/write (getPrototypes, savePrototypes, getAssets, saveAssets, uploadFile)
+- `src/app/core/services/github.service.ts` — GitHub API read/write (getPrototypes, savePrototypes, getAssets, saveAssets, getCollections, saveCollections, uploadFile)
 - `src/app/core/services/prototype.service.ts` — signal-based prototype state; addPrototype uploads file then updates JSON
 - `src/app/core/services/asset.service.ts` — signal-based asset state
+- `src/app/core/services/collection.service.ts` — signal-based folder (collection) state; add/update/deleteCollection persist collections.json
 - `src/app/core/services/ui-state.service.ts` — cross-component Add button trigger (triggerAdd$ Subject)
 - `src/app/features/dashboard/` — prototype grid; showModal/editingPrototype are signals (required for OnPush)
 - `src/app/features/prototype-detail/` — shareable detail page; caches SafeResourceUrl to prevent iframe flicker
@@ -40,13 +42,15 @@ GitHub repo (source of truth)
 - `src/app/features/assets/` — assets tab
 - `src/app/features/add-prototype/` — add/edit prototype modal; drag-and-drop file upload, multi-select tag dropdown, creator combobox
 - `src/app/features/add-asset/` — add/edit asset modal
+- `src/app/features/folders/` — folders (collections) list tab; `folder-card/` — folder card (glyph + count, navigates to detail); `folder-detail/` — folder page (member prototype grid + Edit/Delete); `add-folder/` — add/edit folder modal with searchable prototype multi-select
 - `src/environments/environment.ts` — GitHub owner/repo/branch config
 - `src/index.html` — has `<meta name="dl-shell">` so the detail page can detect when no prototype file exists
 
 ## Data models
 ```typescript
-Prototype { id, title, tags[], creator, date, description, folder, thumbnail? }
-Asset     { id, name, type, description, file, tags?, addedBy, date }
+Prototype  { id, title, tags[], creator, date, description, folder, thumbnail? }
+Asset      { id, name, type, description, file, tags?, addedBy, date }
+Collection { id, name, description?, creator, date, updatedAt?, prototypeIds[] }  // a "Folder" in the UI
 ```
 
 ## Adding prototypes
@@ -70,6 +74,14 @@ Asset     { id, name, type, description, file, tags?, addedBy, date }
   - **Require a root `index.html`** (entry page) — otherwise the modal sets `errorMsg` and clears `uploadedFiles`, blocking submit. This is why the preview components can stay hardcoded to `index.html` (no `entryFile` field needed).
   - Skips `entry.dir`, `__MACOSX`, and dotfiles at any depth; content stays base64 (handles binary assets).
 - The non-ZIP (individual files) branch is unchanged: a lone `.html` is still renamed to `index.html` (single-page path).
+
+## Folders (collections)
+- **UI term is "Folders"; code entity is `Collection`** — because `Prototype.folder` already means a GitHub storage path. Model in `collection.model.ts`; persisted as `collections.json` at the repo root.
+- **Many-to-many, flat, folder-side membership**: a `Collection` holds `prototypeIds[]` (denormalised) so a prototype can be in many folders and adding/removing membership rewrites only `collections.json`, never prototypes. No `entryFile`/parent fields; no nesting.
+- `GithubService.getCollections()` maps a **404 to an empty list** (the file doesn't exist until the first folder is saved); `saveCollections()` omits the SHA on first save so the PUT creates the file.
+- `CollectionService` mirrors `AssetService` (signals + `filtered` search over name/description + `findById` + add/update/delete). `deleteCollection` removes only the collection entry — prototypes are untouched.
+- The Folders tab + header Add button: `app.ts` adds `isFoldersRoute()` (exact `/folders` → "Add folder") and hides the Add button on `/folder/:id` (detail has its own Edit/Delete, mirroring the archived precedent).
+- `folder-detail` resolves members by mapping `prototypeIds` through `PrototypeService` (skips missing/archived) via a computed that reads the prototype signal, so it fills in once prototypes load on a deep link.
 
 ## Prototype preview (iframe)
 - The detail page and card thumbnails both iframe `window.location.origin/<folder>/index.html` (served from Vercel's static output).
@@ -112,6 +124,7 @@ v0 and v1 are shipped. Remaining items tracked in the PRD.
 - ~~Creator filter (F-05)~~ DONE: labeled "Creators" pill row above the "Tags" row on the dashboard. Reuses `TagFilterComponent` via a new optional `label` input (and `showClear` to suppress the per-row clear button — a single "Clear filters" affordance lives in the dashboard toolbar). State mirrors tags in `PrototypeService`: `_activeCreators` signal, `allCreators` computed, `toggleCreator()`, and `clearFilters()` clears all three. Creator + tag + search combine with AND. Each pill row also has an "All" chip (`showAll` input + `selectAll` output) that is active by default (when that row's active set is empty) and, when clicked, clears just that row via `clearCreators()` / `clearTags()`.
 - Sort controls (F-06) not yet built
 - Multi-page ZIP upload is shipped, but **editing** a prototype with a new ZIP overwrites files by path and does NOT delete files from the prior version that are absent in the new ZIP (stale files linger). Needs a recursive folder-list + delete flow to fully clean up.
+- ~~Folders (collections)~~ DONE: Folders tab + `/folder/:id`, many-to-many/flat/folder-side membership in `collections.json` (see "Folders (collections)"). Deferred: nested folders; per-prototype "in N folders" chips; member-thumbnail mosaics on folder cards; archiving folders (delete only).
 - Figma component reference (F-13) — depends on Figma MCP availability
 - Auth model for stakeholder sharing (F-15) — TBD
 - New creator names added via the combobox are session-only; consider a flow to persist them to the CREATORS constant or to prototypes.json

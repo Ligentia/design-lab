@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map, switchMap, forkJoin, of, catchError } from 'rxjs';
 import { Prototype } from '../models/prototype.model';
 import { Asset } from '../models/asset.model';
+import { Collection } from '../models/collection.model';
 import { environment } from '../../../environments/environment';
 
 interface GitHubFileResponse {
@@ -56,6 +57,33 @@ export class GithubService {
       { message: 'Update assets.json via Design Lab', content, sha, branch: environment.githubBranch },
       { headers }
     );
+  }
+
+  getCollections(): Observable<{ collections: Collection[]; sha: string }> {
+    return this.http
+      .get<GitHubFileResponse>(`${this.base}/collections.json`)
+      .pipe(
+        map((res) => ({
+          collections: JSON.parse(atob(res.content.replace(/\n/g, ''))) as Collection[],
+          sha: res.sha,
+        })),
+        // collections.json won't exist until the first folder is created — treat
+        // a 404 (or any read failure) as an empty, unsaved list rather than an error.
+        catchError(() => of({ collections: [] as Collection[], sha: '' }))
+      );
+  }
+
+  saveCollections(collections: Collection[], sha: string, pat: string): Observable<unknown> {
+    const headers = new HttpHeaders({ Authorization: `token ${pat}` });
+    const content = btoa(JSON.stringify(collections, null, 2));
+    const body: Record<string, unknown> = {
+      message: 'Update collections.json via Design Lab',
+      content,
+      branch: environment.githubBranch,
+    };
+    // No SHA on first save (file doesn't exist yet); include it for updates.
+    if (sha) body['sha'] = sha;
+    return this.http.put(`${this.base}/collections.json`, body, { headers });
   }
 
   uploadFile(path: string, base64Content: string, pat: string): Observable<unknown> {

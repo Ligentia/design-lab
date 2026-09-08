@@ -17,6 +17,18 @@ export const routes: Routes = [
       import('./features/archived/archived.component').then((m) => m.ArchivedComponent),
   },
   {
+    path: 'folders',
+    loadComponent: () =>
+      import('./features/folders/folders.component').then((m) => m.FoldersComponent),
+  },
+  {
+    path: 'folder/:id',
+    loadComponent: () =>
+      import('./features/folder-detail/folder-detail.component').then(
+        (m) => m.FolderDetailComponent
+      ),
+  },
+  {
     path: 'prototype/:id',
     loadComponent: () =>
       import('./features/prototype-detail/prototype-detail.component').then(
