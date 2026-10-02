@@ -179,7 +179,7 @@
   <div style="display:flex;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
     <span class="view-switch-label" id="view-switch-label">View</span>
     <div class="view-switch" role="group" aria-labelledby="view-switch-label">
-      <button id="btn-individual" aria-pressed="true"  onclick="switchView('individual',this)">Individual goals</button>
+      <button id="btn-individual" aria-pressed="true"  onclick="switchView('individual',this)">Individual (median) goals</button>
       <button id="btn-total"      aria-pressed="false" onclick="switchView('total',this)">Total accumulated</button>
     </div>
   </div>
@@ -212,6 +212,8 @@
         <text x="11" y="14" font-size="7" font-family="DM Mono,monospace" fill="rgba(148,163,184,0.7)" text-anchor="middle">starts</text>
       </svg>
       <span style="color:var(--text3);">Mid-year start (G10, G15)</span>
+      <span aria-hidden="true"> · </span>
+      <span style="color:var(--text3);">G8 paused Apr–Aug, reactivated Sep</span>
     </div>
     <div class="key-item" role="listitem">
       <svg class="key-line" viewBox="0 0 22 4" aria-hidden="true"><line x1="0" y1="2" x2="22" y2="2" stroke="#e8a838" stroke-width="2" stroke-dasharray="6 3"/></svg>
@@ -220,6 +222,18 @@
   </div>
 
   <!-- Total info bar -->
+  <!-- Median info bar (individual view) -->
+  <div class="total-info visible" id="median-info" role="region" aria-label="Individual goals median summary" style="flex-direction:column;gap:12px;">
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;" id="mi-months"></div>
+      <div class="total-divider" aria-hidden="true"></div>
+      <div class="total-info-item"><span class="ti-val" id="mi-current">—</span><span class="ti-lbl" id="mi-current-lbl">Median cum. (—)</span></div>
+      <div class="total-divider" aria-hidden="true"></div>
+      <div class="total-info-item"><span class="ti-val" id="mi-proj">—</span><span class="ti-lbl">Projected Dec median</span></div>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;" id="mi-bands-row"></div>
+  </div>
+
   <div class="total-info" id="total-info" role="region" aria-label="Total accumulated summary">
     <div class="total-info-items" id="ti-months" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
     <div class="total-divider" aria-hidden="true"></div>
@@ -333,7 +347,7 @@
   <div class="caveat-note" role="note" aria-label="Important caveat on performance band interpretation">
     <strong>Important caveat on these bands:</strong> Not all low scores represent a failure of execution. A goal scoring 1 or 2 points because of engineering dependencies, stakeholder unavailability, or organisational blockers outside the design team's control tells a very different story from a goal that simply wasn't progressed. Where scores sit in the Failure or Acceptable bands, it is worth distinguishing between <strong>execution failures</strong> (the team did not drive the work) and <strong>external failures</strong> (the team was blocked by factors they could not control). Goal 6 (Swift) in March and Goal 16 (Collab Lab) are examples of the latter. This context should always accompany the numbers when presenting to senior stakeholders.
     <br><br>
-    <strong>Goal 8 — Roadmap Visibility</strong> was sunset at the end of April 2026 following a strategic decision to cease pursuing it due to a lack of organisational traction. Its historical scores (Jan–Apr) remain in the record and count toward totals for those months. From May onward, Goal 8 is excluded from the max possible calculation, median, and projections. The year-end maximum therefore reflects 12 active goals rather than 13. This is a deliberate strategic decision, not a performance failure, and should be framed as such when presenting to senior stakeholders.
+    <strong>Goal 8 — Roadmap Visibility</strong> was paused at the end of March 2026 following a strategic decision to cease pursuing it due to a lack of organisational traction. It remained excluded from scoring and max-possible calculations from April through August. Following the September 2026 organisational restructure — which changed who owns prioritisation within the tech team — Goal 8 was reactivated and resumed active tracking from September onward. Its Jan–Mar historical scores remain in the record; April–August are excluded from all calculations (max-possible, median, projections) for those months.
     <br><br>
     <strong>What the gold line means in each view — they are not the same measurement:</strong>
     <br><br>
@@ -385,24 +399,24 @@
 // ── Data ──────────────────────────────────────────────────
 const GOALS = [
   // contributors: everyone who should appear when that person's filter is active
-  {id:'G1', num:1, label:'AI workflows & agents',assignee:'Team',contributors:['CW','AP','CE'],color:'#60a5fa',scores:[4,3,3,3,3,2,2,null,null,null,null,null],dash:[],sunset:false,sunsetMonth:null},
-  {id:'G2', num:2, label:'AIUI',                  assignee:'Team',contributors:['CW'],          color:'#34d399',scores:[1,4,4,3,4,null,null,null,null,null,null,null],dash:[6,3],sunset:false,sunsetMonth:null,pausedMonths:[5,6]},
-  {id:'G4', num:4, label:'Guidde',                assignee:'AP',  contributors:['AP'],           color:'#fbbf24',scores:[2,3,4,4,3,3,1,null,null,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null},
-  {id:'G5', num:5, label:'Userflow',              assignee:'CW',  contributors:['CW','AP'],      color:'#a78bfa',scores:[4,4,2,3,2,3,2,null,null,null,null,null],dash:[],sunset:false,sunsetMonth:null},
-  {id:'G6', num:6, label:'Swift improvements',    assignee:'Team',contributors:['CW','CE'],      color:'#fb923c',scores:[2,3,1,3,2,2,3,null,null,null,null,null],dash:[8,3,2,3],sunset:false,sunsetMonth:null},
-  {id:'G8', num:8, label:'Roadmap visibility',    assignee:'CW',  contributors:['CW'],           color:'#686878',scores:[3,1,1,null,null,null,null,null,null,null,null,null],dash:[4,4],sunset:true,sunsetMonth:3},
-  {id:'G9', num:9, label:'Notifications vision',  assignee:'CE',  contributors:['CE','CW','AP'], color:'#f472b6',scores:[2,4,2,4,1,1,1,null,null,null,null,null],dash:[6,2],sunset:false,sunsetMonth:null},
-  {id:'G10',num:10,label:'Listening tour',        assignee:'Team',contributors:['CW','AP','CE'], color:'#94a3b8',scores:[null,null,1,2,2,2,4,null,null,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null,startMonth:2},
-  {id:'G11',num:11,label:'Validation practice',   assignee:'Team',contributors:['CW','AP','CE'], color:'#86efac',scores:[2,3,3,4,3,4,2,null,null,null,null,null],dash:[8,3],sunset:false,sunsetMonth:null},
-  {id:'G13',num:13,label:'Team learning',         assignee:'Team',contributors:['CW','AP','CE'], color:'#c084fc',scores:[2,3,2,4,null,null,null,null,null,null,null,null],dash:[5,2,2,2],sunset:false,sunsetMonth:null,pausedMonths:[4,5,6]},
-  {id:'G14',num:14,label:'Design visibility',     assignee:'CE',  contributors:['CE','CW','AP'], color:'#2dd4bf',scores:[3,3,2,3,3,4,4,null,null,null,null,null],dash:[4,2],sunset:false,sunsetMonth:null},
-  {id:'G15',num:15,label:'UX maturity survey',    assignee:'CW',  contributors:['CW'],           color:'#fde047',scores:[null,null,null,null,null,4,4,null,null,null,null,null],dash:[2,2],sunset:false,sunsetMonth:null,startMonth:5},
-  {id:'G16',num:16,label:'Collab lab',            assignee:'CW',  contributors:['CW'],           color:'#fb7185',scores:[2,4,2,1,1,1,3,null,null,null,null,null],dash:[10,3],sunset:false,sunsetMonth:null},
-  {id:'G17',num:17,label:'Delight',               assignee:'Team',contributors:['CW','CE','AP'], color:'#38bdf8',scores:[4,3,3,4,4,3,3,null,null,null,null,null],dash:[6,3,2,3],sunset:false,sunsetMonth:null},
+  {id:'G1', num:1, label:'AI workflows & agents',assignee:'Team',contributors:['CW','AP','CE'],color:'#60a5fa',scores:[4,3,3,3,3,2,2,2,1,null,null,null],dash:[],sunset:false,sunsetMonth:null},
+  {id:'G2', num:2, label:'AIUI',                  assignee:'Team',contributors:['CW'],          color:'#34d399',scores:[1,4,4,3,4,null,null,null,3,null,null,null],dash:[6,3],sunset:false,sunsetMonth:null,pausedMonths:[5,6,7]},
+  {id:'G4', num:4, label:'Guidde',                assignee:'AP',  contributors:['AP'],           color:'#fbbf24',scores:[2,3,4,4,3,3,1,null,null,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null,pausedMonths:[7,8]},
+  {id:'G5', num:5, label:'Userflow',              assignee:'CW',  contributors:['CW','AP'],      color:'#a78bfa',scores:[4,4,2,3,2,3,2,2,2,null,null,null],dash:[],sunset:false,sunsetMonth:null},
+  {id:'G6', num:6, label:'Swift improvements',    assignee:'Team',contributors:['CW','CE'],      color:'#fb923c',scores:[2,3,1,3,2,2,3,2,4,null,null,null],dash:[8,3,2,3],sunset:false,sunsetMonth:null},
+  {id:'G8', num:8, label:'Roadmap visibility',    assignee:'CW',  contributors:['CW'],           color:'#686878',scores:[3,1,1,null,null,null,null,null,3,null,null,null],dash:[4,4],sunset:false,sunsetMonth:null,pausedMonths:[3,4,5,6,7]},
+  {id:'G9', num:9, label:'Notifications vision',  assignee:'CE',  contributors:['CE','CW','AP'], color:'#f472b6',scores:[2,4,2,4,1,1,1,4,3,null,null,null],dash:[6,2],sunset:false,sunsetMonth:null},
+  {id:'G10',num:10,label:'Listening tour',        assignee:'Team',contributors:['CW','AP','CE'], color:'#94a3b8',scores:[null,null,1,2,2,2,4,4,1,null,null,null],dash:[3,3],sunset:false,sunsetMonth:null,startMonth:2},
+  {id:'G11',num:11,label:'Validation practice',   assignee:'Team',contributors:['CW','AP','CE'], color:'#86efac',scores:[2,3,3,4,3,4,2,4,3,null,null,null],dash:[8,3],sunset:false,sunsetMonth:null},
+  {id:'G13',num:13,label:'Team learning',         assignee:'Team',contributors:['CW','AP','CE'], color:'#c084fc',scores:[2,3,2,4,null,null,null,3,3,null,null,null],dash:[5,2,2,2],sunset:false,sunsetMonth:null,pausedMonths:[4,5,6]},
+  {id:'G14',num:14,label:'Design visibility',     assignee:'CE',  contributors:['CE','CW','AP'], color:'#2dd4bf',scores:[3,3,2,3,3,4,4,1,3,null,null,null],dash:[4,2],sunset:false,sunsetMonth:null},
+  {id:'G15',num:15,label:'UX maturity survey',    assignee:'CW',  contributors:['CW'],           color:'#fde047',scores:[null,null,null,null,null,4,4,4,4,null,null,null],dash:[2,2],sunset:false,sunsetMonth:null,startMonth:5},
+  {id:'G16',num:16,label:'Collab lab',            assignee:'CW',  contributors:['CW'],           color:'#fb7185',scores:[2,4,2,1,1,1,3,null,null,null,null,null],dash:[10,3],sunset:false,sunsetMonth:null,pausedMonths:[7,8]},
+  {id:'G17',num:17,label:'Delight',               assignee:'Team',contributors:['CW','CE','AP'], color:'#38bdf8',scores:[4,3,3,4,4,3,3,2,2,null,null,null],dash:[6,3,2,3],sunset:false,sunsetMonth:null},
 ];
 
 const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const ACTUAL_MONTHS = 7;
+const ACTUAL_MONTHS = 9;
 
 // Today's date — determines YTD and future month disabling
 const TODAY = new Date();
@@ -477,10 +491,10 @@ const projectedTotalYE=fullTotalProj[11];
 // Active goal count for band scaling (exclude sunset goals from May onward)
 const ACTIVE_GOAL_COUNT=GOALS.filter(g=>!g.sunset).length; // 12 after G8 sunset
 const BANDS=[
-  {label:'Exceptional',min:44,max:48,color:'rgba(74,222,128,0.07)'},
-  {label:'Good',       min:36,max:44,color:'rgba(96,165,250,0.07)'},
-  {label:'Acceptable', min:26,max:36,color:'rgba(251,191,36,0.07)'},
-  {label:'Failure',    min:0, max:26,color:'rgba(248,113,113,0.07)'},
+  {label:'Exceptional',min:44,max:48,color:'rgba(74,222,128,0.18)'},
+  {label:'Good',       min:36,max:44,color:'rgba(96,165,250,0.15)'},
+  {label:'Acceptable', min:26,max:36,color:'rgba(251,191,36,0.14)'},
+  {label:'Failure',    min:0, max:26,color:'rgba(248,113,113,0.13)'},
 ];
 function scaleBand(b,isTotal,monthCount){
   if(!isTotal)return{min:b.min*(monthCount/12),max:b.max*(monthCount/12),color:b.color};
@@ -493,6 +507,70 @@ function bandLabelFor(value,scale){
   for(const b of BANDS){ if(value>=b.min*scale) return b.label; }
   return 'Failure';
 }
+
+// ── Median band helpers ───────────────────────────────────
+function bandForValue(val, scale){
+  for(const b of BANDS){ if(val >= b.min * scale) return b; }
+  return BANDS[BANDS.length-1];
+}
+function bandGaps(val, scale){
+  const cur = bandForValue(val, scale);
+  const curIdx = BANDS.indexOf(cur);
+  const toUp   = curIdx > 0                   ? parseFloat((BANDS[curIdx-1].min * scale - val).toFixed(1)) : null;
+  const toDown = curIdx < BANDS.length-1       ? parseFloat((val - BANDS[curIdx+1].min * scale).toFixed(1)) : null;
+  return {cur, toUp, toDown, upLabel: curIdx > 0 ? BANDS[curIdx-1].label : null, downLabel: curIdx < BANDS.length-1 ? BANDS[curIdx+1].label : null};
+}
+
+// ── Median info bar ───────────────────────────────────────
+(function buildMedianInfo(){
+  // Monthly breakdown
+  const miMonths = document.getElementById('mi-months');
+  for(let m=0; m<ACTUAL_MONTHS; m++){
+    const val = actualMedians[m];
+    const scale = (m+1)/12;
+    const b = val !== null ? bandForValue(val, scale) : null;
+    const item = document.createElement('div');
+    item.className = 'total-info-item';
+    item.innerHTML = `<span class="ti-val" style="color:${b ? BAND_TEXT[b.label] : 'var(--text3)'};">${val !== null ? val : '—'}</span><span class="ti-lbl">${MONTH_LABELS[m]} median</span>`;
+    miMonths.appendChild(item);
+  }
+
+  // Current position (latest actual month)
+  const latestIdx = ACTUAL_MONTHS - 1;
+  const curVal = actualMedians[latestIdx];
+  const curScale = ACTUAL_MONTHS / 12;
+  document.getElementById('mi-current').textContent = curVal !== null ? curVal : '—';
+  document.getElementById('mi-current-lbl').textContent = `Median cum. (${MONTH_LABELS[latestIdx]})`;
+  if(curVal !== null){
+    document.getElementById('mi-current').style.color = BAND_TEXT[bandForValue(curVal, curScale).label];
+  }
+
+  // Projected year-end
+  const projVal = projectedMedianYE;
+  document.getElementById('mi-proj').textContent = projVal !== null ? projVal.toFixed(1) : '—';
+  if(projVal !== null){
+    document.getElementById('mi-proj').style.color = BAND_TEXT[bandForValue(projVal, 1).label];
+  }
+
+  // Band gap rows
+  const bandsRow = document.getElementById('mi-bands-row');
+  const sections = [
+    {label: `Current position (${MONTH_LABELS[latestIdx]})`, val: curVal, scale: curScale},
+    {label: `Projected year-end`, val: projVal, scale: 1},
+  ];
+  sections.forEach(({label, val, scale}) => {
+    if(val === null) return;
+    const {cur, toUp, toDown, upLabel, downLabel} = bandGaps(val, scale);
+    let html = `<div style="font-size:11px;font-family:var(--mono);color:var(--text3);">
+      <div style="margin-bottom:4px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;font-size:10px;">${label}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span>Band: <strong style="color:${BAND_TEXT[cur.label]};">${cur.label}</strong></span>`;
+    if(toUp !== null)   html += `<span style="color:#4ade80;">▲ +${toUp} pts → ${upLabel}</span>`;
+    if(toDown !== null) html += `<span style="color:#f87171;">▼ −${toDown} pts → ${downLabel}</span>`;
+    html += `</div></div>`;
+    bandsRow.innerHTML += html;
+  });
+})();
 
 // ── Header stats ──────────────────────────────────────────
 document.getElementById('avg-monthly-note').textContent=monthlyGain.toFixed(2);
@@ -554,9 +632,11 @@ const TOT_MAX_IDX=GOALS.length+5;
 function cumulativeForLine(g){
   let t=0,started=false;
   return g.scores.map((s,i)=>{
-    if(g.sunset && i>g.sunsetMonth) return null;
     if(i>=ACTUAL_MONTHS) return null;
     if(s!==null){t+=s;started=true;return t;}
+    // Genuinely inactive month: show a break rather than a flat carry-forward
+    if(g.pausedMonths && g.pausedMonths.includes(i)) return null;
+    if(!g.startMonth && i===0 && !started) return null;
     return started?t:null;
   });
 }
@@ -862,8 +942,9 @@ function getOriginalData(idx){return originalData[idx];}
 function getOriginalPointRadius(idx){return originalPointRadius[idx]||[];}
 
 // ── Y-axis zoom ───────────────────────────────────────────
-const ZOOM_LEVELS_INDIV=[6,8,10,12,14,16,20,24,32,40,48];
-const ZOOM_LEVELS_TOTAL=[50,80,100,130,160,200,260,320,400,500,600];
+const ZOOM_LEVELS_INDIV=[6,8,10,12,16,20,24,32,40,48];
+const TOTAL_FULL_RANGE=Math.ceil(cumMaxPossible[11]/50)*50;
+const ZOOM_LEVELS_TOTAL=[50,80,100,130,160,200,260,320,400,TOTAL_FULL_RANGE];
 
 function updateZoom(val){
   const levels=currentView==='individual'?ZOOM_LEVELS_INDIV:ZOOM_LEVELS_TOTAL;
@@ -895,6 +976,7 @@ function switchView(view,clickedBtn){
   document.getElementById('toggles-section').style.display=isIndiv?'':'none';
   document.getElementById('assignee-controls').style.display=isIndiv?'':'none';
   document.getElementById('total-info').classList.toggle('visible',!isIndiv);
+  document.getElementById('median-info').classList.toggle('visible',isIndiv);
   document.getElementById('key-median-label').textContent=isIndiv?'Median (actual → projected)':'Team total (actual → projected)';
   document.getElementById('stat-max').textContent=isIndiv?'48':cumMaxPossible[11];
   document.getElementById('stat-max-lbl').textContent=isIndiv?'Max possible':'Max possible (total)';
@@ -906,9 +988,9 @@ function switchView(view,clickedBtn){
   chart.options.scales.y.title.text=isIndiv?'Cumulative points':'Total cumulative points (all goals)';
   const slider=document.getElementById('ymax-slider');
   slider.value=10;
-  chart.options.scales.y.max=isIndiv?48:ZOOM_LEVELS_TOTAL[9];
+  chart.options.scales.y.max=isIndiv?48:TOTAL_FULL_RANGE;
   chart.options.scales.y.ticks.stepSize=isIndiv?4:50;
-  document.getElementById('zoom-vals').textContent=`0 – ${isIndiv?48:ZOOM_LEVELS_TOTAL[9]} pts`;
+  document.getElementById('zoom-vals').textContent=`0 – ${isIndiv?48:TOTAL_FULL_RANGE} pts`;
   document.getElementById('zoom-label').innerHTML='<strong>Y-axis ceiling:</strong>&nbsp; full range';
   chart.update();
 }
