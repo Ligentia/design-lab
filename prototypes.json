@@ -1,5 +1,17 @@
 [
   {
+    "id": "design-notes",
+    "title": "Design Notes",
+    "description": "",
+    "creator": "Chuka",
+    "date": "2026-10-09",
+    "tags": [
+      "design team",
+      "internal tools"
+    ],
+    "folder": "prototypes/design-notes"
+  },
+  {
     "id": "swift-v2-playground",
     "title": "Swift V2 playground",
     "description": "A playground for exploring Swift V2 styles.",
