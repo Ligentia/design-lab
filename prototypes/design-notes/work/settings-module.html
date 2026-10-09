@@ -1,0 +1,322 @@
+<!DOCTYPE html><html lang="en-GB" data-theme="editorial" data-astro-cid-z4jru4n3><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark light"><script>
+      (() => {
+        const KEY = 'dn-theme';
+        let t;
+        try {
+          t = localStorage.getItem(KEY);
+        } catch {
+          /* Safari private mode throws on access */
+        }
+        if (t !== 'linear' && t !== 'editorial') {
+          t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'linear' : 'editorial';
+        }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script><style>@font-face{font-family:Inter-af3ef3e5d685fc1a;src:url("/prototypes/design-notes/_astro/fonts/2640269fc0017342.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:100 900;font-style:normal;}@font-face{font-family:Inter-af3ef3e5d685fc1a;src:url("/prototypes/design-notes/_astro/fonts/35475886762aa2d5.woff2") format("woff2");font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;font-weight:100 900;font-style:normal;}@font-face{font-family:"Inter-af3ef3e5d685fc1a fallback: Arial";src:local("Arial");font-display:swap;font-weight:100 900;font-style:normal;size-adjust:107.1194%;ascent-override:90.4365%;descent-override:22.518%;line-gap-override:0%;}@font-face{font-family:"Inter-af3ef3e5d685fc1a fallback: Arial";src:local("Arial");font-display:swap;font-weight:100 900;font-style:normal;size-adjust:107.1194%;ascent-override:90.4365%;descent-override:22.518%;line-gap-override:0%;}:root{--font-inter:Inter-af3ef3e5d685fc1a,"Inter-af3ef3e5d685fc1a fallback: Arial",system-ui,-apple-system,"Segoe UI",sans-serif;}</style><link rel="preload" href="/prototypes/design-notes/_astro/fonts/2640269fc0017342.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/prototypes/design-notes/_astro/fonts/35475886762aa2d5.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7";src:url("/prototypes/design-notes/_astro/fonts/a822c35c903db398.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:200 900;font-style:normal;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7";src:url("/prototypes/design-notes/_astro/fonts/c19d7d6b0e46db20.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:200 900;font-style:italic;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7";src:url("/prototypes/design-notes/_astro/fonts/7a424e1bf5c046b3.woff2") format("woff2");font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;font-weight:200 900;font-style:normal;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7";src:url("/prototypes/design-notes/_astro/fonts/e0d9850b8153e910.woff2") format("woff2");font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;font-weight:200 900;font-style:italic;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:200 900;font-style:normal;size-adjust:110.7692%;ascent-override:93.5278%;descent-override:30.2431%;line-gap-override:0%;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:200 900;font-style:italic;size-adjust:110.7692%;ascent-override:93.5278%;descent-override:30.2431%;line-gap-override:0%;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:200 900;font-style:normal;size-adjust:110.7692%;ascent-override:93.5278%;descent-override:30.2431%;line-gap-override:0%;}@font-face{font-family:"Source Serif 4-8938fcacb04b5ea7 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:200 900;font-style:italic;size-adjust:110.7692%;ascent-override:93.5278%;descent-override:30.2431%;line-gap-override:0%;}:root{--font-source-serif:"Source Serif 4-8938fcacb04b5ea7","Source Serif 4-8938fcacb04b5ea7 fallback: Times New Roman",Charter,Georgia,"Times New Roman",serif;}</style><link rel="preload" href="/prototypes/design-notes/_astro/fonts/a822c35c903db398.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/prototypes/design-notes/_astro/fonts/c19d7d6b0e46db20.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/prototypes/design-notes/_astro/fonts/7a424e1bf5c046b3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/prototypes/design-notes/_astro/fonts/e0d9850b8153e910.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"JetBrains Mono-a17a5f73346cf68d";src:url("/prototypes/design-notes/_astro/fonts/eb8cefc0a57905aa.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:100 800;font-style:normal;}@font-face{font-family:"JetBrains Mono-a17a5f73346cf68d fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:100 800;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}:root{--font-jetbrains:"JetBrains Mono-a17a5f73346cf68d","JetBrains Mono-a17a5f73346cf68d fallback: Courier New",ui-monospace,SFMono-Regular,monospace;}</style><title>One place for settings, usable by anyone who needs them · Design Notes</title><meta name="description" content="In L4, settings weren't placed with any plan. Some lived on an ad hoc page, some in language only engineers could read, some only in code. Most of this work happened before any screen was drawn."><meta property="og:title" content="One place for settings, usable by anyone who needs them · Design Notes"><meta property="og:description" content="In L4, settings weren't placed with any plan. Some lived on an ad hoc page, some in language only engineers could read, some only in code. Most of this work happened before any screen was drawn."><meta property="og:type" content="website"><meta name="robots" content="noindex"><link rel="icon" href="/prototypes/design-notes/favicon.svg" type="image/svg+xml"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/prototypes/design-notes/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CYDbzu1r.js"></script><link rel="stylesheet" href="/prototypes/design-notes/_astro/_id_.72JrrGFR.css"><link rel="stylesheet" href="/prototypes/design-notes/_astro/BaseLayout.H-_4Zr_K.css"></head><body data-astro-cid-z4jru4n3><a class="skip" href="#main" data-astro-cid-pbhazpx6>Skip to content</a><header class="header" data-astro-cid-nen7h5rs><div class="inner page" data-astro-cid-nen7h5rs><a class="wordmark" href="/prototypes/design-notes/index.html" data-astro-cid-nen7h5rs><span class="mark" aria-hidden="true" data-astro-cid-nen7h5rs></span><span class="name" data-astro-cid-nen7h5rs>Design Notes</span></a><nav aria-label="Primary" data-astro-cid-nen7h5rs><ul class="nav" data-astro-cid-nen7h5rs><li data-astro-cid-nen7h5rs><a href="/prototypes/design-notes/index.html" data-astro-cid-nen7h5rs>Work</a></li><li data-astro-cid-nen7h5rs><a href="/prototypes/design-notes/about.html" data-astro-cid-nen7h5rs>About</a></li></ul></nav><div class="switch" role="radiogroup" aria-label="Theme" data-astro-cid-ijxc6blt><span class="indicator" aria-hidden="true" data-astro-cid-ijxc6blt></span><button type="button" role="radio" class="opt" data-theme-option="linear" aria-checked="false" tabindex="-1" data-astro-cid-ijxc6blt>Dark</button><button type="button" role="radio" class="opt" data-theme-option="editorial" aria-checked="false" tabindex="-1" data-astro-cid-ijxc6blt>Editorial</button></div><script type="module">var e=[`linear`,`editorial`],t=t=>e.includes(t);function n(e,t=!1){document.documentElement.dataset.theme=e;try{localStorage.setItem(`dn-theme`,e)}catch{}r(t)}function r(e=!1){let t=document.documentElement.dataset.theme;document.querySelectorAll(`.switch`).forEach(n=>{let r=[...n.querySelectorAll(`[data-theme-option]`)],i=n.querySelector(`.indicator`);r.forEach(n=>{let r=n.dataset.themeOption===t;n.setAttribute(`aria-checked`,String(r)),n.tabIndex=r?0:-1,r&&i&&(i.style.setProperty(`--ind-w`,`${n.offsetWidth}px`),i.style.setProperty(`--ind-x`,`${n.offsetLeft-3}px`)),r&&e&&n.focus()}),n.setAttribute(`data-ready`,``)})}function i(){document.querySelectorAll(`.switch`).forEach(e=>{if(e.dataset.bound)return;e.dataset.bound=`true`;let r=[...e.querySelectorAll(`[data-theme-option]`)];e.addEventListener(`click`,e=>{let r=e.target.closest(`[data-theme-option]`)?.dataset.themeOption;t(r)&&n(r)}),e.addEventListener(`keydown`,e=>{if(![`ArrowRight`,`ArrowDown`,`ArrowLeft`,`ArrowUp`].includes(e.key))return;e.preventDefault();let i=r.findIndex(e=>e.getAttribute(`aria-checked`)===`true`),a=e.key===`ArrowRight`||e.key===`ArrowDown`?1:-1,o=r[(i+a+r.length)%r.length]?.dataset.themeOption;t(o)&&n(o,!0)})}),r()}i(),document.addEventListener(`astro:page-load`,i),window.addEventListener(`resize`,()=>r()),document.fonts?.ready.then(()=>r());</script></div></header><main id="main" class="main flush" data-astro-cid-z4jru4n3><article data-astro-cid-iu2tt25f><header class="head" data-astro-cid-iu2tt25f><figure class="hero" data-astro-cid-iu2tt25f><img src="/prototypes/design-notes/_astro/cover.C-xabcPo_Z1sMhlV.webp" srcset="/prototypes/design-notes/_astro/cover.C-xabcPo_Z18z9Of.webp 720w, /prototypes/design-notes/_astro/cover.C-xabcPo_18CEzb.webp 1080w, /prototypes/design-notes/_astro/cover.C-xabcPo_ka5wH.webp 1440w, /prototypes/design-notes/_astro/cover.C-xabcPo_AfUEC.webp 1920w" alt="The Shipment Approval settings page in Ligentix, showing the SA rules config tab and plain-English explanations of First Approval, Highlight Validation and Review Hold." sizes="(max-width: 1000px) 100vw, 1440px" loading="eager" data-astro-cid-iu2tt25f="true" decoding="async" width="2560" height="1440"><div class="scrim" aria-hidden="true" data-astro-cid-iu2tt25f></div></figure><div class="titling page" data-astro-cid-iu2tt25f><p class="eyebrow" data-astro-cid-iu2tt25f>Settings</p><h1 class="display" data-astro-cid-iu2tt25f>One place for settings, usable by anyone who needs them</h1><p class="deck" data-astro-cid-iu2tt25f>Building a central settings module for Ligentix, starting with Delivery Module and Shipment Approval.</p><div class="byline" data-astro-cid-kz7xf6wb><div class="avatars" aria-hidden="true" data-astro-cid-kz7xf6wb><img src="/prototypes/design-notes/_astro/craig-wetherall.CiP0wM8H_ZIXOf6.svg" alt data-astro-cid-kz7xf6wb="true" loading="lazy" decoding="async" width="52" height="52" class="av"><img src="/prototypes/design-notes/_astro/chuka-ezeoke.BB6ILrkb_ZIXOf6.svg" alt data-astro-cid-kz7xf6wb="true" loading="lazy" decoding="async" width="52" height="52" class="av"><img src="/prototypes/design-notes/_astro/adrian.BmE9u-Zr_ZIXOf6.svg" alt data-astro-cid-kz7xf6wb="true" loading="lazy" decoding="async" width="52" height="52" class="av"></div><p class="names" data-astro-cid-kz7xf6wb><a href="/prototypes/design-notes/team/craig-wetherall.html" data-astro-cid-kz7xf6wb>Craig Wetherall</a><span class="sep" data-astro-cid-kz7xf6wb>, </span><a href="/prototypes/design-notes/team/chuka-ezeoke.html" data-astro-cid-kz7xf6wb>Chuka Ezeoke</a><span class="sep" data-astro-cid-kz7xf6wb> and </span><a href="/prototypes/design-notes/team/adrian.html" data-astro-cid-kz7xf6wb>Adrian</a><span class="roles" data-astro-cid-kz7xf6wb> · Product design lead, Product design and Language and content design</span></p></div></div></header><div class="body page" data-astro-cid-iu2tt25f><div class="cs-layout" data-astro-cid-iu2tt25f><div class="meta" data-astro-cid-iu2tt25f><dl class="rail" data-astro-cid-wttqxb4s><div class="row" data-astro-cid-wttqxb4s><dt data-astro-cid-wttqxb4s>Product area</dt><dd data-astro-cid-wttqxb4s>Settings</dd></div><div class="row" data-astro-cid-wttqxb4s><dt data-astro-cid-wttqxb4s>Status</dt><dd data-astro-cid-wttqxb4s>In build</dd></div><div class="row" data-astro-cid-wttqxb4s><dt data-astro-cid-wttqxb4s>Timeframe</dt><dd data-astro-cid-wttqxb4s><time datetime="2026-06" data-astro-cid-wttqxb4s>June 2026 — ongoing</time></dd></div><div class="row" data-astro-cid-wttqxb4s><dt data-astro-cid-wttqxb4s>Disciplines</dt><dd data-astro-cid-wttqxb4s>Product design, Content design, Interaction design, Research</dd></div></dl></div><div class="prose" data-astro-cid-iu2tt25f><p>In the old platform (L4), settings weren’t placed with any plan. Some lived on
+an ad hoc page. Some were described in language only engineers could read.
+Some existed only in code. Even where settings were in the interface, most
+people who needed them couldn’t use them.</p>
+<p>Our goal was one central place for all settings in Ligentix, usable by anyone
+who needs it, whether they’re an engineer, a BA or an account manager. We
+started with two modules, Delivery Module and Shipment Approval.</p>
+<p>Most of this work happened before any screen was drawn. We found out what the
+rules actually did and who they affected. We changed what we understood the
+problem to be. And we made the case for a single settings module for the whole
+platform.</p>
+<p>At first there wasn’t the resource to build one. We adjusted and designed
+settings per module and structured them to be lifted out later. However, we
+kept making the case, and successfully achieved a change in product direction.
+Because of how we’d designed it, the move cost a revision rather than a
+restart, with only limited front-end rework for engineering.</p>
+<p>Delivery Module settings are in final build. Shipment Approval is in the
+pipeline. There is no outcome data yet. We set out below what we’ll measure.</p>
+<figure class="ap is-wide box" data-asset="Asset01" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset01</span><span class="type" data-astro-cid-45k74d23>hero visual</span></div><div class="what" data-astro-cid-45k74d23><p>The L4 Shipment Approval rules next to the new Shipment Approval rules SIP.
+This is the one image a reader should see if they see nothing else. The
+caption should state the change and spell out “slide in panel (SIP)”.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> L4 screenshots and the current Figma file</p></div></figure>
+<h2 id="what-this-work-involved">What this work involved</h2>
+<p>This project involved:</p>
+<ul>
+<li>defining the problem with operations, BAs and engineering</li>
+<li>research through stakeholder walkthroughs</li>
+<li>structuring the rules and how settings are organised</li>
+<li>rewriting every rule in plain English</li>
+<li>making the case for a central settings module</li>
+<li>working with engineering on scope</li>
+<li>testing behaviour with interactive prototypes</li>
+<li>agreeing how prototypes are handed between teams</li>
+</ul>
+<p>Visual design was just one part of it.</p>
+<p>The two modules needed different things from us. Delivery Module settings
+already had an earlier version in L5, so that work meant merging rules that
+duplicated each other and capturing information earlier. Shipment Approval was
+closer to starting over, against rules that nest three levels deep and
+configuration that existed only in code. The same approach had to cover both.</p>
+<p>Rules written as plain-language statements worked on Delivery Module, held in
+the Shipment Approval panel, and needed a different approach on the Shipment
+Approval rules table, which is where we moved to sentence based rows within
+the tables.</p>
+<figure class="ap is-content box" data-asset="Asset02" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset02</span><span class="type" data-astro-cid-45k74d23>figure</span></div><div class="what" data-astro-cid-45k74d23><p>A rough split of the team’s time across this work, for example stakeholder
+sessions, research, structure, language, prototyping and visual design. This
+is the most direct evidence that design is more than visual output. Rough
+estimates are fine.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Craig, Adrian and Chuka</p></div></figure>
+<figure class="ap is-wide box" data-asset="Asset03" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset03</span><span class="type" data-astro-cid-45k74d23>diagram</span></div><div class="what" data-astro-cid-45k74d23><p>A collaboration map with design at the centre. Around it, show each person or
+group design worked with and what came out of working with them: Dennis Jones
+(what each rule does operationally); Jonathan Maynard (found the duplicated
+parameters); engineering (limited resource availability at the start, which
+led to designing per module so settings could be lifted out later); senior
+product stakeholders and engineering (agreed the move to a central module);
+BAs (rules they couldn’t explain); Timea Toth (a walkthrough of the L4
+settings); Dee Williams (tone validation); account managers (information
+chased mid-process).</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<h2 id="1-context-why-this-mattered">1. Context: why this mattered</h2>
+<h3 id="the-business-problem">The business problem</h3>
+<p>Settings slowed down onboarding, took engineering time and carried a real risk
+of costly mistakes.</p>
+<p>L4 grew by addition. When a client wanted something slightly different, a new
+rule appeared next to a near-identical one. After years of this, the Shipment
+Approval side alone had roughly 50 to 60 rules, and nobody could tell us what
+all of them did.</p>
+<p>Some configuration wasn’t in the interface at all. It was in the code. A client
+request became an engineering ticket, and someone had to read the source code
+to find out what the system currently did.</p>
+<p>Onboarding a customer and configuring their settings were close to the same
+job, done twice, in two places that didn’t connect. That puts settings on the
+critical path for how quickly Ligentia can bring a customer live, and allow us
+to advocate for a similar approach for onboarding.</p>
+<figure class="ap is-content note" data-asset="Asset04" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset04</span><span class="type" data-astro-cid-45k74d23>figures</span></div><div class="what" data-astro-cid-45k74d23><p>Three numbers would support this section: the engineering hours spent on
+settings changes each month, the average time to onboard a customer, and the
+number of clients still waiting to migrate. Rough figures are fine.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Dennis or engineering leadership</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset05" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset05</span><span class="type" data-astro-cid-45k74d23>figure</span></div><div class="what" data-astro-cid-45k74d23><p>The number of Shipment Approval configurations that were hard-coded and are
+now in the interface. This is the most direct measure of getting configuration
+out of engineering’s hands.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Engineering</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset06" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset06</span><span class="type" data-astro-cid-45k74d23>diagram</span></div><div class="what" data-astro-cid-45k74d23><p>Onboarding and settings configuration shown as two disconnected processes
+doing overlapping work.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<h3 id="who-it-affected">Who it affected</h3>
+<p>The problem wasn’t only for the people configuring settings. It reached BAs,
+account managers, engineers and, in the end, customers.</p>
+<p>When the BAs were asked about specific rules, the answer was usually the same:
+“We don’t know what that is” or “we don’t touch that.” Using the system
+depended on knowledge picked up over time, not on anything the screen
+explained.</p>
+<p>BAs and account managers were continually chasing information before and after
+the customer was initially set up.</p>
+<p>Engineers had effectively become the support queue for settings, which used
+capacity that should have been better utilised elsewhere.</p>
+<figure class="ap is-content note" data-asset="Asset07" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset07</span><span class="type" data-astro-cid-45k74d23>testimony</span></div><div class="what" data-astro-cid-45k74d23><p>A short quote from a BA or an account manager on what working with L4 settings
+was like.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> The BAs who worked with Adrian, or the Delivery Module account managers</p></div></figure>
+<h3 id="what-we-found">What we found</h3>
+<aside class="callout insight" data-astro-cid-lnlu5god><p class="label" data-astro-cid-lnlu5god>What we learned</p><div class="body" data-astro-cid-lnlu5god><p>These settings aren’t preferences. They are instructions for a physical
+operation, and a wrong setting shows up later as a real cost on a real
+shipment.</p></div></aside>
+<p>This came from screen-shares with Dennis Jones, who went through the L4 rules
+one at a time and explained what each one does. A clear example was rent start
+dates. The same setting behaves differently depending on the customer’s
+country. If it’s set wrongly, someone is invoiced materially more or less than
+they should be.</p>
+<p>That changed what the screen had to be. It couldn’t be a preferences panel. It
+had to be closer to an instrument that you can’t set wrongly by accident.</p>
+<p>Our sources were qualitative. Most of our understanding came from stakeholder
+walkthroughs:</p>
+<ul>
+<li>Dennis, on what the rules do in operations</li>
+<li>Timea Toth, provided additional insight into L4 settings</li>
+<li>engineering, on what made the area hard to maintain</li>
+</ul>
+<p>We also read the existing screens closely. We did use some figures, such as how
+many suppliers a customer can hold and the migration backlog. We didn’t use
+support tickets, because the old tool was internal and run by engineers.</p>
+<figure class="ap is-content note" data-asset="Asset08" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset08</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>Has a misconfiguration like this ever caused a real billing error? If so,
+roughly what did it cost? One real incident would turn this from an argument
+into a fact.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Dennis</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset09" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset09</span><span class="type" data-astro-cid-45k74d23>illustration</span></div><div class="what" data-astro-cid-45k74d23><p>One setting producing different invoice outcomes in different countries.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<h2 id="2-approach-what-we-did">2. Approach: what we did</h2>
+<h3 id="the-case-for-one-settings-module">The case for one settings module</h3>
+<p>We made the case that one central settings module was the right route, both
+tactically and strategically. At first there wasn’t the resource to build it.
+So we designed per module, structured to be lifted out later, and kept making
+the case. A central module is now the agreed direction. Because of how we’d
+designed it, the move cost the design team a revision rather than a restart,
+and the engineering rework was limited, mostly front end.</p>
+<p>Our case was focused on a longer term vision for platform settings, not any one
+screen. Someone who has just set up a customer and needs to change their
+configuration shouldn’t have to know which module owns which setting. One place
+to go means one thing to learn, and one structure to maintain. Settings
+collected via an extensive onboarding process should not need re-creating or
+re-entering.</p>
+<p>At the start, engineering supported the idea, but had limited resource
+available. That was a fair call at the time. So we designed settings per
+module, and made every structural choice assuming they would later be combined.
+Because that strategic thinking had already been laid out, this had the benefit
+of reducing future product and design work whilst providing engineering with
+additional context they could consider during build.</p>
+<p>We did, however, keep making the case. Over the course of the project, design
+explained why a central module was the better route, for users now and for the
+platform long term. It took sustained effort but Design successfully convinced
+senior product stakeholders that this was the right route. With engineering’s
+agreement, a central module was adopted as the approved direction.</p>
+<p>To support this advocacy, the design team had built a proof of concept that put
+known L4 rules into the design system (SwiftDS), and adjusted them to support a
+modular structure. This was an asset intended to help teams align on a long term
+vision and experience the benefits of this approach directly. An example of
+where this approach would directly avoid costly future rework was in exposing
+the need for three level deep rule navigation. It showed the default design
+system tab approach would cause distinct usability issues. Content was visually
+competing with each other in the same space, confusing users. We required an
+alternative, long term approach.</p>
+<p>We built those early explorations to work either per module or standalone, so
+when the decision changed, the design was ready for it.</p>
+<figure class="ap is-content note" data-asset="Asset10" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset10</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>What the advocacy involved: roughly how long it ran, which groups were
+involved, and what persuaded them. For example, the proof of concept, a
+presentation or a specific point that landed.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Craig</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset11" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset11</span><span class="type" data-astro-cid-45k74d23>figure</span></div><div class="what" data-astro-cid-45k74d23><p>An estimate of the time saved, in two parts. First, design time saved by
+needing a revision rather than a restart. Second, the engineering rework that
+was needed, compared with what a full rebuild would have taken. Even “about X
+days of front-end work rather than a rebuild” would carry it.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Craig, Adrian and engineering</p></div></figure>
+<figure class="ap is-content note" data-asset="Asset12" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset12</span><span class="type" data-astro-cid-45k74d23>testimony</span></div><div class="what" data-astro-cid-45k74d23><p>A short quote from a senior product stakeholder or engineering lead on why
+they agreed to change direction.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Whoever led the decision on the product or engineering side</p></div></figure>
+<figure class="ap is-wide box" data-asset="Asset13" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset13</span><span class="type" data-astro-cid-45k74d23>diagram</span></div><div class="what" data-astro-cid-45k74d23><p>A timeline: (1) we made the case for one module; (2) there was no resource at
+first; (3) we designed per module, to be lifted out later; (4) we kept making
+the case; (5) senior product stakeholders and engineering agreed the move; (6)
+the change was a revision, with limited front-end rework.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset14" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset14</span><span class="type" data-astro-cid-45k74d23>diagram</span></div><div class="what" data-astro-cid-45k74d23><p>The per-module structure and how it maps into the central settings module.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<figure class="ap is-content box" data-asset="Asset15" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset15</span><span class="type" data-astro-cid-45k74d23>visual</span></div><div class="what" data-astro-cid-45k74d23><p>The proof-of-concept exploration showing the tabs on tabs problem.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Adrian</p></div></figure>
+<h3 id="key-decisions">Key decisions</h3>
+<p>Each decision below shows the problem, who was involved, what we decided and
+the effect we expect.</p>
+<h4 id="fewer-rules-and-the-right-information-captured-earlier--delivery-module">Fewer rules, and the right information captured earlier · Delivery Module</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>Rules in the first version of Delivery Module settings looked independent, but several did the same job under different names. L4&#39;s sprawl had copied itself into the new platform. Information that should have been captured at customer setup was being chased later.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>The design team, and the Delivery Module BAs.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>We merged rules that duplicated each other, deleted repeats, and added fields at setup for information that was previously chased mid-process.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>Fewer rules that are easier to read. Fewer and shorter tickets for account managers.</dd></div></dl></div>
+<figure class="figure is-wide frame" data-astro-cid-2n6bsby7><div class="media" data-astro-cid-2n6bsby7><p><img src="/prototypes/design-notes/_astro/dm-settings.DJdzJ13o_Z2saidB.webp" alt="The Delivery Module client settings screen" loading="lazy" decoding="async" width="2560" height="1400"></p></div><figcaption data-astro-cid-2n6bsby7>Delivery Module settings in Ligentix. Client names masked.</figcaption></figure>
+<figure class="ap is-content note" data-asset="Asset16" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset16</span><span class="type" data-astro-cid-45k74d23>figures</span></div><div class="what" data-astro-cid-45k74d23><p>The rule count before and after. Also list the setup fields added and what
+each one removed the need to chase.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Chuka and the Delivery Module BAs</p></div></figure>
+<h4 id="copy-a-clients-configuration--delivery-module-first-reused-on-shipment-approval">Copy a client’s configuration · Delivery Module first, reused on Shipment Approval</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>Clients often need a configuration that differs from an existing one in only a few places, but it had to be rebuilt rule by rule.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>The design team and Dennis Jones.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>We let users duplicate a client&#39;s existing configuration and then change what&#39;s different.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>Faster setup for any client whose configuration is close to one that already exists.</dd></div></dl></div>
+<p>After seeing it work effectively on Delivery Module, Dennis asked for it across
+all the Shipment Approval tabs. That is our clearest early sign that it solved a
+real problem.</p>
+<figure class="ap is-content note" data-asset="Asset17" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset17</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>Any estimate of the time this saves when setting up a new client.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Dennis or the BAs</p></div></figure>
+<h4 id="parameters-first-then-toggles--shipment-approval">Parameters first, then toggles · Shipment Approval</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>The early Shipment Approval structure placed a rule&#39;s parameters under First Approval. A client who wanted Highlight Validation without auto-approval couldn&#39;t get it cleanly. Anyone who wanted both had to define the same parameters twice.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>Jonathan Maynard found the flaw. The design team reworked the model.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>Each rule and its parameters are defined once. First Approval, Highlight Validation and Review Hold sit on top as independent toggles.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>A simpler, more efficient model with no duplicate setup, and fewer ways to configure a client incorrectly, reducing errors.</dd></div></dl></div>
+<figure class="ap is-wide box" data-asset="Asset18" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset18</span><span class="type" data-astro-cid-45k74d23>diagram</span></div><div class="what" data-astro-cid-45k74d23><p>Before and after of the model. Before should show the parameters nested and
+duplicated, with the duplication called out. After should show them defined
+once, with the toggles on top.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Earlier Figma states, if they still exist</p></div></figure>
+<h4 id="sentences-instead-of-columns--shipment-approval-pattern-first-used-on-delivery-module">Sentences instead of columns · Shipment Approval (pattern first used on Delivery Module)</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>Rule creation in the SIP (slide in panel) already used plain language, so setting up a rule read like writing a statement. That worked on Delivery Module. It was well validated. Shipment Approval rules nest three levels deep, and the table carried a separate column for every parameter any rule type might use. The pattern held in the SIP but not in the table.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Scale of it</dt><dd data-astro-cid-oagma235>Eleven columns, six of them parameters that only apply to some rule types, so most cells were empty. Reading one rule meant scanning the full width of the table to find the two or three values that applied to it, and the rule name on its own did not say what the rule checked. The table was also longer than it needed to be, so finding a rule required extensive scrolling.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>The design team.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>Each rule in the table is written as a short sentence instead of a row of yes/no columns. The easy choice was to accept the sparse grid. We decided not to.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>The six parameter columns collapse into one that reads as a sentence, taking the table from eleven columns to six. A rule can be read without opening it, and each row can expand to explain what the rule checks.</dd></div></dl></div>
+<figure class="figure is-wide frame" data-astro-cid-2n6bsby7><div class="media" data-astro-cid-2n6bsby7><p><img src="/prototypes/design-notes/_astro/sa-rules-table.DOVrJjW8_YTObz.webp" alt="The Shipment Approval rules table, showing many columns with dashes where a parameter does not apply to that rule type" loading="lazy" decoding="async" width="2560" height="1800"></p></div><figcaption data-astro-cid-2n6bsby7>The Shipment Approval rules table. The empty cells are the problem — most parameter columns only apply to some rule types. Client names masked.</figcaption></figure>
+<figure class="ap is-wide box" data-asset="Asset19" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset19</span><span class="type" data-astro-cid-45k74d23>visual</span></div><div class="what" data-astro-cid-45k74d23><p>Before and after screens of the rules table are available. The caption should
+give the column counts (eleven before, six after) and point at the empty cells
+in the “before”. Mask the customer name in both screens before use.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Chuka — supplied, needs masking</p></div></figure>
+<h4 id="logs-moved-out-of-the-rule--shipment-approval">Logs moved out of the rule · Shipment Approval</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>Dennis flagged audit logging as critical. A rule can be deleted, but its history still has to survive, so logs couldn&#39;t live inside the rule. Logs were also spread across notification alerts and migrated clients.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>Dennis Jones and the design team.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>We moved logs out of the SIP to one top-level tab that can be filtered by rule, by deletion and by history. Later, when someone suggested copying the existing logs across as they were, we explained that log content differs by settings area, so a single view needs designing rather than copying.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>Audit history survives rule deletion, and logs can be found in one place.</dd></div></dl></div>
+<h4 id="clashing-rules-are-disabled-not-hidden--shipment-approval">Clashing rules are disabled, not hidden · Shipment Approval</h4>
+<div class="spec" data-astro-cid-oagma235><dl data-astro-cid-oagma235><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Problem</dt><dd data-astro-cid-oagma235>Some rules can&#39;t be used together. Our first idea was to filter the available rules by customer.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Who</dt><dd data-astro-cid-oagma235>The design team proposed the filtering approach. Dennis Jones and Jonathan Maynard pushed back on it.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Decision</dt><dd data-astro-cid-oagma235>Choosing one rule greys out the rules that clash with it, and explains why. We dropped filtering by customer, because predefining which rules each customer can have does not scale.</dd></div><div class="row" data-astro-cid-oagma235><dt data-astro-cid-oagma235>Expected effect</dt><dd data-astro-cid-oagma235>Users can&#39;t create conflicting setups, and the system doesn&#39;t need rework each time a new customer type arrives.</dd></div></dl></div>
+<h3 id="language-as-its-own-workstream">Language as its own workstream</h3>
+<p>The language problem was big enough to need someone’s full attention, so we
+split the work. One designer led language while the rest of the team led the
+interaction design.</p>
+<p>We set a voice rather than checking every line of text one at a time. That
+meant plain English, as little jargon as possible, rules written as sentences,
+and an example wherever a rule needed one. One early draft came out too warm
+and was pulled back toward plain instruction.</p>
+<p>We tested the tone with Dee Williams, and checked accuracy with Dennis and the
+BAs.</p>
+<figure class="ap is-wide box" data-asset="Asset20" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset20</span><span class="type" data-astro-cid-45k74d23>visual</span></div><div class="what" data-astro-cid-45k74d23><p>Two or three L4 rule descriptions next to their rewrites. This is the quickest
+proof that the old language couldn’t be read.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> L4 screenshots and Adrian&#39;s rewrites</p></div></figure>
+<figure class="ap is-content note" data-asset="Asset21" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset21</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>How many people tested the language, which rules they tested, and what came
+back. Include anything that surprised us.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Adrian</p></div></figure>
+<h3 id="how-we-worked">How we worked</h3>
+<aside class="callout decision" data-astro-cid-lnlu5god><p class="label" data-astro-cid-lnlu5god>Decision</p><div class="body" data-astro-cid-lnlu5god><p>We tested behaviour with interactive prototypes instead of static screens, and
+the quality of feedback improved. We also agreed with other teams how
+prototypes should be handed over.</p></div></aside>
+<p>The design team built and iterated on prototypes made with Claude, so they
+behaved more like the real product than traditional prototypes do. In reviews
+with BAs, engineering and the product owner, people could click through and
+interact with how the screens actually worked instead of imagining it. Feedback
+became more focused and complete, and decisions came out of those sessions. One
+example is replacing a dropdown with a strict search, because the backend
+structure made the dropdown the wrong choice.</p>
+<p>AI prototyping tools were new to several teams during this project. Prototypes
+produced outside design helped show intent, but they mixed in code-level and
+BA-level detail, which made the scope look bigger than it was and caused
+unexpected friction between teams. We read them down to the core flows. We then
+worked with other teams to agree what a prototype should contain at handover and
+evolved cross team processes to solve the issues caused by new ways of working.</p>
+<figure class="ap is-content note" data-asset="Asset22" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset22</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>One example of something the prototype could show that a traditional prototype
+couldn’t. For example, nested rules switching on and off, the strict search
+responding to input, or clashing rules greying out live.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Chuka</p></div></figure>
+<figure class="ap is-content note" data-asset="Asset23" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset23</span><span class="type" data-astro-cid-45k74d23>evidence</span></div><div class="what" data-astro-cid-45k74d23><p>Three or four other decisions that came out of the prototype reviews. At the
+moment there’s only one example.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Chuka</p></div></figure>
+<figure class="ap is-wide box" data-asset="Asset24" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset24</span><span class="type" data-astro-cid-45k74d23>visual</span></div><div class="what" data-astro-cid-45k74d23><p>Stills from the prototype showing the dropdown before and the strict search
+after.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Chuka</p></div></figure>
+<h2 id="3-value-what-design-contributed">3. Value: what design contributed</h2>
+<p>Design shaped what was built, not only how it looked.</p>
+<ul>
+<li><strong>We redefined the problem.</strong> Settings were treated as a source of
+operational risk, not as preferences.</li>
+<li><strong>We saw the structural problem coming.</strong> A design proof of concept found it
+before the project started.</li>
+<li><strong>We made the case for a central module.</strong> It was sustained over the project,
+and it is now the agreed direction for the platform.</li>
+<li><strong>We kept the better option affordable.</strong> Designing per module, structured to
+be lifted out, meant the change of direction cost a revision rather than a
+restart.</li>
+<li><strong>We reduced the work.</strong> Rules were merged, information is captured earlier,
+and configurations can be copied.</li>
+<li><strong>We made the rules readable.</strong> Language was handled as its own workstream.</li>
+<li><strong>We improved how teams work together.</strong> Interactive prototypes led to better
+review sessions, and handover between teams was agreed.</li>
+</ul>
+<figure class="ap is-content note" data-asset="Asset25" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset25</span><span class="type" data-astro-cid-45k74d23>testimony</span></div><div class="what" data-astro-cid-45k74d23><p>A short quote from Dennis, Jonathan or engineering on how working with design
+changed the outcome. For the purpose of this case study, this is the strongest
+evidence available, because it comes from outside design.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Dennis Jones, Jonathan Maynard or engineering leadership</p></div></figure>
+<h3 id="where-it-stands-and-how-well-measure-it">Where it stands and how we’ll measure it</h3>
+<p>Delivery Module settings are in final build. Shipment Approval is in progress.
+There is no outcome data yet.</p>
+<p>Once Delivery Module is live, we want evidence of someone’s job getting easier.
+For example, an account manager or BA making a change they would previously
+have raised a ticket for.</p>
+<figure class="ap is-content note" data-asset="Asset26" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset26</span><span class="type" data-astro-cid-45k74d23>table</span></div><div class="what" data-astro-cid-45k74d23><p>What we’ll measure, the current baseline, and who owns the data. The GA4
+requirements for Delivery Module and Shipment Approval may cover part of this.
+If nothing is set up to measure yet, it’s better to find that out before
+launch.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team and analytics</p></div></figure>
+<figure class="ap is-content note" data-asset="CHECK" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>CHECK</span><span class="type" data-astro-cid-45k74d23>to confirm</span></div><div class="what" data-astro-cid-45k74d23><p>Whether the GA4 requirements track settings changes.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Analytics</p></div></figure>
+<h2 id="4-forward-how-design-gets-involved">4. Forward: how design gets involved</h2>
+<h3 id="what-this-project-shows-about-involving-design-early">What this project shows about involving design early</h3>
+<aside class="callout insight" data-astro-cid-lnlu5god><p class="label" data-astro-cid-lnlu5god>What we learned</p><div class="body" data-astro-cid-lnlu5god><p>The most valuable design work on this project happened before anything was
+built. Bringing design in early on platform-wide decisions gives that work the
+most room to pay off.</p></div></aside>
+<p>Several of the outcomes in this case study came from design being involved
+early:</p>
+<ul>
+<li>A design proof of concept found the structural problem before the project
+properly started.</li>
+<li>Designing per module, structured to be lifted out later, kept the central
+module affordable when the direction changed.</li>
+<li>Screen-shares with Dennis changed what the problem was before any screens
+were drawn.</li>
+</ul>
+<p>Each of these was cheap because it happened early. The same insight found
+later, after build, would have meant rework.</p>
+<p>Platform-wide decisions like this one affect how every module works, and how
+everyone who uses Ligentix finds their way around it. They benefit most from
+design involvement at the point where the direction is being set, not after
+it’s been decided.</p>
+<h3 id="where-this-applies-next">Where this applies next</h3>
+<p>Two open questions are good examples of where early design involvement would
+help.</p>
+<p><strong>Notification settings.</strong> Every module has them. It isn’t clear that someone
+changing notifications thinks in modules at all, or whether they’d expect one
+notifications page. That’s a platform-wide structural question of the same kind
+as the central settings module, and it’s at the stage where design input costs
+least.</p>
+<p><strong>Testing with people who don’t know the domain.</strong> We haven’t yet checked
+whether someone new to the area can read a sentence-based rule and understand
+it. Testing this before Shipment Approval is built is cheaper than changing it
+afterwards.</p>
+<figure class="ap is-content note optional" data-asset="Asset27" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset27</span><span class="type" data-astro-cid-45k74d23>evidence</span><span class="opt" data-astro-cid-45k74d23>optional</span></div><div class="what" data-astro-cid-45k74d23><p>A rough comparison of cost early versus late from this project. For example,
+how long the proof-of-concept work took compared with the rework it avoided.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Adrian and Craig</p></div></figure>
+<figure class="ap is-content box optional" data-asset="Asset28" data-astro-cid-45k74d23><div class="frame" data-astro-cid-45k74d23><div class="head" data-astro-cid-45k74d23><span class="id" data-astro-cid-45k74d23>Asset28</span><span class="type" data-astro-cid-45k74d23>visual</span><span class="opt" data-astro-cid-45k74d23>optional</span></div><div class="what" data-astro-cid-45k74d23><p>A rough sketch of the notifications question, showing one page compared with
+per-module settings.</p></div><p class="src" data-astro-cid-45k74d23><span class="src-label" data-astro-cid-45k74d23>Source</span> Design team</p></div></figure>
+<hr/>
+<p>Sources: design team sync recording, 29 September 2026. Designer case study
+prompt sheet. Shipment Approval rules configuration working sessions, June to
+July 2026.</p></div></div><section class="credits" aria-labelledby="credits-h" data-astro-cid-khmwjn73><h2 id="credits-h" class="eyebrow" data-astro-cid-khmwjn73>Who made it</h2><ul class="list" data-astro-cid-khmwjn73><li class="person" data-astro-cid-khmwjn73><img src="/prototypes/design-notes/_astro/craig-wetherall.CiP0wM8H_Zgyip1.svg" alt data-astro-cid-khmwjn73="true" loading="lazy" decoding="async" width="104" height="104" class="av"><div data-astro-cid-khmwjn73><p class="name" data-astro-cid-khmwjn73><a href="/prototypes/design-notes/team/craig-wetherall.html" data-astro-cid-khmwjn73>Craig Wetherall</a></p><p class="role" data-astro-cid-khmwjn73>Product design lead<span class="lead" data-astro-cid-khmwjn73> · Lead</span></p><p class="bio" data-astro-cid-khmwjn73>Runs the design function and does the least glamorous half of the job — sequencing, saying no, and making sure the thing we shipped is the thing we argued for. Has opinions about tables that he will share unprompted.</p></div></li><li class="person" data-astro-cid-khmwjn73><img src="/prototypes/design-notes/_astro/chuka-ezeoke.BB6ILrkb_Zgyip1.svg" alt data-astro-cid-khmwjn73="true" loading="lazy" decoding="async" width="104" height="104" class="av"><div data-astro-cid-khmwjn73><p class="name" data-astro-cid-khmwjn73><a href="/prototypes/design-notes/team/chuka-ezeoke.html" data-astro-cid-khmwjn73>Chuka Ezeoke</a></p><p class="role" data-astro-cid-khmwjn73>Product design</p><p class="bio" data-astro-cid-khmwjn73>Works across the operational surfaces — shipment panels, navigation, the screens people have open for eight hours a day. Builds most of what he designs, which shortens the argument considerably.</p></div></li><li class="person" data-astro-cid-khmwjn73><img src="/prototypes/design-notes/_astro/adrian.BmE9u-Zr_Zgyip1.svg" alt data-astro-cid-khmwjn73="true" loading="lazy" decoding="async" width="104" height="104" class="av"><div data-astro-cid-khmwjn73><p class="name" data-astro-cid-khmwjn73><a href="/prototypes/design-notes/team/adrian.html" data-astro-cid-khmwjn73>Adrian</a></p><p class="role" data-astro-cid-khmwjn73>Language and content design</p><p class="bio" data-astro-cid-khmwjn73>Led language as its own workstream on the settings project — rewriting every rule in plain English, setting a voice rather than checking copy line by line, and validating tone with the people who had to read it.</p></div></li></ul></section></div></article></main><footer class="footer" data-astro-cid-jo6i4kqk><div class="inner page" data-astro-cid-jo6i4kqk><div class="col" data-astro-cid-jo6i4kqk><p class="eyebrow" data-astro-cid-jo6i4kqk>Design Notes</p><p class="blurb" data-astro-cid-jo6i4kqk>Short case studies from the design team. If you want us on something, or want to write one of these up, come and find us.</p></div><nav class="col" aria-label="Footer" data-astro-cid-jo6i4kqk><p class="eyebrow" data-astro-cid-jo6i4kqk>Pages</p><ul data-astro-cid-jo6i4kqk><li data-astro-cid-jo6i4kqk><a href="/prototypes/design-notes/index.html" data-astro-cid-jo6i4kqk>Work</a></li><li data-astro-cid-jo6i4kqk><a href="/prototypes/design-notes/about.html" data-astro-cid-jo6i4kqk>The team</a></li><li data-astro-cid-jo6i4kqk><a href="/prototypes/design-notes/styleguide.html" data-astro-cid-jo6i4kqk>Styleguide</a></li></ul></nav><div class="col" data-astro-cid-jo6i4kqk><p class="eyebrow" data-astro-cid-jo6i4kqk>Status</p><p class="stamp tnum" data-astro-cid-jo6i4kqk>1 case study · 3 people</p><p class="disclaimer" data-astro-cid-jo6i4kqk>Case studies are written by the team. Where a figure or image is still being gathered, the page says so in place — look for a <strong data-astro-cid-jo6i4kqk>marked gap</strong> rather than assuming a number.</p></div></div></footer><script type="module">var e=()=>{if(!window.matchMedia(`(prefers-reduced-motion: no-preference)`).matches)return;let e=document.querySelectorAll(`[data-reveal]`);if(!e.length)return;let t=new IntersectionObserver((e,t)=>{for(let n of e)n.isIntersecting&&(n.target.classList.add(`is-in`),t.unobserve(n.target))},{rootMargin:`0px 0px -8% 0px`,threshold:.05});e.forEach((e,n)=>{e.classList.add(`reveal`),e.style.setProperty(`--reveal-delay`,`${Math.min(n,6)*40}ms`),t.observe(e)})};e(),document.addEventListener(`astro:page-load`,e);</script></body></html>
