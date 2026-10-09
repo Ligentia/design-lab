@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Prototype, CREATORS } from '../../core/models/prototype.model';
@@ -191,6 +191,10 @@ const PAT_KEY = 'dl_github_pat';
         </div>
 
         <div class="modal-footer">
+          <div class="upload-progress" *ngIf="saving && progress() as pr">
+            <div class="bar"><div class="fill" [style.width.%]="pr.total ? (pr.done / pr.total * 100) : 0"></div></div>
+            <span class="ptext">{{ pr.done < pr.total ? ('Uploading file ' + (pr.done + 1) + ' of ' + pr.total) : 'Finalising…' }}</span>
+          </div>
           <button class="btn-secondary" (click)="cancel.emit()" [disabled]="saving">Cancel</button>
           <button class="btn-primary" (click)="submit()" [disabled]="!isValid() || saving">
             <svg *ngIf="saving" class="spin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -210,7 +214,11 @@ const PAT_KEY = 'dl_github_pat';
     .close-btn { background: none; border: none; cursor: pointer; padding: var(--space-1); color: var(--color-text-tertiary); border-radius: var(--radius-sm); display: flex; align-items: center; transition: color var(--transition-fast), background var(--transition-fast); }
     .close-btn:hover { color: var(--color-text-primary); background: var(--color-surface-hover); }
     .modal-body { padding: var(--space-5) var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); }
-    .modal-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: var(--space-3); position: sticky; bottom: 0; background: var(--color-surface); }
+    .modal-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3); position: sticky; bottom: 0; background: var(--color-surface); }
+    .upload-progress { margin-right: auto; display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+    .upload-progress .bar { width: 140px; height: 6px; background: var(--color-surface-hover); border-radius: var(--radius-full); overflow: hidden; }
+    .upload-progress .fill { height: 100%; background: var(--color-accent); border-radius: var(--radius-full); transition: width var(--transition-base); }
+    .upload-progress .ptext { font-size: var(--text-xs); color: var(--color-text-secondary); white-space: nowrap; }
     .field { display: flex; flex-direction: column; gap: var(--space-1); }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
     .label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-primary); }
@@ -332,6 +340,10 @@ export class AddPrototypeModalComponent implements OnInit {
       }
     }
   }
+  // Per-file upload progress fed from the parent while files upload (null = idle).
+  // Signal input so the bar re-renders reactively as the signal updates mid-upload
+  // (this component uses Default CD in a zoneless app).
+  progress = input<{ done: number; total: number } | null>(null);
   @Output() saved = new EventEmitter<{ prototype: Prototype; pat: string; files?: { name: string; content: string }[] }>();
   @Output() cancel = new EventEmitter<void>();
 

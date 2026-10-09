@@ -73,6 +73,7 @@ A prototype can be more than one page. Zip its folder and drop the `.zip` in —
 
 - The ZIP **must contain an `index.html` at its top level** — that's the entry page the preview loads. If it doesn't, the modal blocks the upload.
 - A single wrapping folder is fine: a "Compress"-style ZIP that nests everything under `my-proto/` is unwrapped automatically so `index.html` lands at the prototype root.
+- While it uploads, the modal shows a **progress bar** — "Uploading file X of N" per file, then "Finalising…" as the metadata saves — so you can see how far along a multi-file upload is.
 - **Known limitation:** editing a prototype and uploading a new ZIP overwrites files by path but does **not** delete files from the previous version that are absent in the new ZIP — stale files remain in the folder.
 
 ### Via CLI

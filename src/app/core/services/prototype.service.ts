@@ -112,20 +112,34 @@ export class PrototypeService {
     this._activeCreators.set(new Set());
   }
 
-  async uploadFiles(prototype: Prototype, pat: string, files: { name: string; content: string }[]) {
+  async uploadFiles(
+    prototype: Prototype,
+    pat: string,
+    files: { name: string; content: string }[],
+    onProgress?: (done: number, total: number) => void
+  ) {
+    let done = 0;
     for (const file of files) {
       await firstValueFrom(
         this.github.uploadFile(`${prototype.folder}/${file.name}`, file.content, pat)
       );
+      onProgress?.(++done, files.length);
     }
   }
 
-  async addPrototype(prototype: Prototype, pat: string, files?: { name: string; content: string }[]) {
+  async addPrototype(
+    prototype: Prototype,
+    pat: string,
+    files?: { name: string; content: string }[],
+    onProgress?: (done: number, total: number) => void
+  ) {
     if (files?.length) {
+      let done = 0;
       for (const file of files) {
         await firstValueFrom(
           this.github.uploadFile(`${prototype.folder}/${file.name}`, file.content, pat)
         );
+        onProgress?.(++done, files.length);
       }
     }
     const updated = [prototype, ...this._prototypes()];

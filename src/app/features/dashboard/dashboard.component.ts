@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrototypeService } from '../../core/services/prototype.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -90,6 +90,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       [existingTags]="svc.allTags()"
       [editing]="editingPrototype()"
       [externalError]="modalError()"
+      [progress]="uploadProgress()"
       (saved)="onSaved($event)"
       (cancel)="closeModal()"
     />
@@ -137,9 +138,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class DashboardComponent implements OnInit {
   svc = inject(PrototypeService);
   private ui = inject(UiStateService);
+  private cdr = inject(ChangeDetectorRef);
   showModal = signal(false);
   editingPrototype = signal<Prototype | null>(null);
   modalError = signal('');
+  // Per-file upload progress for the modal's progress bar (null = not uploading).
+  uploadProgress = signal<{ done: number; total: number } | null>(null);
 
   constructor() {
     this.ui.triggerAdd$.pipe(takeUntilDestroyed()).subscribe(() => this.openAdd());
@@ -149,19 +153,24 @@ export class DashboardComponent implements OnInit {
 
   openAdd() { this.editingPrototype.set(null); this.modalError.set(''); this.showModal.set(true); }
   openEdit(p: Prototype) { this.editingPrototype.set(p); this.modalError.set(''); this.showModal.set(true); }
-  closeModal() { this.showModal.set(false); this.editingPrototype.set(null); this.modalError.set(''); }
+  closeModal() { this.showModal.set(false); this.editingPrototype.set(null); this.modalError.set(''); this.uploadProgress.set(null); }
 
   async onSaved({ prototype, pat, files }: { prototype: Prototype; pat: string; files?: { name: string; content: string }[] }) {
+    // markForCheck: these updates land in async promise callbacks (no triggering
+    // event), so nudge change detection to push the new value into the modal.
+    const track = (done: number, total: number) => { this.uploadProgress.set({ done, total }); this.cdr.markForCheck(); };
+    this.uploadProgress.set(files?.length ? { done: 0, total: files.length } : null);
     try {
       if (this.editingPrototype()) {
         prototype.updatedAt = new Date().toISOString().slice(0, 10);
-        if (files?.length) await this.svc.uploadFiles(prototype, pat, files);
+        if (files?.length) await this.svc.uploadFiles(prototype, pat, files, track);
         await this.svc.updatePrototype(prototype, pat);
       } else {
-        await this.svc.addPrototype(prototype, pat, files);
+        await this.svc.addPrototype(prototype, pat, files, track);
       }
       this.closeModal();
     } catch (err: unknown) {
+      this.uploadProgress.set(null);
       console.error('Save failed', err);
       const status = (err as any)?.status;
       const msg = (err as any)?.error?.message ?? (err as any)?.message ?? 'Unknown error';

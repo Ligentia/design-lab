@@ -74,6 +74,7 @@ Collection { id, name, description?, creator, date, updatedAt?, prototypeIds[] }
   - **Require a root `index.html`** (entry page) — otherwise the modal sets `errorMsg` and clears `uploadedFiles`, blocking submit. This is why the preview components can stay hardcoded to `index.html` (no `entryFile` field needed).
   - Skips `entry.dir`, `__MACOSX`, and dotfiles at any depth; content stays base64 (handles binary assets).
 - The non-ZIP (individual files) branch is unchanged: a lone `.html` is still renamed to `index.html` (single-page path).
+- **Upload progress**: `addPrototype`/`uploadFiles` take an optional `onProgress(done, total)` callback fired after each file's PUT. The dashboard stores it in an `uploadProgress` signal and passes it to the modal (`progress` is a **signal `input()`**); the modal footer shows a bar + "Uploading file X of N" / "Finalising…". Because the callback fires in async promise continuations (no triggering event), the dashboard calls `cdr.markForCheck()` after each update so the value propagates to the modal (same zoneless caveat as below). Component-style budget in `angular.json` was raised (8kB warn / 12kB error) since the add-prototype modal's inline styles grew past the old 8kB error cap.
 
 ## Folders (collections)
 - **UI term is "Folders"; code entity is `Collection`** — because `Prototype.folder` already means a GitHub storage path. Model in `collection.model.ts`; persisted as `collections.json` at the repo root.
