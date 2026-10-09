@@ -9,7 +9,8 @@
       "design team",
       "internal tools"
     ],
-    "folder": "prototypes/design-notes"
+    "folder": "prototypes/design-notes",
+    "archived": true
   },
   {
     "id": "swift-v2-playground",
