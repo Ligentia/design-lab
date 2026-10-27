@@ -1,5 +1,14 @@
 [
   {
+    "id": "views-version-a",
+    "title": "Views (version a)",
+    "description": "",
+    "creator": "Adrian",
+    "date": "2026-10-27",
+    "tags": [],
+    "folder": "prototypes/views-version-a"
+  },
+  {
     "id": "design-notes",
     "title": "Design Notes",
     "description": "",
