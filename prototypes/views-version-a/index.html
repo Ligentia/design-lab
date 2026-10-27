@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>View A — v1</title>
+<style>
+  :root {
+    --surface:#fff; --raise:#f6f6f6; --band:#eeeeee; --sunk:#fbfbfb;
+    --line:#d9d9d9; --soft:#ececec; --bar:#e2e2e2;
+    --ink:#333; --mid:#737373; --faint:#9a9a9a; --dark:#333;
+    --pinbg:#f1f1f1; --hard:#737373;
+    --r:6px; --rs:3px;
+  }
+  * { box-sizing:border-box; }
+  html,body { height:100%; }
+  body {
+    margin:0; background:#eee; color:var(--ink);
+    font:13px/1.45 Inter,-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button { font:inherit; color:inherit; cursor:pointer; background:none; border:0; }
+  :focus-visible { outline:2px solid #333; outline-offset:2px; }
+  .sr { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
+
+  #shell { max-width:1440px; margin:0 auto; min-height:100%; background:var(--surface);
+           display:flex; flex-direction:column; border-inline:1px solid var(--line); }
+  .appbar { height:56px; display:flex; align-items:center; gap:14px; padding:0 24px;
+            background:var(--raise); border-bottom:1px solid var(--line); flex:0 0 auto; }
+  .logo { width:28px;height:28px;border-radius:var(--r);background:#bfbfbf; }
+  .crumb { font-weight:600; font-size:15px; }
+  .spacer { flex:1 1 auto; }
+  .avatar { width:28px;height:28px;border-radius:50%;background:#ccc; }
+  .who { font-size:12px; color:var(--mid); text-align:right; line-height:1.3; }
+  .who b { display:block; color:var(--ink); font-size:13px; }
+
+  .toolbar { display:flex; align-items:center; gap:10px; padding:12px 24px; flex:0 0 auto;
+             flex-wrap:wrap; row-gap:10px; }
+  .toolbar > .btn, .toolbar > .search { flex:0 0 auto; }
+  .search { display:flex; align-items:center; gap:8px; height:36px; width:250px; padding:0 12px;
+            border:1px solid var(--line); border-radius:var(--r); color:var(--faint); }
+  .search .o { width:12px;height:12px;border:1.5px solid var(--faint);border-radius:50%; }
+  .btn { height:36px; padding:0 14px; border:1px solid var(--line); border-radius:var(--r);
+         display:inline-flex; align-items:center; gap:8px; font-weight:500; background:var(--surface); }
+  .btn:hover { background:var(--raise); }
+  .btn.primary { background:var(--dark); border-color:var(--dark); color:#fff; }
+  .btn[disabled] { opacity:.45; cursor:not-allowed; }
+
+
+  .menu { position:absolute; right:0; top:calc(100% + 6px); width:340px; z-index:70;
+          background:var(--surface); border:1px solid var(--line); border-radius:8px;
+          box-shadow:0 6px 20px rgba(0,0,0,.18); padding:6px 0; }
+  .menu h4 { margin:0; padding:9px 12px 5px; font-size:10px; font-weight:700; color:var(--mid); letter-spacing:.04em;
+             display:flex; gap:6px; align-items:center; }
+  .menu h4 span { font-weight:400; color:var(--faint); }
+  .menu .row { display:flex; align-items:center; gap:8px; width:100%; padding:0 12px; height:34px; text-align:left; }
+  .menu .row:hover { background:var(--raise); }
+
+  .menu .row .tick { width:12px; flex:0 0 12px; font-weight:700; }
+
+  .menu hr { border:0;border-top:1px solid var(--soft); margin:6px 0; }
+  .menu .kebab { margin-left:auto; color:var(--faint); padding:2px 5px; border-radius:var(--rs); }
+  .menu .kebab:hover { background:var(--band); color:var(--ink); }
+
+  .tagx { display:inline-flex;align-items:center;height:15px;padding:0 5px;border-radius:var(--rs);
+          background:#e8e8e8;color:#666;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap; }
+
+  /* table */
+  .content { flex:1 1 auto; padding:4px 24px 24px; overflow:hidden; display:flex; flex-direction:column; gap:10px; }
+  .bandrow th .band-in { display:flex; align-items:center; gap:6px; overflow:hidden; }
+  .bandrow th .bname { overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  /* a collapsed column: one clean strip — the header holds the handle and a
+     chevron, and a single cell runs the full height below with the title down it */
+  .headrow th.collapsed { padding:0; vertical-align:middle; background:#ececec; }
+  .headrow th.collapsed .cin { display:flex; flex-direction:column; align-items:center; justify-content:center;
+                               gap:2px; min-height:42px; }
+  .cexp { display:inline-flex; align-items:center; justify-content:center; width:22px; height:20px;
+          border-radius:var(--rs); padding:0; position:relative; }
+  .cexp:hover { background:#dcdcdc; }
+  .cexp .chev { font-size:15px; line-height:1; color:#4d4d4d; font-weight:600; }
+  tbody td.cstrip { padding:12px 0; vertical-align:top; text-align:center; cursor:pointer;
+                    background:#f4f4f4; border-bottom:0; border-left:1px solid var(--soft);
+                    border-right:1px solid var(--soft); }
+  tbody td.cstrip:hover { background:#ebebeb; }
+  tbody td.cstrip.pinned { background:#efefef; }
+  .cstrip .vlab { display:inline-block; writing-mode:vertical-rl; white-space:nowrap; font-weight:600;
+                  font-size:calc(var(--tfont,13px) - 1px); color:var(--ink); letter-spacing:.01em; }
+  .headrow th.collapsed { z-index:5; }
+  .bandrow th .bgrab { cursor:grab; display:inline-flex; align-items:center; color:#aaa; flex:0 0 auto; }
+  .bandrow th .bgrab:hover { color:#595959; }
+  .bandrow th .bgrab svg { display:block; fill:currentColor; }
+  .th-in .lbl { font:inherit; font-weight:600; color:inherit; padding:0; text-align:left;
+                white-space:nowrap; cursor:pointer; }
+  .th-in .lbl:hover { text-decoration:underline; text-underline-offset:2px; }
+  .sortbtn { display:inline-flex; align-items:center; padding:2px; border-radius:var(--rs);
+             color:#333; flex:0 0 auto; }
+  .sortbtn:hover { background:#e6e6e6; }
+  .sortbtn svg { display:block; }
+  .headrow th.sorted { background:#ececec; }
+  .colmenu { position:fixed; z-index:220; min-width:236px; background:#fff;
+             border:1px solid var(--line); border-radius:6px; box-shadow:0 6px 22px rgba(0,0,0,.19);
+             padding:5px 0; font-size:13px; }
+  .colmenu .mi { display:flex; align-items:center; gap:12px; width:100%; padding:0 14px 0 12px;
+                 height:36px; text-align:left; white-space:nowrap; }
+  .colmenu .mi:hover:not([disabled]) { background:#eef2f7; }
+  .colmenu .mi[disabled] { opacity:.4; cursor:not-allowed; }
+  .colmenu .mi.on { background:#eef2f7; }
+  .colmenu .mi .ic { width:16px; flex:0 0 16px; display:inline-flex; justify-content:center; color:#4d4d4d; }
+  .colmenu .mi .lb { flex:1 1 auto; }
+  .colmenu .mi .chev { color:var(--faint); font-size:11px; }
+  .colmenu .mi .tick { color:#4d4d4d; font-size:11px; }
+  .colmenu .sep { border-top:1px solid var(--soft); margin:5px 0; }
+  .colmenu .hdr { padding:4px 12px 6px; font-size:10px; font-weight:700; color:var(--mid); letter-spacing:.04em; }
+  .gswitch { display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:600;
+             color:#4d4d4d; padding:2px 6px 2px 4px; border-radius:12px; }
+  .gswitch:hover { background:#ededed; }
+  .gtrack { width:30px; height:17px; border-radius:9px; background:#cfcfcf; padding:2px;
+            display:inline-flex; align-items:center; flex:0 0 30px; }
+  .gtrack.on { background:var(--dark); justify-content:flex-end; }
+  .gknob { width:13px; height:13px; border-radius:50%; background:#fff; }
+
+  .tick { display:flex; flex-direction:column; align-items:center; gap:3px; padding:2px 4px; border-radius:4px; }
+
+  /* the fixed select column */
+  .bandrow th.selcell, .headrow th.selcell, tbody td.selcell {
+    position:sticky; left:0; padding:0; text-align:center; }
+  .selinner { display:flex; align-items:center; justify-content:center; height:100%; width:100%; }
+  thead .bandrow .selcell { z-index:9; background:#e4e4e4; }
+  thead .headrow .selcell { z-index:9; background:var(--raise); }
+  tbody .selcell { z-index:6; background:#fff; }
+  tr.rowsel td { background:#f2f2f2; }
+  tr.rowsel td.pinned { background:#eeeeee; }
+  tr.rowsel .selcell { background:#f2f2f2; }
+  .selcell { box-shadow:2px 0 3px -2px rgba(0,0,0,.14); }
+  .rowbox { width:15px; height:15px; border:1px solid #a6a6a6; border-radius:var(--rs);
+            background:#fff; display:inline-flex; align-items:center; justify-content:center;
+            font-size:9px; line-height:1; padding:0; color:#fff; }
+  .rowbox.on { background:var(--dark); border-color:var(--dark); }
+  .rowbox.some { background:var(--dark); border-color:var(--dark); }
+  .rowbox.some::after { content:''; width:7px; height:2px; background:#fff; border-radius:1px; }
+  .selchip { display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 12px;
+             border-radius:var(--r); background:#f0f0f0; border:1px solid var(--line);
+             font-size:12px; font-weight:600; color:#333; }
+  .selchip button { font-size:11px; font-weight:600; color:#4d4d4d; text-decoration:underline; }
+
+  /* the column settings panel */
+  .modal.hidmodal { max-width:460px; max-height:80vh; }
+  .hidbody { flex:1 1 auto; min-height:0; overflow-y:auto; padding:6px 0; }
+  .hidrow { display:flex; align-items:center; gap:12px; padding:9px 24px; border-bottom:1px solid var(--soft); }
+  .hidrow:last-child { border-bottom:0; }
+  .hidrow.grp { background:#fafafa; }
+  .hidname { flex:1 1 auto; min-width:0; font-weight:600; }
+  .hidname small { display:block; font-weight:400; font-size:11px; color:var(--mid); }
+  .hidempty { margin:0; padding:24px; color:var(--mid); text-align:center; }
+  .panehelp { margin:-4px 0 8px; font-size:11.5px; color:var(--mid); line-height:1.5; }
+
+  .grpcb { flex:0 0 15px; }
+  .cb.some { background:var(--dark); border-color:var(--dark); position:relative; }
+  .cb.some::after { content:''; position:absolute; left:3px; right:3px; height:2px;
+                    background:#fff; border-radius:1px; }
+
+  .aliasin { width:170px; flex:0 0 170px; height:28px; padding:0 9px; font:inherit; font-size:12px;
+             border:1px solid var(--line); border-radius:var(--rs); background:#fff; color:var(--ink); }
+  .aliasin::placeholder { color:#b0b0b0; }
+  .aliasin:hover { border-color:#b4b4b4; }
+  .aliasin:focus { border-color:#808080; outline:none; }
+  .item .name { flex:0 1 auto; }
+
+  .pager { display:flex; align-items:center; gap:10px; padding:7px 12px; background:#f7f7f7;
+           border:1px solid var(--line); border-radius:var(--r); font-size:12px; color:var(--mid); }
+  .pager .pgl { font-weight:600; color:var(--ink); }
+  .pager .pgn { min-width:96px; text-align:center; }
+  .pgb { width:26px; height:24px; border:1px solid var(--line); border-radius:var(--rs);
+         background:#fff; font-size:13px; line-height:1; }
+  .pgb:hover:not([disabled]) { background:var(--raise); }
+  .pgb[disabled] { opacity:.35; cursor:not-allowed; }
+  .viewbar { display:flex; align-items:center; gap:9px; flex-wrap:wrap; row-gap:7px;
+             padding:8px 12px; background:#f4f4f4; border:1px solid var(--line);
+             border-radius:var(--r); font-size:12px; }
+  .viewbar .vbl { font-weight:700; }
+
+  .hiddenstrip { border:1px solid var(--line); border-radius:var(--r); background:#fbfbfb;
+                 margin-bottom:10px; flex:0 0 auto; max-height:132px; overflow-y:auto; }
+  .hiddenhead { display:flex; align-items:center; gap:7px; padding:0 10px; height:32px;
+                background:#efefef; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:2; }
+  .hhl { font-size:12px; font-weight:600; }
+  .hhn { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px;
+         padding:0 5px; border-radius:9px; background:#8a8a8a; color:#fff; font-size:10.5px; font-weight:700; }
+  .hiddenchips { display:flex; flex-wrap:wrap; gap:6px; padding:9px 10px; }
+  .hchip { display:inline-flex; align-items:baseline; gap:6px; padding:5px 8px 5px 10px;
+           border:1px solid var(--line); border-radius:14px; background:#fff; text-align:left; }
+  .hchip:hover { border-color:#808080; background:var(--raise); }
+  .hchip .hn { font-size:12px; font-weight:600; color:var(--ink); }
+  .hchip .hw { font-size:10px; color:var(--mid); }
+  .hchip .hp { font-size:13px; font-weight:700; color:#8a8a8a; line-height:1; }
+  .hchip:hover .hp { color:var(--ink); }
+  .hchip.grp { border-style:dashed; }
+  .hidchip { display:inline-flex; align-items:center; height:24px; padding:0 9px; border-radius:12px;
+             background:#fff; border:1px solid var(--line); font-size:11.5px; font-weight:600; color:#4d4d4d; }
+  .hidchip:hover { background:var(--dark); border-color:var(--dark); color:#fff; }
+
+  .menu.settings { width:318px; padding-bottom:6px; }
+
+  .tick { display:flex; flex-direction:column; align-items:center; gap:3px; padding:2px 4px; border-radius:4px; }
+
+  .btn.sm { height:30px; padding:0 12px; font-size:12px; }
+
+  .cathead.empty { background:#ebebeb; border-left-color:#c4c4c4; }
+
+
+  .info { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
+          border:1px solid #a6a6a6; border-radius:50%; color:var(--mid); font-size:10px;
+          font-weight:700; line-height:1; padding:0; flex:0 0 15px; cursor:help;
+          font-family:Georgia,serif; }
+  .info:hover, .info:focus-visible { background:var(--dark); border-color:var(--dark); color:#fff; }
+  .scrollwrap { position:relative; border:1px solid var(--line); border-radius:var(--r); overflow:hidden; }
+  .scroller { overflow:auto; max-height:calc(100vh - 250px); }
+  table { border-collapse:separate; border-spacing:0; width:max-content; min-width:100%; }
+  .bandrow th { height:30px; padding:0 8px 0 9px; background:var(--band); font-size:10px; font-weight:600;
+                color:#595959; text-align:left; border-bottom:1px solid #cfcfcf; white-space:nowrap;
+                position:sticky; top:0; z-index:3; }
+  /* the pinned block stays put while everything else scrolls behind it */
+  .bandrow th.pinband { background:#e4e4e4; z-index:7; }
+  .headrow th.pinned { z-index:6; }
+  tbody td.pinned { position:sticky; z-index:4; background:#fbfbfb; }
+  th.pinedge, td.pinedge { box-shadow:3px 0 5px -3px rgba(0,0,0,.18); }
+  .headrow th { height:42px; padding:0 8px 0 9px; background:var(--raise); text-align:left;
+                font-size:calc(var(--tfont,13px) - 1px); font-weight:600; border-bottom:1px solid #cfcfcf;
+                white-space:nowrap; position:sticky; top:var(--theadtop,30px); z-index:3; }
+  .headrow th.pinned { background:#f0f0f0; }
+
+  th.pinedge, td.pinedge { border-right:2px solid var(--hard); }
+  .th-in { display:flex; align-items:center; gap:5px; }
+  .th-in .lbl { flex:0 1 auto; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .th-in .acts { margin-left:auto; display:flex; align-items:center; gap:6px; padding-left:10px; }
+  .grab { cursor:grab; display:inline-flex; align-items:center; color:#b4b4b4; flex:0 0 auto; padding:0; }
+  .grab:hover { color:#6b6b6b; }
+  .grab:active { cursor:grabbing; }
+  .grab svg { display:block; fill:currentColor; }
+
+  .iconbtn { display:inline-flex; align-items:center; justify-content:center; padding:2px;
+             border-radius:var(--rs); opacity:.55; }
+  .iconbtn:hover:not([disabled]) { opacity:1; background:#e6e6e6; }
+  .iconbtn[disabled] { cursor:not-allowed; }
+  .iconbtn.on[data-unpin]:hover { background:#dcdcdc; }
+  .iconbtn.on { opacity:1; }
+  .rsz { position:absolute; top:0; right:0; width:9px; height:100%; cursor:col-resize; z-index:5; }
+  .rsz::after { content:''; position:absolute; top:6px; bottom:6px; right:0; width:2px;
+                background:#9a9a9a; opacity:0; border-radius:1px; }
+  .rsz:hover::after { opacity:1; }
+  body.resizing, body.resizing * { cursor:col-resize !important; }
+  .headrow th { position:sticky; }
+
+  tbody td { height:var(--trow,44px); padding:0 12px; border-bottom:1px solid var(--soft);
+             background:#fff; font-size:var(--tfont,13px); }
+  tbody tr:last-child td { border-bottom:0; }
+  td.pinned { background:#fbfbfb; }
+  .cv { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* drag overlays */
+  .dimzone, .okzone { position:absolute; top:0; bottom:0; pointer-events:none; z-index:8; }
+  .dimzone { background:rgba(255,255,255,.62); }
+  .okzone { border:1.5px solid #595959; border-radius:3px; }
+  .zonelabel { position:absolute; z-index:9; background:var(--dark); color:#fff; font-size:10px;
+               font-weight:600; padding:3px 8px; border-radius:4px; pointer-events:none; white-space:nowrap; }
+  .dropline { position:absolute; top:30px; bottom:0; width:3px; background:#2e2e2e; z-index:10; pointer-events:none; }
+  .dropline::before { content:''; position:absolute; top:-5px; left:-4px; width:11px; height:11px;
+                      background:#2e2e2e; transform:rotate(45deg); }
+  .barrier { position:absolute; top:0; bottom:0; width:4px; background:#2e2e2e; z-index:10; pointer-events:none; }
+  /* Excel-style: the column does not move while you drag. A dashed line shows
+     where the edge will land, and the width is read out at the top. */
+  .rszguide { position:absolute; top:30px; bottom:0; width:1px; z-index:12; pointer-events:none;
+              background:repeating-linear-gradient(to bottom, #2e2e2e 0 4px, transparent 4px 8px); }
+  .rszorigin { position:absolute; top:30px; bottom:0; width:1px; z-index:11; pointer-events:none;
+               background:#c4c4c4; }
+  .rszlabel { position:absolute; z-index:13; pointer-events:none; background:#2e2e2e; color:#fff;
+              font-size:11px; font-weight:600; padding:3px 7px; border-radius:4px; white-space:nowrap;
+              transform:translateX(-50%); }
+  .dragchip { position:fixed; z-index:200; display:flex; align-items:center; gap:8px;
+              background:#fff; border:1.5px solid #595959; border-radius:5px; padding:8px 11px;
+              box-shadow:0 5px 14px rgba(0,0,0,.24); font-size:12px; font-weight:600; pointer-events:none; }
+  .dragchip .no { background:#2e2e2e; color:#fff; font-size:9px; font-weight:700; padding:2px 5px; border-radius:3px; }
+  body.dragging { user-select:none; }
+
+  /* modal */
+  .scrim { position:fixed; inset:0; background:rgba(26,26,30,.4); z-index:100;
+           display:flex; align-items:center; justify-content:center; padding:20px; }
+  .modal { background:var(--surface); border:1px solid var(--line); border-radius:10px;
+           box-shadow:0 8px 28px rgba(0,0,0,.22); width:100%; max-width:880px; max-height:94vh;
+           display:flex; flex-direction:column; overflow:hidden; }
+
+  .mhead { display:flex; align-items:center; gap:12px; padding:13px 20px 13px 24px;
+           border-bottom:1px solid var(--soft); flex:0 0 auto; }
+  .mhead h2 { margin:0; font-size:18px; }
+  .mhead .sub { font-size:12px; color:var(--mid); }
+  .x { font-size:16px; color:var(--mid); padding:4px 8px; border-radius:var(--rs); }
+  .x:hover { background:var(--raise); color:var(--ink); }
+
+  .lnk { font-size:12px; font-weight:600; color:#4d4d4d; padding:3px 6px; border-radius:4px; }
+  .lnk:hover { background:#ededed; }
+  .lnk.sm { font-size:11px; }
+  .panes { display:flex; gap:20px; padding:16px 24px; overflow:hidden; flex:1 1 auto; }
+
+  .pane { flex:1 1 0; min-width:0; display:flex; flex-direction:column; }
+  .paneheadwrap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .paneheadwrap h3 { margin:0; font-size:12px; }
+  .paneheadwrap .cnt { font-size:12px; color:var(--mid); font-weight:400; }
+  .list { flex:1 1 auto; border:1px solid var(--line); border-radius:var(--r); overflow-y:auto;
+          min-height:260px; background:#fdfdfd; }
+  /* Each group is one block: a heavier header, a spine down its rows, and a gap
+     above it. Without those three the list reads as one long stripe. */
+  .cathead { display:flex; align-items:center; gap:8px; padding:0 10px; height:40px;
+             background:#dadada; border-top:1px solid #b3b3b3; border-bottom:1px solid #b3b3b3;
+             border-left:4px solid #8f8f8f; margin-top:14px;
+             font-size:13px; font-weight:600; color:#1f1f1f; }
+  .cathead .cnt { font-weight:400; color:#6b6b6b; font-size:11px; }
+  .cathead.pin { background:#cfcfcf; border-left-color:#3d3d3d;
+                 border-bottom:2px solid var(--hard); margin-top:0; }
+  .cathead.hiddengrp { background:#ebebeb; border-left-color:#c4c4c4; color:var(--mid); }
+  .list > :first-child { margin-top:0; }
+  .item.ingroup { border-left:4px solid #e6e6e6; }
+  .item.inpin { border-left:4px solid #bdbdbd; background:#fcfcfc; }
+  .item.ingroup:last-child, .item.inpin:last-child { border-bottom:0; }
+  .item.desel { background:#fafafa; border-left-color:#efefef; }
+  .lockicon { color:var(--mid); font-size:11px; }
+  .barrierrow { padding:4px 10px 4px 14px; background:#efefef; font-size:10px; color:var(--mid);
+                border-bottom:1px solid var(--soft); border-left:4px solid transparent; }
+  .item { display:flex; align-items:center; gap:10px; padding:0 10px 0 24px; min-height:40px;
+          border-bottom:1px solid var(--soft); background:#fff; }
+  .item.deep { padding-left:36px; min-height:38px; }
+  .item.ghost { background:#f7f7f7; color:var(--mid); }
+  .item.req { background:#f7f7f7; }
+  .item .name { flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .item .name small { display:block; font-size:10px; color:var(--mid); }
+  .cb { width:15px;height:15px;border:1px solid #a6a6a6;border-radius:var(--rs);background:#fff;
+        display:inline-flex;align-items:center;justify-content:center;font-size:9px;flex:0 0 15px;padding:0; }
+  .cb.on { background:var(--dark); border-color:var(--dark); color:#fff; }
+  .cb[disabled] { background:#8c8c8c; border-color:#8c8c8c; color:#fff; opacity:1; cursor:not-allowed; }
+  .mgrip { display:inline-flex; align-items:center; justify-content:center; width:22px; height:24px;
+           border-radius:var(--rs); color:#b4b4b4; cursor:grab; flex:0 0 22px; padding:0; }
+  .mgrip:hover { color:#595959; background:#ededed; }
+  .mgrip:active { cursor:grabbing; }
+  .mgrip svg { display:block; fill:currentColor; }
+  .item.drop-above, .cathead.drop-above { box-shadow:inset 0 2px 0 #2e2e2e; }
+  .item.drop-below, .cathead.drop-below { box-shadow:inset 0 -2px 0 #2e2e2e; }
+  .item.dragging-row, .cathead.dragging-row { opacity:.42; }
+  .list { position:relative; }
+  .deselhead { display:flex; align-items:center; gap:8px; padding:0 10px 0 32px; height:30px;
+               background:#f1f1f1; border-left:4px solid #e6e6e6; border-top:1px dashed #c9c9c9;
+               border-bottom:1px solid var(--soft); font-size:10px; font-weight:700;
+               color:var(--mid); letter-spacing:.03em; }
+  .pinbtn { display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 8px;
+            border:1px solid var(--line); border-radius:4px; font-size:11px; font-weight:600; color:var(--mid); background:#fff; }
+  .pinbtn.on { background:#ededed; border-color:#808080; color:var(--ink); }
+  .pinbtn:hover { background:var(--raise); }
+  .mfoot { display:flex; align-items:center; gap:10px; padding:13px 24px; background:var(--sunk);
+           border-top:1px solid var(--soft); font-size:12px; color:var(--mid);
+           flex:0 0 auto; flex-wrap:wrap; row-gap:8px; }
+
+  .field label { display:block; font-size:12px; font-weight:600; margin-bottom:6px; }
+  .field input { width:100%; height:40px; padding:0 12px; font:inherit; border:1.5px solid #a6a6a6; border-radius:var(--r); }
+  .field select { width:100%; height:40px; padding:0 10px; font:inherit; background:#fff;
+                  border:1.5px solid #a6a6a6; border-radius:var(--r); max-width:none; }
+
+  #toast { position:fixed; left:24px; bottom:24px; z-index:300; display:flex; align-items:center; gap:12px;
+           background:#2e2e2e; color:#fff; padding:12px 14px; border-radius:var(--r);
+           box-shadow:0 5px 14px rgba(0,0,0,.25); font-size:13px; }
+  #toast button { color:#fff; border:1px solid #7a7a7a; border-radius:4px; padding:4px 9px; font-size:12px; font-weight:600; }
+
+  #dev { position:fixed; right:10px; bottom:6px; z-index:200; width:300px; background:#fff;
+         border:1px solid #bdbdbd; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.18); font-size:12px; }
+  #dev.min { width:auto; opacity:.6; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+  #dev.min:hover { opacity:1; }
+  #dev.min header { padding:5px 9px; font-size:11px; font-weight:500; color:var(--mid); }
+  #dev header { display:flex; align-items:center; gap:8px; padding:9px 12px; border-bottom:1px solid var(--soft); font-weight:600; }
+  #dev header button { margin-left:auto; color:var(--mid); }
+  #dev .db { padding:11px 12px; display:flex; flex-direction:column; gap:9px; max-height:60vh; overflow:auto; }
+  #dev.min .db { display:none; }
+  #dev select { width:100%; height:30px; font:inherit; border:1px solid var(--line); border-radius:var(--rs); padding:0 6px; }
+  #dev .mini { height:28px; padding:0 10px; border:1px solid var(--line); border-radius:var(--rs); font-size:11px; font-weight:500; background:#fff; }
+  #dev .mini:hover { background:var(--raise); }
+  #dev pre { margin:0; background:#f4f4f4; border-radius:var(--rs); padding:8px; font-size:10px;
+             max-height:150px; overflow:auto; font-family:ui-monospace,Menlo,Consolas,monospace; }
+  #dev .row { display:flex; gap:6px; flex-wrap:wrap; }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  .mi .mnote { margin-left:auto; padding-left:10px; font-size:11px; color:var(--mid); white-space:nowrap; }
+</style>
+</head>
+<body>
+<div id="shell"></div>
+<div id="overlay"></div>
+<div id="toastwrap"></div>
+<div id="dev"></div>
+<div id="live" class="sr" aria-live="polite"></div>
+
+<script>
+/* ==========================================================
+   VIEW A — v1
+   Header variant A: the grabber on the left, then the title and a
+   sort icon. Clicking the title or the icon sorts the column. The
+   column and group options have no visible button — right-click a
+   header (or a group band) to open them. Columns and whole groups can
+   be collapsed to a narrow strip with the title running down it.
+   Stripped back from v11 to the column controls alone: show and
+   hide, reorder, pin, groups, aliases, widths. No presets, no
+   draft, no sort or filters, no reports, no export, no display
+   settings, and nothing is saved between sessions.
+   ========================================================== */
+
+/* ---------- catalogue ---------- */
+const CATS = [
+  { id:'film',    name:'Film' },
+  { id:'people',  name:'People' },
+  { id:'details', name:'Details' },
+  { id:'release', name:'Release' },
+  { id:'reviews', name:'Reviews' },
+  { id:'money',   name:'Box office' }
+];
+
+/* No column is required: every column and every group can be hidden. */
+const FIELDS = [
+  ['title','Title','film',1,0,210],
+  ['year','Year','film',1,0,80],
+  ['genre','Genre','film',1,0,130],
+  ['certificate','Age rating','film',1,0,110],
+  ['director','Director','people',1,0,150],
+  ['leadActor','Lead actor','people',1,0,150],
+  ['studio','Studio','people',1,0,160],
+  ['runtime','Running time','details',1,0,120],
+  ['language','Language','details',1,0,110],
+  ['country','Country','details',1,0,130],
+  ['releaseDate','Release date','release',1,0,130],
+  ['whereToWatch','Where to watch','release',1,0,170],
+  ['service','Streaming service','release',1,0,150],
+  ['criticScore','Critic score','reviews',1,0,110],
+  ['audienceScore','Audience score','reviews',1,0,130],
+  ['awards','Awards won','reviews',1,0,110],
+  ['budget','Budget','money',1,0,100],
+  ['boxOffice','Box office','money',1,0,120]
+].map(a => ({ id:a[0], label:a[1], cat:a[2], defaultVisible:!!a[3], required:!!a[4], defaultWidth:a[5] }));
+
+const F = {}; FIELDS.forEach(f => F[f.id] = f);
+const CATNAME = {}; CATS.forEach(c => CATNAME[c.id] = c.name);
+const DEFAULT_CAT_ORDER = CATS.map(c => c.id);
+const catFieldsDefault = cid => FIELDS.filter(f => f.cat === cid).map(f => f.id);
+
+/* ---------- dummy data ----------
+   48 invented films, so that anyone can follow the table without specialist
+   knowledge. Every title, person, studio and streaming service is made up; any
+   resemblance to a real film is a coincidence. Generated from a fixed seed, so
+   the table is the same on every load. */
+const TODAY = new Date(2026, 9, 14);
+const DATA = (function () {
+  let seedN = 20261014;
+  const rnd = () => { seedN |= 0; seedN = seedN + 0x6D2B79F5 | 0;
+    let t = Math.imul(seedN ^ seedN >>> 15, 1 | seedN);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const int = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmt = d => String(d.getDate()).padStart(2, '0') + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear();
+  const millions = n => '£' + (n >= 10 ? Math.round(n) : n.toFixed(1)) + 'm';
+
+  const TITLES = [
+    'The Lantern Keeper', 'Midnight Orchard', 'Paper Moons Over Leeds', 'Silver Harbour', 'The Quiet Engine',
+    'A Map of Small Things', 'Saltwater Kings', 'The Glass Allotment', 'Thunder on Juniper Street', 'Velvet Static',
+    'The Clockmaker’s Dog', 'Ninefold', 'Brightwater Rising', 'The Summer We Flew', 'Ghosts of Platform Six',
+    'Copper Tide', 'Everything After Tuesday', 'The Weaver’s Daughter', 'Starlings at Dusk', 'Lemon Sky Motel',
+    'The Long Way to Fernhill', 'Iron Meadow', 'Pocketful of Thunder', 'The Cartographer’s Last Map', 'Blue Hour Robbery',
+    'The Small Hours Club', 'The Owl Who Counted', 'Harbour Lights Out', 'Marmalade Season', 'Under the Kettle Bridge',
+    'The Seventh Postcard', 'Northbound Strangers', 'Kingfisher Lane', 'The Gravity of Biscuits', 'Rook and Raven',
+    'Dust on the Wind Farm', 'The Accidental Mayor', 'Ember Bay', 'Last Train to Hollowmere', 'Tin Soldiers Dance',
+    'The Borrowed Sea', 'Cloudbreak Junction', 'A Fox in the Library', 'Neon Hedgerow', 'The Puzzle Box Affair',
+    'Wintergreen Avenue', 'Orbit of Us', 'Lanterns for Lucy'
+  ];
+  const GENRES = [
+    { g:'Drama',       ages:['12A','15'] },
+    { g:'Comedy',      ages:['PG','12A','15'] },
+    { g:'Thriller',    ages:['12A','15','18'] },
+    { g:'Animation',   ages:['U','PG'] },
+    { g:'Sci-fi',      ages:['12A','15'] },
+    { g:'Horror',      ages:['15','18'] },
+    { g:'Romance',     ages:['12A','15'] },
+    { g:'Documentary', ages:['U','PG','12A'] },
+    { g:'Family',      ages:['U','PG'] },
+    { g:'Action',      ages:['12A','15'] }
+  ];
+  const FIRST = ['Amara', 'Ben', 'Clara', 'Dev', 'Elena', 'Felix', 'Grace', 'Hugo', 'Imogen', 'Jonah',
+                 'Kemi', 'Leo', 'Maya', 'Niall', 'Orla', 'Pablo', 'Rosa', 'Theo', 'Uma', 'Yusuf'];
+  const LAST = ['Ashworth', 'Bellamy', 'Carver', 'Delacroix', 'Ellison', 'Fairbairn', 'Greaves', 'Holloway',
+                'Ibsen', 'Jarrow', 'Kingsley', 'Lockhart', 'Moreau', 'Nakamura', 'Okoro', 'Pemberton', 'Quill', 'Ravensdale'];
+  const STUDIOS = ['Lantern Pictures', 'Bluebell Films', 'North Pier Studios', 'Halcyon Screen', 'Copperleaf Media', 'Little Owl Animation'];
+  const PLACES = [['English','United Kingdom'], ['English','United Kingdom'], ['English','United States'], ['English','United States'],
+                  ['English','Ireland'], ['English','Australia'], ['French','France'], ['Spanish','Spain'],
+                  ['Korean','South Korea'], ['Japanese','Japan'], ['Hindi','India'], ['Italian','Italy']];
+  const SERVICES = ['Reelhouse', 'StreamBox', 'FlickNow', 'Couchlight'];
+
+  const rows = [];
+  for (let i = 0; i < 48; i++) {
+    const gen = pick(GENRES);
+    const place = pick(PLACES);
+    const year = i < 4 ? 2026 : int(1998, 2026);
+    const released = new Date(year, int(0, 11), int(1, 28));
+    const upcoming = released > TODAY;
+    const mins = gen.g === 'Animation' || gen.g === 'Family' ? int(82, 105) : int(88, 165);
+    const r = rnd();
+    const where = upcoming ? 'Coming soon' : (r < 0.35 ? 'Cinema' : r < 0.7 ? 'Cinema and streaming' : 'Streaming only');
+    const budget = gen.g === 'Documentary' ? 1 + rnd() * 4 : (gen.g === 'Animation' || gen.g === 'Action' ? int(40, 180) : 2 + rnd() * 60);
+    const critic = int(22, 98);
+    const audience = Math.max(15, Math.min(99, critic + int(-20, 15)));
+    const awards = critic > 85 ? int(1, 9) : (critic > 70 ? int(0, 3) : 0);
+    rows.push({
+      title: TITLES[i],
+      year: String(year),
+      genre: gen.g,
+      certificate: pick(gen.ages),
+      director: pick(FIRST) + ' ' + pick(LAST),
+      leadActor: pick(FIRST) + ' ' + pick(LAST),
+      studio: gen.g === 'Animation' && rnd() < 0.6 ? 'Little Owl Animation' : pick(STUDIOS.slice(0, 5)),
+      runtime: Math.floor(mins / 60) + 'h ' + String(mins % 60).padStart(2, '0') + 'm',
+      language: place[0],
+      country: place[1],
+      releaseDate: fmt(released),
+      whereToWatch: where,
+      service: where === 'Cinema and streaming' || where === 'Streaming only' ? pick(SERVICES) : '—',
+      criticScore: upcoming ? '—' : critic + '%',
+      audienceScore: upcoming ? '—' : audience + '%',
+      awards: upcoming ? '—' : String(awards),
+      budget: millions(budget),
+      boxOffice: upcoming || where === 'Streaming only' ? '—' : millions(budget * (0.3 + rnd() * 5))
+    });
+  }
+  return rows;
+})();
+function cellText(r, id) { return (DATA[r] && DATA[r][id] != null) ? String(DATA[r][id]) : ''; }
+
+/* One person, one table. There are no presets: the layout in S.cols is the
+   table, every change applies straight away, and a reload starts again from
+   the defaults — every column showing, nothing pinned, groups on. */
+const USER = { name:'Alex Taylor', role:'Film club' };
+
+/* Text size, row height and rows a page are fixed in this prototype. */
+const FONT_PX = 13, ROW_PX = 44, PAGE_SIZE = 20;
+function pageSize() { return PAGE_SIZE; }
+function pageCount() { return Math.max(1, Math.ceil(matchedTotal() / pageSize())); }
+function pageIndex() {
+  const p = (S.ui && S.ui.page) || 0;
+  return Math.max(0, Math.min(pageCount() - 1, p));
+}
+function goPage(i) {
+  S.ui.page = Math.max(0, Math.min(pageCount() - 1, i));
+  commit('Page ' + (pageIndex() + 1) + ' of ' + pageCount());
+}
+function rowsOnPage() {
+  const start = pageIndex() * pageSize();
+  return Math.max(0, Math.min(pageSize(), matchedTotal() - start));
+}
+function applyScale() {
+  const sh = $('shell');
+  if (!sh) return;
+  sh.style.setProperty('--tfont', FONT_PX + 'px');
+  sh.style.setProperty('--trow', ROW_PX + 'px');
+  sh.style.setProperty('--theadtop', (isGrouped() ? 30 : 0) + 'px');
+}
+
+/** the column's name in the catalogue — what an alias replaces */
+function canonLab(id) { return (F[id] || {}).label || id; }
+/* An alias is the column's name as far as the rest of the interface is
+   concerned: the header, the menus and the hidden chips all read it through here. */
+function aliasOf(id) {
+  const a = S.cols.alias[id];
+  return a === undefined ? null : a;
+}
+function lab(id) {
+  const a = aliasOf(id);
+  return (a && a.trim()) ? a : canonLab(id);
+}
+function setAlias(id, text) {
+  const t = (text || '').trim();
+  const was = aliasOf(id);
+  if ((was || '') === t) return;
+  change(t ? 'Renamed ' + canonLab(id) + ' to “' + t + '”' : 'Removed the name given to ' + canonLab(id),
+    d => { d.alias[id] = t; });
+}
+/** a group name */
+function catName(cid) { return CATNAME[cid] || cid; }
+
+/* ---------- state ---------- */
+function blankColumns() {
+  return { vis:{}, widths:{}, pinned:[], catOrder:null, catFieldOrder:{}, catHidden:{},
+           grouped:true, flatOrder:null, alias:{}, collapsed:{} };
+}
+function seed() {
+  return {
+    cols: blankColumns(),  // the table's column layout — the only thing that changes
+    collapsed:{}, menuOpen:false, colMenu:null, grpMenu:null,
+    ui:{ page:0 },
+    sort:null,             // { id, dir:'asc'|'desc' } — one column at a time
+    selected:[],           // row selection — nothing to do with columns
+    devMin:true, devState:false
+  };
+}
+let S = seed();
+
+/* ---------- model ---------- */
+function visibleOf(fid) {
+  if (F[fid].required) return true;
+  const v = S.cols.vis[fid];
+  return typeof v === 'boolean' ? v : true;
+}
+function widthOf(fid) { return S.cols.widths[fid] || F[fid].defaultWidth; }
+function pinnedList() { return S.cols.pinned.slice(); }
+function catOrder() { return (S.cols.catOrder || DEFAULT_CAT_ORDER).slice(); }
+function catFields(cid) {
+  const o = S.cols.catFieldOrder[cid];
+  return o ? o.slice() : catFieldsDefault(cid);
+}
+
+/* A whole group can be hidden, not just its columns. A group holding a required
+   column cannot be hidden — otherwise "hide this group" would need an exception
+   for one column, which is worse than not offering it. */
+const clone = x => JSON.parse(JSON.stringify(x));
+function catCanHide(cid) { return !catFieldsDefault(cid).some(id => F[id].required); }
+function catHiddenMap() { return S.cols.catHidden; }
+function catIsHidden(cid) { return !!catHiddenMap()[cid]; }
+
+/* Groups can be switched off. With them on, a column moves only inside its own
+   group; with them off there is one flat order and a column can go anywhere.
+   The two orders are stored separately, so turning groups back on restores the
+   grouped arrangement rather than flattening it permanently. */
+function isGrouped() { return S.cols.grouped !== false; }
+function defaultFlat() {
+  const out = [];
+  catOrder().forEach(cid => catFields(cid).forEach(id => out.push(id)));
+  FIELDS.forEach(f => { if (out.indexOf(f.id) === -1) out.push(f.id); });
+  return out;
+}
+function flatOrder() {
+  const base = defaultFlat();
+  const stored = S.cols.flatOrder;
+  if (!stored) return base;
+  const out = stored.filter(id => F[id]);
+  base.forEach(id => { if (out.indexOf(id) === -1) out.push(id); });
+  return out;
+}
+function toggleGrouping() {
+  const on = isGrouped();
+  change(on ? 'Turned column groups off' : 'Turned column groups on', d => { d.grouped = !on; });
+}
+function reorderFlat(fid, targetId, after) {
+  const arr = flatOrder().filter(x => x !== fid);
+  const i = arr.indexOf(targetId);
+  if (i === -1) return;
+  arr.splice(after ? i + 1 : i, 0, fid);
+  change('Moved ' + lab(fid), d => { d.flatOrder = arr; });
+}
+function moveFlat(fid, dir) {
+  const pins = pinnedList();
+  const ordered = flatOrder();
+  const vis = ordered.filter(id => pins.indexOf(id) === -1 && visibleOf(id));
+  const i = vis.indexOf(fid), j = i + dir;
+  if (i === -1 || j < 0 || j >= vis.length) return;
+  const arr = ordered.filter(x => x !== fid);
+  const at = arr.indexOf(vis[j]);
+  arr.splice(dir < 0 ? at : at + 1, 0, fid);
+  change('Moved ' + lab(fid) + (dir < 0 ? ' earlier' : ' later'), d => { d.flatOrder = arr; });
+}
+
+const TOTAL_ROWS = DATA.length;
+function matchedTotal() { return TOTAL_ROWS; }
+
+/* ---------- sorting ----------
+   One column at a time. Clicking the title or the icon cycles it:
+   ascending, descending, then back to the original order. */
+const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+function sortKey(id, v) {
+  if (id === 'releaseDate') {
+    const m = /^(\d+) (\w+) (\d+)$/.exec(v);
+    return m ? new Date(+m[3], MONTHS[m[2]], +m[1]).getTime() : 0;
+  }
+  if (id === 'budget' || id === 'boxOffice') return v === '—' ? -1 : parseFloat(v.replace(/[^\d.]/g, '')) || 0;
+  if (id === 'year' || id === 'criticScore' || id === 'audienceScore' || id === 'awards') return v === '—' ? -1 : parseInt(v, 10) || 0;
+  if (id === 'runtime') { const m = /(\d+)h (\d+)m/.exec(v); return m ? +m[1] * 60 + +m[2] : 0; }
+  return v;
+}
+function viewRows() {
+  const idx = DATA.map((_, i) => i);
+  const st = S.sort;
+  if (!st || !F[st.id]) return idx;
+  const dir = st.dir === 'desc' ? -1 : 1;
+  return idx.sort((a, b) => {
+    const ka = sortKey(st.id, cellText(a, st.id)), kb = sortKey(st.id, cellText(b, st.id));
+    const c = (typeof ka === 'number' && typeof kb === 'number')
+      ? ka - kb : String(ka).localeCompare(String(kb), 'en-GB', { numeric:true, sensitivity:'base' });
+    return c ? c * dir : a - b;
+  });
+}
+function sortDirOf(id) { return S.sort && S.sort.id === id ? S.sort.dir : null; }
+function cycleSort(id) {
+  const d = sortDirOf(id);
+  S.sort = d === null ? { id, dir:'asc' } : (d === 'asc' ? { id, dir:'desc' } : null);
+  S.ui.page = 0;
+  commit(S.sort ? 'Sorted by ' + lab(id) + (S.sort.dir === 'asc' ? ', ascending' : ', descending')
+                : 'Sort removed from ' + lab(id));
+}
+
+
+/* ---------- collapsing ----------
+   A collapsed column stays on the table as a narrow strip with its title
+   running down it, so its place is kept and one click brings it back. A group
+   collapses by collapsing every column showing in it. */
+const COLLAPSED_W = 30;
+function isCollapsed(fid) { return !!S.cols.collapsed[fid]; }
+function setCollapsed(fid, on) {
+  change((on ? 'Collapsed ' : 'Expanded ') + lab(fid), d => { d.collapsed[fid] = on; });
+}
+function groupShowing(cid) {
+  if (catIsHidden(cid)) return [];
+  const pins = pinnedList();
+  return catFields(cid).filter(id => visibleOf(id) && pins.indexOf(id) === -1);
+}
+function groupAllCollapsed(cid) { const ids = groupShowing(cid); return ids.length > 0 && ids.every(isCollapsed); }
+function groupAnyCollapsed(cid) { return groupShowing(cid).some(isCollapsed); }
+function setGroupCollapsed(cid, on) {
+  const ids = groupShowing(cid);
+  if (!ids.length) return;
+  change((on ? 'Collapsed the ' : 'Expanded the ') + catName(cid) + ' group', d => {
+    ids.forEach(id => { d.collapsed[id] = on; });
+  });
+}
+
+/** the table: pinned group first, then categories in order, columns within each */
+function tableColumns() {
+  const pins = pinnedList();
+  const cols = [];
+  pins.forEach(id => { if (visibleOf(id)) cols.push({ id, cat:'__pinned', pinned:true }); });
+  if (isGrouped()) {
+    catOrder().forEach(cid => {
+      if (catIsHidden(cid)) return;
+      catFields(cid).forEach(id => {
+        if (pins.indexOf(id) !== -1) return;
+        if (visibleOf(id)) cols.push({ id, cat:cid, pinned:false });
+      });
+    });
+  } else {
+    flatOrder().forEach(id => {
+      if (pins.indexOf(id) !== -1) return;
+      if (visibleOf(id)) cols.push({ id, cat:'__flat', pinned:false });
+    });
+  }
+  return cols.map(c => Object.assign(c, { field:F[c.id], collapsed:isCollapsed(c.id),
+    width: isCollapsed(c.id) ? COLLAPSED_W : widthOf(c.id) }));
+}
+function visibleCount() { return tableColumns().length; }
+function totalCount() { return FIELDS.length; }
+
+/* Every change applies straight to the table. There is no draft to hold it,
+   nothing to save, and no undo. */
+function change(desc, fn) {
+  fn(S.cols);
+  commit(desc);
+}
+
+/* Everything currently out of the table, in the order it would come back in.
+   A hidden group is listed as the group rather than as its columns, because a
+   column inside a hidden group cannot be brought back on its own. A pinned
+   column that has been hidden is listed too, first, because that is where it
+   comes back. */
+function hiddenThings() {
+  const out = [];
+  const pins = pinnedList();
+  const col = id => ({ kind:'column', id, name:lab(id),
+    where: pins.indexOf(id) !== -1 ? 'Pinned to the left' : catName(F[id].cat) });
+  pins.forEach(id => { if (!F[id].required && !visibleOf(id)) out.push(col(id)); });
+  if (isGrouped()) {
+    catOrder().forEach(cid => {
+      if (catIsHidden(cid)) {
+        out.push({ kind:'group', id:cid, name:catName(cid),
+          count: catFields(cid).filter(id => pins.indexOf(id) === -1).length });
+        return;
+      }
+      catFields(cid).forEach(id => {
+        if (pins.indexOf(id) === -1 && !F[id].required && !visibleOf(id)) out.push(col(id));
+      });
+    });
+  } else {
+    flatOrder().forEach(id => {
+      if (pins.indexOf(id) === -1 && !F[id].required && !visibleOf(id)) out.push(col(id));
+    });
+  }
+  return out;
+}
+function hiddenCount() { return hiddenThings().length; }
+/* Every column that is not on the table, including those inside a hidden group.
+   Showing a group does not show the columns hidden inside it, so a "bring
+   everything back" that only did what the strip lists would leave more behind
+   than it restored — and the user would click it twice. */
+function allHiddenColumns() {
+  const pins = pinnedList();
+  return FIELDS.filter(f => !f.required &&
+    (!visibleOf(f.id) || (isGrouped() && catIsHidden(f.cat) && pins.indexOf(f.id) === -1))).map(f => f.id);
+}
+function hiddenGroups() {
+  return isGrouped() ? catOrder().filter(cid => catIsHidden(cid)) : [];
+}
+function restoreAllCount() { return allHiddenColumns().length; }
+function showEverything() {
+  const cols = allHiddenColumns(), groups = hiddenGroups();
+  if (!cols.length && !groups.length) return;
+  change('Brought back ' + cols.length + ' column' + (cols.length === 1 ? '' : 's'), d => {
+    cols.forEach(id => { d.vis[id] = true; });
+    if (groups.length) {
+      const m = {}; const cur = d.catHidden || {};
+      Object.keys(cur).forEach(k => m[k] = cur[k]);
+      groups.forEach(cid => { m[cid] = false; });
+      d.catHidden = m;
+    }
+  });
+}
+
+/* ---------- actions ---------- */
+function setVisible(fid, vis) {
+  if (F[fid].required) return;
+  change((vis ? 'Showed ' : 'Hid ') + lab(fid), d => { d.vis[fid] = vis; });
+}
+function setWidth(fid, w) {
+  change(lab(fid) + ' width set to ' + Math.round(w) + 'px', d => { d.widths[fid] = Math.round(w); });
+}
+
+/* Unpinning returns a column to its group. If that group is hidden there is
+   nowhere for it to go, so it would simply vanish — which reads as "unpin is
+   broken". Every route asks the same question first, and offers to show the
+   group as one step rather than leaving the user stuck. */
+/* Required means the column is always visible. It says nothing about pinning,
+   so a required column can be unpinned like any other — it simply returns to
+   its group and stays visible. The pinned block is allowed to be empty; the
+   default view has no pinned columns at all. */
+function canUnpin(fid) {
+  const pins = pinnedList();
+  if (pins.indexOf(fid) === -1) return { ok:false, why:'not pinned' };
+  if (isGrouped() && catIsHidden(F[fid].cat)) {
+    return { ok:false, hiddenGroup:true,
+      why: catName(F[fid].cat) + ' is hidden, so there would be nowhere for ' + lab(fid) +
+           ' to go. Show the group first.' };
+  }
+  return { ok:true };
+}
+/** show the group and unpin together, as one change */
+function showGroupAndUnpin(fid) {
+  const cid = F[fid].cat;
+  const pins = pinnedList().filter(x => x !== fid);
+  change('Showed ' + catName(cid) + ' and unpinned ' + lab(fid), d => {
+    const m = {}; const cur = d.catHidden || {};
+    Object.keys(cur).forEach(k => m[k] = cur[k]);
+    m[cid] = false;
+    d.catHidden = m;
+    d.pinned = pins;
+  });
+}
+function togglePin(fid) {
+  const pins = pinnedList();
+  const at = pins.indexOf(fid);
+  if (at === -1) {
+    const wasHidden = !visibleOf(fid);
+    change('Pinned ' + lab(fid), d => {
+      d.pinned = pins.concat([fid]);
+      if (wasHidden) d.vis[fid] = true;    // pinning a hidden column brings it back
+    });
+  } else {
+    const c = canUnpin(fid);
+    if (!c.ok) return announce(c.why);
+    change('Unpinned ' + lab(fid), d => { const n = pins.slice(); n.splice(at,1); d.pinned = n; });
+  }
+}
+function moveWithinCategory(fid, dir) {
+  const cid = F[fid].cat;
+  const order = catFields(cid);
+  const i = order.indexOf(fid);
+  const j = i + dir;
+  if (i === -1 || j < 0 || j >= order.length) return;
+  const n = order.slice();
+  n.splice(i,1); n.splice(j,0,fid);
+  change('Moved ' + lab(fid) + (dir<0 ? ' earlier' : ' later'), d => {
+    d.catFieldOrder = d.catFieldOrder || {}; d.catFieldOrder[cid] = n;
+  });
+}
+function movePinned(fid, dir) {
+  const pins = pinnedList();
+  const i = pins.indexOf(fid), j = i + dir;
+  if (i === -1 || j < 0 || j >= pins.length) return;
+  const n = pins.slice(); n.splice(i,1); n.splice(j,0,fid);
+  change('Moved ' + lab(fid) + ' within the pinned columns', d => { d.pinned = n; });
+}
+function toggleCategory(cid) {
+  if (!catCanHide(cid)) return announce(catName(cid) + ' holds a required column, so it cannot be hidden');
+  const hidden = catIsHidden(cid);
+  change((hidden ? 'Showed the ' : 'Hid the ') + catName(cid) + ' group', d => {
+    const m = {}; const cur = d.catHidden || {};
+    Object.keys(cur).forEach(k => m[k] = cur[k]);
+    m[cid] = !hidden;
+    d.catHidden = m;
+  });
+}
+/** drop group cid so it sits before targetCid */
+function dropGroupBefore(cid, targetCid) {
+  if (cid === targetCid) return;
+  const order = catOrder();
+  const n = order.filter(x => x !== cid);
+  n.splice(n.indexOf(targetCid), 0, cid);
+  change('Moved the ' + catName(cid) + ' group before ' + catName(targetCid), d => { d.catOrder = n; });
+}
+function moveCategory(cid, dir) {
+  const order = catOrder();
+  const i = order.indexOf(cid), j = i + dir;
+  if (i === -1 || j < 0 || j >= order.length) return;
+  const n = order.slice(); n.splice(i,1); n.splice(j,0,cid);
+  change('Moved the ' + catName(cid) + ' group', d => { d.catOrder = n; });
+}
+/** drop fid so it sits immediately before targetId. Same category, or both pinned. */
+function dropBefore(fid, targetId) {
+  const pins = pinnedList();
+  const fPinned = pins.indexOf(fid) !== -1, tPinned = pins.indexOf(targetId) !== -1;
+  if (fPinned && tPinned) {
+    const n = pins.filter(x => x !== fid);
+    n.splice(n.indexOf(targetId), 0, fid);
+    return change('Moved ' + lab(fid) + ' within the pinned columns', d => { d.pinned = n; });
+  }
+  if (fPinned || tPinned) return;                       // refused
+  if (!isGrouped()) {                                   // groups off: anywhere goes
+    const arr = flatOrder().filter(x => x !== fid);
+    arr.splice(arr.indexOf(targetId), 0, fid);
+    return change('Moved ' + lab(fid) + ' before ' + lab(targetId), d => { d.flatOrder = arr; });
+  }
+  if (F[fid].cat !== F[targetId].cat) return;           // refused
+  const cid = F[fid].cat;
+  const n = catFields(cid).filter(x => x !== fid);
+  n.splice(n.indexOf(targetId), 0, fid);
+  change('Moved ' + lab(fid) + ' before ' + lab(targetId), d => {
+    d.catFieldOrder = d.catFieldOrder || {}; d.catFieldOrder[cid] = n;
+  });
+}
+/* ---------- helpers ---------- */
+const $ = document.getElementById.bind(document);
+const el = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function announce(m) { $('live').textContent = m; }
+function commit(msg) { render(); if (msg) announce(msg); }
+let toastTimer = null, toastMsg = null;
+function toast(m, ms) {
+  toastMsg = m;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastMsg = null; render(); }, ms || 6000);
+}
+
+/** a small hover-over explanation, used instead of standing instruction text */
+function info(text) {
+  const b = el('<button type="button" class="info" aria-label="' + esc(text) + '" title="' + esc(text) + '">i</button>');
+  b.onclick = e => { e.stopPropagation(); e.preventDefault(); };
+  return b;
+}
+
+/* icons */
+const ICON = {
+  gear: '<svg width="17" height="17" viewBox="0 0 17 17" aria-hidden="true">' +
+    '<circle cx="8.5" cy="8.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+    [0,45,90,135].map(function(a){
+      var r = a * Math.PI / 180, dx = Math.cos(r) * 6.4, dy = Math.sin(r) * 6.4;
+      return '<line x1="' + (8.5-dx).toFixed(2) + '" y1="' + (8.5-dy).toFixed(2) +
+             '" x2="' + (8.5+dx).toFixed(2) + '" y2="' + (8.5+dy).toFixed(2) +
+             '" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
+    }).join('') +
+    '<circle cx="8.5" cy="8.5" r="4.4" fill="var(--raise)" stroke="currentColor" stroke-width="1.4"/>' +
+    '<circle cx="8.5" cy="8.5" r="1.9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>',
+  grip: '<svg width="6" height="14" viewBox="0 0 6 14" aria-hidden="true">' +
+    [3,7,11].map(function(y){ return '<circle cx="1.1" cy="'+y+'" r="1.05"/><circle cx="4.9" cy="'+y+'" r="1.05"/>'; }).join('') +
+    '</svg>',
+  dots: '<svg width="4" height="14" viewBox="0 0 4 14" aria-hidden="true">' +
+    '<circle cx="2" cy="2.6" r="1.35"/><circle cx="2" cy="7" r="1.35"/><circle cx="2" cy="11.4" r="1.35"/></svg>',
+  sort: function (st) {
+    var up = st === 'asc' ? 'currentColor' : '#c4c4c4';
+    var dn = st === 'desc' ? 'currentColor' : '#c4c4c4';
+    return '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none" ' +
+      'stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M3.5 10.5V1.8M1.4 3.9l2.1-2.1 2.1 2.1" stroke="' + up + '"/>' +
+      '<path d="M8.5 1.5v8.7M6.4 8.1l2.1 2.1 2.1-2.1" stroke="' + dn + '"/></svg>';
+  },
+  eye: on => '<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true">' +
+    '<ellipse cx="8" cy="6" rx="7.3" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.2"/>' +
+    (on ? '<circle cx="8" cy="6" r="2.7" fill="currentColor"/>'
+        : '<line x1="1.5" y1="10.5" x2="14.5" y2="1.5" stroke="currentColor" stroke-width="1.4"/>') + '</svg>',
+  pin: on => '<svg width="11" height="14" viewBox="0 0 11 14" aria-hidden="true">' +
+    '<circle cx="5.5" cy="3.6" r="3" fill="' + (on ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.2"/>' +
+    '<rect x="4.7" y="6.6" width="1.7" height="7" rx=".8" fill="currentColor"/></svg>'
+};
+
+/* ==========================================================
+   RENDER
+   ========================================================== */
+function renderAppbar() {
+  const b = el('<div class="appbar"><div class="logo"></div><span class="crumb">Films</span>' +
+    '<div class="spacer"></div></div>');
+  b.appendChild(el('<div class="who"><b>' + esc(USER.name) + '</b>' + esc(USER.role) + '</div>'));
+  b.appendChild(el('<div class="avatar"></div>'));
+  return b;
+}
+
+/* Hidden columns: the one place to bring back what has been taken off the
+   table. Nothing else happens here — every other change is made on the table. */
+function columnsModal() {
+  const scrim = el('<div class="scrim" role="dialog" aria-modal="true" aria-labelledby="cmt"></div>');
+  scrim.onclick = e => { if (e.target === scrim) closeModal(); };
+  const m = el('<div class="modal hidmodal"></div>');
+  m.onclick = e => e.stopPropagation();
+  const items = hiddenThings();
+
+  const head = el('<div class="mhead"><div><h2 id="cmt">Hidden columns</h2>' +
+    '<div class="sub">' + (items.length
+      ? 'Unhide one to put it back where it was'
+      : 'Everything is on the table') + '</div></div><div class="spacer"></div></div>');
+  const x = el('<button class="x" aria-label="Close">✕</button>');
+  x.onclick = () => closeModal();
+  head.appendChild(x);
+  m.appendChild(head);
+
+  const body = el('<div class="hidbody" data-scroll="modal-list"></div>');
+  if (!items.length) {
+    body.appendChild(el('<p class="hidempty">Nothing is hidden.</p>'));
+  }
+  items.forEach(t => {
+    const row = el('<div class="hidrow' + (t.kind === 'group' ? ' grp' : '') + '"></div>');
+    row.appendChild(el('<span class="hidname">' + esc(t.name) + '<small>' + esc(t.kind === 'group'
+      ? 'Whole group · ' + t.count + ' column' + (t.count === 1 ? '' : 's') : t.where) + '</small></span>'));
+    const b = el('<button class="btn sm">' + (t.kind === 'group' ? 'Unhide group' : 'Unhide') + '</button>');
+    b.setAttribute('aria-label', (t.kind === 'group' ? 'Unhide the ' + t.name + ' group' : 'Unhide ' + t.name));
+    b.onclick = () => (t.kind === 'group' ? toggleCategory(t.id) : setVisible(t.id, true));
+    row.appendChild(b);
+    body.appendChild(row);
+  });
+  m.appendChild(body);
+
+  const foot = el('<div class="mfoot"></div>');
+  const all = restoreAllCount();
+  if (all > 1) {
+    const sa = el('<button class="btn">Unhide all</button>');
+    sa.title = 'Unhides all ' + all + ' hidden columns, including those inside a hidden group';
+    sa.onclick = () => showEverything();
+    foot.appendChild(sa);
+  }
+  foot.appendChild(el('<span class="spacer"></span>'));
+  const done = el('<button class="btn primary">Done</button>');
+  done.onclick = () => closeModal();
+  foot.appendChild(done);
+  m.appendChild(foot);
+
+  scrim.appendChild(m);
+  return scrim;
+}
+
+function renderToolbar() {
+  const tb = el('<div class="toolbar"></div>');
+  tb.appendChild(el('<div class="search"><span class="o"></span><span>Search films</span></div>'));
+  tb.appendChild(el('<div class="spacer"></div>'));
+  if (S.selected.length) {
+    const chip = el('<span class="selchip"><span>' + S.selected.length + ' row' +
+      (S.selected.length === 1 ? '' : 's') + ' selected</span></span>');
+    const clr = el('<button>Clear</button>');
+    clr.onclick = () => { S.selected = []; commit('Selection cleared'); };
+    chip.appendChild(clr);
+    tb.appendChild(chip);
+  }
+  return tb;
+}
+
+/* "Autosize" fits a column to the widest value in the rows that are loaded.
+   With real data this is the same question as fit-to-content: on a paginated
+   table it can only ever measure the current page. */
+/* Fit to the widest value in the rows on screen, or to the header, whichever is
+   wider — the same thing Excel does when you double-click a column edge. It can
+   only measure what is loaded, which is why it reads the rows on this page
+   rather than a fixed number. */
+/* Autofit has to be tight or it does nothing visible. The old estimate padded
+   the header so generously that the answer landed within a few pixels of the
+   default width for most columns — double-clicking appeared to do nothing.
+   These are the real measurements: what the cell needs, and what the header
+   furniture needs. */
+const W_MIN = 84, W_MAX = 420;
+const CELL_PAD = 24;                      // 12 either side
+const TH_FURNITURE = 47;                  // padding, grip, sort icon and their gaps
+const TH_PIN_EXTRA = 26;                  // the pin marker on a pinned column, and its gap
+function naturalWidth(id) { return F[id].defaultWidth; }
+function headerNeed(id) {
+  return textWidth(lab(id), '600 ' + (FONT_PX - 1) + 'px') + TH_FURNITURE +
+    (pinnedList().indexOf(id) !== -1 ? TH_PIN_EXTRA : 0);
+}
+/* the width a cell's text actually needs, measured in the table's own font */
+let measureCtx = null;
+function textWidth(t, font) {
+  if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
+  measureCtx.font = (font || FONT_PX + 'px') + ' ' + getComputedStyle(document.body).fontFamily;
+  return Math.ceil(measureCtx.measureText(t).width);
+}
+function fittedWidth(id) {
+  let widest = 0;
+  pageRowIds().forEach(r => { widest = Math.max(widest, textWidth(cellText(r, id))); });
+  return Math.max(W_MIN, Math.min(W_MAX, Math.max(widest + CELL_PAD + 2, headerNeed(id))));
+}
+function autosizeColumn(id) {
+  const cols = tableColumns();
+  const idx = cols.findIndex(c => c.id === id);
+  if (idx === -1 || cols[idx].collapsed) return;
+  const want = fittedWidth(id, idx);
+  const from = cols[idx].width;
+  if (Math.abs(want - from) < 2) {
+    snapWidth(id, from + (want > from ? 6 : -6), from);   // a nudge, so the double-click visibly registered
+    return announce(lab(id) + ' is already fitted to its content');
+  }
+  setWidth(id, want);
+  snapWidth(id, from, want);
+}
+/** ease a column from one width to another, after the table has been redrawn at the new one */
+function snapWidth(id, from, to) {
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !document.body.animate) return;
+  const th = document.querySelector('.headrow th[data-col="' + id + '"]');
+  if (!th) return;
+  const col = Array.prototype.indexOf.call(th.parentNode.children, th);
+  const opts = { duration: 180, easing: 'cubic-bezier(.2,.8,.3,1.15)' };
+  th.animate([{ width: from + 'px' }, { width: to + 'px' }], opts);
+  document.querySelectorAll('tbody tr').forEach(tr => {
+    const cv = tr.children[col] && tr.children[col].querySelector('.cv');
+    if (cv) cv.animate([{ width: (from - 24) + 'px' }, { width: (to - 24) + 'px' }], opts);
+  });
+}
+function autosizeAll() {
+  const cols = tableColumns().filter(c => !c.collapsed);
+  const next = {};
+  cols.forEach((c, idx) => { next[c.id] = fittedWidth(c.id, idx); });
+  change('Autosized all ' + cols.length + ' columns', d => {
+    Object.keys(next).forEach(k => { d.widths[k] = next[k]; });
+  });
+}
+
+/* Group-level versions of the same actions. Each one is a single change. */
+function groupCols(cid) { return catFields(cid).filter(id => visibleOf(id)); }
+function groupUnpinned(cid) {
+  const pins = pinnedList();
+  return groupCols(cid).filter(id => pins.indexOf(id) === -1);
+}
+function groupPinned(cid) {
+  const pins = pinnedList();
+  return pins.filter(id => F[id].cat === cid);
+}
+function pinGroup(cid) {
+  const add = groupUnpinned(cid);
+  if (!add.length) return;
+  const pins = pinnedList();
+  change('Pinned the ' + catName(cid) + ' group', d => { d.pinned = pins.concat(add); });
+}
+function unpinGroup(cid) {
+  const drop = groupPinned(cid);
+  if (!drop.length) return;
+  const pins = pinnedList().filter(id => drop.indexOf(id) === -1);
+  change('Unpinned the ' + catName(cid) + ' group', d => { d.pinned = pins; });
+}
+function hideGroupColumns(cid) {
+  const all = groupCols(cid);
+  const targets = all.filter(id => !F[id].required);
+  if (!targets.length) return;
+  const skipped = all.length - targets.length;
+  change('Hid ' + (skipped ? 'the optional columns' : 'every column') + ' in ' + catName(cid),
+    d => { targets.forEach(id => { d.vis[id] = false; }); });
+}
+function autosizeGroup(cid) {
+  const cols = tableColumns();
+  const mine = cols.filter(c => !c.collapsed && (c.cat === cid || (c.pinned && F[c.id].cat === cid)));
+  if (!mine.length) return;
+  const next = {};
+  mine.forEach(c => { next[c.id] = fittedWidth(c.id, cols.findIndex(x => x.id === c.id)); });
+  change('Autosized the ' + catName(cid) + ' group', d => {
+    Object.keys(next).forEach(k => { d.widths[k] = next[k]; });
+  });
+}
+
+/* ---------- the group header menu ---------- */
+function renderGrpMenu() {
+  const gm = S.grpMenu;
+  if (!gm || !catName(gm.cid)) return null;
+  const cid = gm.cid;
+  const order = catOrder();
+  const at = order.indexOf(cid);
+  const cols = groupCols(cid);
+  const unpinned = groupUnpinned(cid);
+  const pinnedHere = groupPinned(cid);
+
+  const m = el('<div class="colmenu" role="menu" style="left:' + gm.x + 'px;top:' + gm.y + 'px"></div>');
+  m.onclick = e => e.stopPropagation();
+  m.appendChild(el('<div class="hdr">' + esc(catName(cid)) + ' group · ' + cols.length +
+    ' column' + (cols.length === 1 ? '' : 's') + '</div>'));
+  const close = () => { S.grpMenu = null; };
+  const item = (icon, label, opts) => {
+    const o = opts || {};
+    const b = el('<button class="mi ' + (o.on ? 'on' : '') + '" role="menuitem"' +
+      (o.disabled ? ' disabled' : '') + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
+      '<span class="ic">' + (icon || '') + '</span><span class="lb">' + esc(label) + '</span>' +
+      (o.note ? '<span class="mnote">' + esc(o.note) + '</span>' : '') +
+      (o.tick ? '<span class="tick">✓</span>' : '') +
+      (o.chev ? '<span class="chev">' + (o.on ? '⌄' : '›') + '</span>' : '') + '</button>');
+    if (!o.disabled && o.fn) b.onclick = () => o.fn();
+    m.appendChild(b);
+    return b;
+  };
+
+  if (unpinned.length) {
+    item(ICON.pin(false), 'Pin to the left' + (unpinned.length > 1 ? ' — ' + unpinned.length + ' columns' : ''), {
+      title:'Holds every showing column in this group at the left edge, in its current order',
+      fn: () => { close(); pinGroup(cid); } });
+  }
+  if (pinnedHere.length) {
+    item(ICON.pin(true), 'Unpin' + (pinnedHere.length > 1 ? ' — ' + pinnedHere.length + ' columns' : ''), {
+      disabled: catIsHidden(cid),
+      title: catIsHidden(cid)
+        ? 'The group is hidden, so unpinning would make these columns disappear'
+        : 'Returns them to ' + catName(cid),
+      fn: () => { close(); unpinGroup(cid); } });
+  }
+
+  item(ICON.eye(false), 'Hide column group', { disabled: !catCanHide(cid),
+    title: catCanHide(cid) ? 'Removes the whole group from the table'
+                           : catName(cid) + ' holds a required column, so the group cannot be hidden',
+    fn: () => { close(); toggleCategory(cid); } });
+  const optional = cols.filter(id => !F[id].required);
+  if (!catCanHide(cid)) {
+    // the group itself cannot be hidden, so this is the only way to clear it down
+    item('', 'Hide all optional columns', { disabled: !optional.length,
+      title: optional.length
+        ? 'Hides the ' + optional.length + ' column' + (optional.length === 1 ? '' : 's') +
+          ' that are not required, and keeps the rest'
+        : 'Every column in ' + catName(cid) + ' is required',
+      fn: () => { close(); hideGroupColumns(cid); } });
+  }
+
+  m.appendChild(el('<div class="sep"></div>'));
+  const shownHere = groupShowing(cid);
+  if (!groupAllCollapsed(cid)) {
+    item('', 'Collapse group', { disabled: !shownHere.length,
+      title:'Narrows every column in ' + catName(cid) + ' to a strip. Its place in the table is kept.',
+      fn: () => { close(); setGroupCollapsed(cid, true); } });
+  }
+  if (groupAnyCollapsed(cid)) {
+    item('', 'Expand group', { title:'Opens every collapsed column in ' + catName(cid) + ' back out',
+      fn: () => { close(); setGroupCollapsed(cid, false); } });
+  }
+
+  m.appendChild(el('<div class="sep"></div>'));
+
+  item('', 'Move group left', { disabled: at <= 0, fn: () => { close(); moveCategory(cid, -1); } });
+  item('', 'Move group right', { disabled: at === -1 || at >= order.length - 1,
+    fn: () => { close(); moveCategory(cid, 1); } });
+
+  m.appendChild(el('<div class="sep"></div>'));
+  item('', 'Turn off column groups', {
+    title:'Removes the group bands and lets any column go anywhere. Your grouped arrangement is kept, ' +
+          'so turning groups back on restores it.',
+    fn: () => { close(); toggleGrouping(); } });
+
+  m.appendChild(el('<div class="sep"></div>'));
+  item('', 'Autosize group', { disabled: !cols.length, fn: () => { close(); autosizeGroup(cid); } });
+  item('', 'Autosize all columns', { fn: () => { close(); autosizeAll(); } });
+
+  return m;
+}
+
+/* ---------- the column header menu ---------- */
+function renderColMenu() {
+  const cm = S.colMenu;
+  if (!cm || !F[cm.id]) return null;
+  const id = cm.id, f = F[id];
+  const pins = pinnedList();
+  const isPin = pins.indexOf(id) !== -1;
+
+  const m = el('<div class="colmenu" role="menu" style="left:' + cm.x + 'px;top:' + cm.y + 'px"></div>');
+  m.onclick = e => e.stopPropagation();
+  m.appendChild(el('<div class="hdr">' + esc(lab(f.id)) + '</div>'));
+  const close = () => { S.colMenu = null; };
+  const item = (icon, label, opts) => {
+    const o = opts || {};
+    const b = el('<button class="mi ' + (o.on ? 'on' : '') + '" role="menuitem"' +
+      (o.disabled ? ' disabled' : '') + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
+      '<span class="ic">' + (icon || '') + '</span><span class="lb">' + esc(label) + '</span>' +
+      (o.note ? '<span class="mnote">' + esc(o.note) + '</span>' : '') +
+      (o.tick ? '<span class="tick">✓</span>' : '') +
+      (o.chev ? '<span class="chev">' + (o.on ? '⌄' : '›') + '</span>' : '') + '</button>');
+    if (!o.disabled && o.fn) b.onclick = () => o.fn();
+    m.appendChild(b);
+    return b;
+  };
+
+  if (isPin) {
+    const cu = canUnpin(id);
+    item(ICON.pin(true), 'Unpin', { disabled: !cu.ok,
+      title: cu.ok ? 'Returns it to ' + (isGrouped() ? catName(f.cat) : 'the table') : cu.why,
+      fn: () => { close(); togglePin(id); } });
+    if (cu.hiddenGroup) {
+      item('', 'Show ' + catName(f.cat) + ' and unpin', {
+        title: 'Brings the group back and returns ' + lab(f.id) + ' to it, as one change',
+        fn: () => { close(); showGroupAndUnpin(id); } });
+    }
+  } else {
+    item(ICON.pin(false), 'Pin to the left', {
+      title:'Held at the left edge as the rest of the table scrolls' +
+        (isGrouped() ? ', outside ' + catName(f.cat) : ''),
+      fn: () => { close(); togglePin(id); } });
+  }
+
+  item(ICON.eye(false), 'Hide column', { disabled: f.required,
+    title: f.required ? f.label + ' is required and cannot be hidden'
+                      : 'Takes it off the table. “Hidden · bring back” unhides it.',
+    fn: () => { close(); setVisible(id, false); } });
+  if (isGrouped()) item(ICON.eye(false), 'Hide column group', { note: catName(f.cat), disabled: !catCanHide(f.cat) || isPin,
+    title: isPin ? 'This column is pinned, so it sits outside its group'
+                 : (catCanHide(f.cat) ? 'Hides every column in ' + catName(f.cat)
+                                      : catName(f.cat) + ' holds a required column, so it cannot be hidden'),
+    fn: () => { close(); toggleCategory(f.cat); } });
+
+  m.appendChild(el('<div class="sep"></div>'));
+  const col = isCollapsed(id);
+  item('', col ? 'Expand column' : 'Collapse column', {
+    title: col ? 'Opens ' + lab(id) + ' back out to its full width'
+               : 'Narrows ' + lab(id) + ' to a strip with its title running down it',
+    fn: () => { close(); setCollapsed(id, !col); } });
+  if (isGrouped() && !isPin) {
+    const gAll = groupAllCollapsed(f.cat);
+    item('', (gAll ? 'Expand' : 'Collapse') + ' the ' + catName(f.cat) + ' group', {
+      fn: () => { close(); setGroupCollapsed(f.cat, !gAll); } });
+  }
+
+  m.appendChild(el('<div class="sep"></div>'));
+  if (!isGrouped()) {
+    item('', 'Turn column groups on', {
+      title:'Puts the columns back into ' + CATS.slice(0,3).map(c => c.name).join(', ') +
+            ' and the rest, in the arrangement you had before',
+      fn: () => { close(); toggleGrouping(); } });
+  } else {
+    item('', 'Turn off column groups', {
+      title:'Removes the group bands and lets any column go anywhere. Your grouped arrangement is kept.',
+      fn: () => { close(); toggleGrouping(); } });
+  }
+
+  m.appendChild(el('<div class="sep"></div>'));
+  item('', 'Autosize column', { disabled: col, title: col ? 'Expand it first' : '',
+    fn: () => { close(); autosizeColumn(id); } });
+  item('', 'Autosize all columns', { fn: () => { close(); autosizeAll(); } });
+
+  return m;
+}
+
+/* The row-select column is not a column in the sense the rest of this file means.
+   It is not in the field catalogue, and it cannot be hidden,
+   moved, pinned or resized. It is a fixed frame the table is drawn inside, held
+   at the far left of everything including the pinned block. */
+const ROWS = 12;
+const SEL_BASE = 44;
+function selWidth() { return SEL_BASE; }
+function isRowSelected(i) { return S.selected.indexOf(i) !== -1; }
+function toggleRow(i) {
+  const at = S.selected.indexOf(i);
+  if (at === -1) S.selected.push(i); else S.selected.splice(at, 1);
+  commit(S.selected.length + ' row' + (S.selected.length === 1 ? '' : 's') + ' selected');
+}
+function pageRowIds() {
+  const start = pageIndex() * pageSize();
+  return viewRows().slice(start, start + rowsOnPage());
+}
+function toggleAllRows() {
+  const ids = pageRowIds();
+  const allOn = ids.length && ids.every(i => S.selected.indexOf(i) !== -1);
+  S.selected = allOn ? S.selected.filter(i => ids.indexOf(i) === -1)
+                     : S.selected.concat(ids.filter(i => S.selected.indexOf(i) === -1));
+  commit(S.selected.length ? S.selected.length + ' rows selected' : 'Selection cleared');
+}
+function selectAllState() {
+  const ids = pageRowIds();
+  const on = ids.filter(i => S.selected.indexOf(i) !== -1).length;
+  if (!on) return 'none';
+  return on === ids.length ? 'all' : 'some';
+}
+
+/* ---------- table ---------- */
+let drag = null;   // { fid, x, y, overId, ok }
+let resizing = null;
+let lastEdgeClick = null;   // { id, t } — the first half of a double-click on a column edge
+
+function renderTable() {
+  const cols = tableColumns();
+  const pins = pinnedList();
+  const wrap = el('<div class="content"></div>');
+
+  if (!cols.length) {
+    const e = el('<div class="scrollwrap" style="padding:48px;text-align:center;color:#737373"></div>');
+    e.appendChild(el('<p>Every column is hidden.</p>'));
+    const b = el('<button class="btn primary">Bring every column back</button>');
+    b.onclick = () => showEverything();
+    e.appendChild(b); wrap.appendChild(e); return wrap;
+  }
+
+  /* the bar only appears when something is out of the table */
+  if (hiddenCount()) {
+    const vb = el('<div class="viewbar"></div>');
+    vb.appendChild(el('<span class="vbl">' + TOTAL_ROWS + ' rows</span>'));
+    const n = hiddenCount();
+    const hb = el('<button class="hidchip">' + n + ' hidden · bring back</button>');
+    hb.title = n + ' column' + (n === 1 ? '' : 's') +
+      ' currently out of the table. Opens the list of hidden columns, where one click brings any of them back.';
+    hb.onclick = () => openModal();
+    vb.appendChild(hb);
+    wrap.appendChild(vb);
+  }
+
+  const sw = el('<div class="scrollwrap"></div>');
+  const sc = el('<div class="scroller" data-scroll="table"></div>');
+
+  // group runs for the band row
+  const runs = [];
+  cols.forEach(c => {
+    const key = c.pinned ? '__pinned' : c.cat;
+    const last = runs[runs.length-1];
+    if (last && last.key === key) { last.cols.push(c); last.w += c.width; }
+    else runs.push({ key, cols:[c], w:c.width });
+  });
+
+  const SELW = selWidth();
+  const selStyle = 'width:' + SELW + 'px;min-width:' + SELW + 'px;max-width:' + SELW + 'px';
+  const leftOf = {};
+  let stick = SELW;
+  cols.forEach(c => { if (c.pinned) { leftOf[c.id] = stick; stick += c.width; } });
+
+  let html = '<table><caption class="sr">Films, ' + cols.length + ' of ' + totalCount() + ' columns</caption><thead>';
+  const grouped = isGrouped();
+  if (grouped) {
+  html += '<tr class="bandrow"><th class="selcell" style="' + selStyle + '" aria-hidden="true"></th>';
+  runs.forEach((r, i) => {
+    const pinned = r.key === '__pinned';
+    const canHide = !pinned && catCanHide(r.key);
+    html += '<th colspan="' + r.cols.length + '" class="' + (pinned ? 'pinband pinedge' : '') +
+      '"' + (pinned ? ' style="left:' + SELW + 'px"' : ' title="Right-click for group options"') +
+      ' data-band="' + r.key + '"><span class="band-in" style="width:' + Math.max(0, r.w - 17) + 'px">' +
+      (pinned ? '' : '<span class="bgrab" data-bgrab="' + r.key + '" aria-hidden="true" title="Drag to move the ' +
+        esc(catName(r.key)) + ' group. It cannot go left of the pinned columns.">' + ICON.grip + '</span>') +
+      '<span class="bname">' + (pinned ? esc('Pinned to the left') : esc(catName(r.key))) + '</span>' +
+      '</span></th>';
+  });
+  html += '</tr>';
+  }
+  const selState = selectAllState();
+  html += '<tr class="headrow"><th class="selcell" style="' + selStyle + '" scope="col">' +
+    '<span class="selinner"><button class="rowbox ' +
+    (selState === 'all' ? 'on' : selState === 'some' ? 'some' : '') +
+    '" data-selall="1" role="checkbox" aria-checked="' +
+    (selState === 'all' ? 'true' : selState === 'some' ? 'mixed' : 'false') +
+    '" aria-label="Select all rows" title="' +
+    (selState === 'none' ? 'Select all rows' : 'Clear the selection') + '">' +
+    (selState === 'all' ? '✓' : '') + '</button></span></th>';
+  cols.forEach((c, i) => {
+    const isPin = c.pinned;
+    const lastPin = isPin && (!cols[i+1] || !cols[i+1].pinned);
+    if (c.collapsed) {
+      html += '<th style="width:' + c.width + 'px' + (isPin ? ';left:' + leftOf[c.id] + 'px' : '') +
+        '" data-col="' + c.id + '" class="collapsed ' + (isPin ? 'pinned ' : '') + (lastPin ? 'pinedge' : '') + '">' +
+        '<span class="cin">' +
+          '<span class="grab" data-grab="' + c.id + '" aria-hidden="true" title="Drag to move ' + esc(lab(c.id)) + '">' +
+            ICON.grip + '</span>' +
+          '<button class="cexp" data-expand="' + c.id + '" aria-label="Expand ' + esc(lab(c.id)) +
+            '" title="Expand ' + esc(lab(c.id)) + '. Right-click for more options.">' +
+            '<span class="chev" aria-hidden="true">›</span></button>' +
+        '</span></th>';
+      return;
+    }
+    const sorted = sortDirOf(c.id);
+    const sortTip = 'Sort ' + esc(lab(c.id)) + (sorted === null ? ' ascending' : sorted === 'asc' ? ' descending' : ' — back to the original order') +
+      '. Right-click for more options.';
+    html += '<th style="width:' + c.width + 'px' +
+      (isPin ? ';left:' + leftOf[c.id] + 'px' : '') + '" data-col="' + c.id + '" class="' +
+      (isPin ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (sorted ? 'sorted' : '') + '"' +
+      (sorted ? ' aria-sort="' + (sorted === 'asc' ? 'ascending' : 'descending') + '"' : '') + '>' +
+      '<span class="th-in">' +
+        '<span class="grab" data-grab="' + c.id + '" aria-hidden="true" title="Drag to move ' +
+          esc(lab(c.id)) + (isPin ? ' within the pinned columns'
+            : (grouped ? ' within ' + esc(catName(c.cat)) + ' — it cannot leave its group or join the pinned columns'
+                       : ' anywhere in the table — it cannot join the pinned columns')) + '">' + ICON.grip + '</span>' +
+        '<button class="lbl" data-sort="' + c.id + '" aria-haspopup="menu" title="' + sortTip + '">' +
+          esc(lab(c.id)) + '</button>' +
+        '<button class="sortbtn' + (sorted ? ' active' : '') + '" data-sort="' + c.id + '" tabindex="-1" ' +
+          'aria-hidden="true" title="' + sortTip + '">' + ICON.sort(sorted) + '</button>' +
+        (isPin ? '<span class="acts">' : '') +
+          (isPin
+            ? '<button class="iconbtn on" data-unpin="' + c.id + '"' +
+              (canUnpin(c.id).ok ? '' : ' disabled') +
+              ' aria-label="Unpin ' + esc(lab(c.id)) + '" title="' +
+              (canUnpin(c.id).ok
+                ? 'Pinned to the left. Click to unpin and return it to ' +
+                  (grouped ? esc(catName(F[c.id].cat)) : 'the table') + '.'
+                : esc(canUnpin(c.id).why)) +
+              '">' + ICON.pin(true) + '</button>'
+            : '') +
+        (isPin ? '</span>' : '') +
+      '</span><span class="rsz" data-rsz="' + c.id +
+      '" title="Drag the edge to resize — the dashed line shows where it will land. ' +
+      'Double-click it to fit the column to its widest value."></span>';
+    html += '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  const rowIds = pageRowIds();
+  rowIds.forEach((r, ri) => {
+    html += '<tr class="' + (isRowSelected(r) ? 'rowsel' : '') + '">' +
+      '<td class="selcell" style="' + selStyle + '">' +
+      '<span class="selinner"><button class="rowbox ' + (isRowSelected(r) ? 'on' : '') +
+      '" data-selrow="' + r + '" role="checkbox" aria-checked="' + isRowSelected(r) +
+      '" aria-label="Select row ' + (r+1) + '">' +
+      (isRowSelected(r) ? '✓' : '') + '</button></span></td>';
+    cols.forEach((c, i) => {
+      const lastPin = c.pinned && (!cols[i+1] || !cols[i+1].pinned);
+      if (c.collapsed) {
+        // one cell for the whole strip, so no row lines cut across the title
+        if (ri === 0) html += '<td class="cstrip ' + (c.pinned ? 'pinned ' : '') + (lastPin ? 'pinedge' : '') +
+          '" rowspan="' + rowIds.length + '" data-expand="' + c.id + '" title="Expand ' + esc(lab(c.id)) + '"' +
+          (c.pinned ? ' style="left:' + leftOf[c.id] + 'px"' : '') + '><span class="vlab">' + esc(lab(c.id)) + '</span></td>';
+        return;
+      }
+      html += '<td class="' + (c.pinned ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (c.collapsed ? 'collapsed' : '') + '"' +
+        (c.pinned ? ' style="left:' + leftOf[c.id] + 'px"' : '') + '>' +
+        (c.collapsed ? '' : '<div class="cv" style="width:' + (c.width - 24) + 'px" title="' +
+        esc(cellText(r, c.id)) + '">' + esc(cellText(r, c.id)) + '</div>') + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  sc.appendChild(el(html));
+  sw.appendChild(sc);
+  wrap.appendChild(sw);
+
+  const from = pageIndex() * pageSize() + 1;
+  const to = pageIndex() * pageSize() + rowsOnPage();
+  const pg = el('<div class="pager"></div>');
+  pg.appendChild(el('<span class="pgl">' + (rowsOnPage() ? from + '–' + to : '0') +
+    ' ' + esc('of') + ' ' + matchedTotal() + ' ' + esc('rows') + '</span>'));
+  pg.appendChild(el('<span class="spacer"></span>'));
+  const prev = el('<button class="pgb"' + (pageIndex() === 0 ? ' disabled' : '') +
+    ' aria-label="Previous page">‹</button>');
+  prev.onclick = () => goPage(pageIndex() - 1);
+  pg.appendChild(prev);
+  pg.appendChild(el('<span class="pgn">' + esc('Page') + ' ' + (pageIndex() + 1) +
+    ' ' + esc('of') + ' ' + pageCount() + '</span>'));
+  const next = el('<button class="pgb"' + (pageIndex() >= pageCount() - 1 ? ' disabled' : '') +
+    ' aria-label="Next page">›</button>');
+  next.onclick = () => goPage(pageIndex() + 1);
+  pg.appendChild(next);
+  pg.appendChild(el('<span>' + pageSize() + ' a page</span>'));
+  wrap.appendChild(pg);
+
+  /* interactions */
+  const sa = sc.querySelector('[data-selall]');
+  if (sa) sa.onclick = ev => { ev.stopPropagation(); toggleAllRows(); };
+  sc.querySelectorAll('[data-selrow]').forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    toggleRow(parseInt(b.dataset.selrow, 10));
+  });
+  sc.querySelectorAll('[data-unpin]').forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    togglePin(b.dataset.unpin);
+  });
+  sc.querySelectorAll('[data-expand]').forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    S.colMenu = null; S.grpMenu = null;
+    setCollapsed(b.dataset.expand, false);
+  });
+  sc.querySelectorAll('[data-sort]').forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    S.colMenu = null; S.grpMenu = null;
+    cycleSort(b.dataset.sort);
+  });
+  /* The options that used to sit behind the three dots open on right-click.
+     The context-menu key and Shift+F10 on a focused title do the same, so the
+     menu is still reachable from the keyboard. */
+  const menuAt = (ev, el0) => {
+    if (ev.clientX || ev.clientY) return { x: ev.clientX, y: ev.clientY };
+    const r = el0.getBoundingClientRect();
+    return { x: r.left, y: r.bottom + 4 };
+  };
+  sc.querySelectorAll('th[data-col]').forEach(th => th.addEventListener('contextmenu', ev => {
+    ev.preventDefault(); ev.stopPropagation();
+    const p = menuAt(ev, th);
+    S.grpMenu = null;
+    S.colMenu = { id: th.dataset.col,
+      x: Math.min(p.x, window.innerWidth - 248),
+      y: Math.min(p.y, window.innerHeight - 300) };
+    commit('Options for ' + lab(th.dataset.col));
+  }));
+  sc.querySelectorAll('th[data-band]').forEach(th => th.addEventListener('contextmenu', ev => {
+    ev.preventDefault(); ev.stopPropagation();
+    if (th.dataset.band === '__pinned') return;
+    const p = menuAt(ev, th);
+    S.colMenu = null;
+    S.grpMenu = { cid: th.dataset.band,
+      x: Math.min(p.x, window.innerWidth - 268),
+      y: Math.min(p.y, window.innerHeight - 340) };
+    commit('Options for the ' + catName(th.dataset.band) + ' group');
+  }));
+
+  // drag a whole group along the band row
+  sc.querySelectorAll('[data-bgrab]').forEach(h => {
+    h.addEventListener('pointerdown', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      const cid = h.dataset.bgrab;
+      document.body.classList.add('dragging');
+      const chip = el('<div class="dragchip"><span style="color:#9a9a9a;display:inline-flex">' + ICON.grip + '</span><span>' +
+        esc(catName(cid)) + ' group</span><span id="gno"></span></div>');
+      document.body.appendChild(chip);
+      const zoneEls = [];
+      let pinW = 0;
+      runs.forEach(r => { if (r.key === '__pinned') pinW = r.w; });
+      const total = runs.reduce((a, r) => a + r.w, SELW);
+      if (pinW) {
+        const d1 = el('<div class="dimzone"></div>');
+        d1.style.left = '0'; d1.style.width = (SELW + pinW) + 'px';
+        sw.appendChild(d1); zoneEls.push(d1);
+      }
+      const z = el('<div class="okzone"></div>');
+      z.style.left = (SELW + pinW) + 'px'; z.style.width = (total - SELW - pinW) + 'px';
+      sw.appendChild(z); zoneEls.push(z);
+      const lab = el('<div class="zonelabel">Groups reorder here — never left of the pinned columns</div>');
+      lab.style.left = (SELW + pinW) + 'px'; lab.style.top = '-26px';
+      sw.appendChild(lab); zoneEls.push(lab);
+      let line = null, barrier = null, ok = false, overCid = null;
+
+      const mv2 = e2 => {
+        chip.style.left = (e2.clientX + 14) + 'px';
+        chip.style.top = (e2.clientY - 16) + 'px';
+        const node = document.elementFromPoint(e2.clientX, e2.clientY);
+        const bandTh = node && node.closest ? node.closest('th[data-band]') : null;
+        const colTh = node && node.closest ? node.closest('th[data-col]') : null;
+        let key = bandTh ? bandTh.dataset.band : null;
+        if (!key && colTh) {
+          const cc = cols.find(c => c.id === colTh.dataset.col);
+          key = cc ? (cc.pinned ? '__pinned' : cc.cat) : null;
+        }
+        if (line) { line.remove(); line = null; }
+        if (barrier) { barrier.remove(); barrier = null; }
+        const no = document.getElementById('gno');
+        ok = false; overCid = null;
+        if (!key || key === cid) { if (no) { no.className=''; no.textContent=''; } return; }
+        if (key === '__pinned') {
+          if (no) { no.className = 'no'; no.textContent = 'CANNOT DROP HERE'; }
+          barrier = el('<div class="barrier"></div>');
+          barrier.style.left = (SELW + pinW - 2) + 'px';
+          sw.appendChild(barrier);
+          return;
+        }
+        ok = true; overCid = key;
+        if (no) { no.className=''; no.textContent=''; }
+        let x = SELW;
+        for (let ri = 0; ri < runs.length; ri++) { if (runs[ri].key === key) break; x += runs[ri].w; }
+        line = el('<div class="dropline"></div>');
+        line.style.left = (x - 1.5) + 'px';
+        line.style.top = '0';
+        sw.appendChild(line);
+      };
+      let ended2 = false;
+      const finish2 = (commitIt) => {
+        if (ended2) return;
+        ended2 = true;
+        document.removeEventListener('pointermove', mv2);
+        document.removeEventListener('pointerup', up2);
+        document.removeEventListener('pointercancel', cancel2);
+        window.removeEventListener('blur', cancel2);
+        chip.remove(); zoneEls.forEach(z2 => z2.remove());
+        if (line) line.remove(); if (barrier) barrier.remove();
+        document.body.classList.remove('dragging');
+        if (commitIt && ok && overCid) dropGroupBefore(cid, overCid);
+        else { render(); announce('Group move cancelled'); }
+      };
+      const up2 = () => finish2(true);
+      const cancel2 = () => finish2(false);
+      document.addEventListener('pointermove', mv2);
+      document.addEventListener('pointerup', up2);
+      document.addEventListener('pointercancel', cancel2);
+      window.addEventListener('blur', cancel2);
+      try { h.setPointerCapture(ev.pointerId); } catch (e) {}
+      mv2(ev);
+    });
+  });
+
+  // resize
+  sc.querySelectorAll('[data-rsz]').forEach(g => {
+    g.addEventListener('pointerdown', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      const id = g.dataset.rsz;
+      /* Excel: double-click the edge and the column snaps to fit its content.
+         Detected here rather than with a dblclick event, because the table is
+         rebuilt between the two clicks and the element the first click landed
+         on no longer exists by the second. */
+      const now = Date.now();
+      if (lastEdgeClick && lastEdgeClick.id === id && now - lastEdgeClick.t < 450) {
+        lastEdgeClick = null;
+        return autosizeColumn(id);
+      }
+      lastEdgeClick = { id, t: now };
+      const th = sc.querySelector('th[data-col="' + id + '"]');
+      const startX = ev.clientX, startW = th.offsetWidth;
+      const top = (grouped ? 30 : 0) + 'px';
+      const b0 = sw.getBoundingClientRect();
+      const thb = th.getBoundingClientRect();
+      const edge0 = thb.right - b0.left;            // where the edge is now
+
+      // the edge you started from stays visible, so the move is legible
+      const origin = el('<div class="rszorigin"></div>');
+      origin.style.top = top; origin.style.left = edge0 + 'px';
+      sw.appendChild(origin);
+
+      const guide = el('<div class="rszguide"></div>');
+      guide.style.top = top;
+      sw.appendChild(guide);
+
+      const label = el('<div class="rszlabel"></div>');
+      label.style.top = (grouped ? 4 : 4) + 'px';
+      sw.appendChild(label);
+
+      document.body.classList.add('resizing');
+      resizing = id;
+      let lastW = startW, done = false, moved = false;
+      /* hold the guides back until the pointer has actually travelled, so the
+         first click of a double click does not flash them on and off */
+      [guide, origin, label].forEach(n => { n.style.display = 'none'; });
+
+      const place = w => {
+        const x = edge0 + (w - startW);
+        guide.style.left = x + 'px';
+        label.style.left = Math.max(34, Math.min(sw.clientWidth - 34, x)) + 'px';
+        label.textContent = 'Width: ' + Math.round(w) + ' px' +
+          (w === 96 ? ' (minimum)' : w === 420 ? ' (maximum)' : '');
+      };
+      place(startW);
+      // the column itself is left alone until you let go, exactly as Excel does
+      const mv = e2 => {
+        if (!moved && Math.abs(e2.clientX - startX) < 3) return;
+        if (!moved) { moved = true; lastEdgeClick = null; [guide, origin, label].forEach(n => { n.style.display = ''; }); }
+        const w = Math.max(W_MIN, Math.min(W_MAX, startW + (e2.clientX - startX)));
+        lastW = w;
+        place(w);
+      };
+      const end = (commitIt) => {
+        if (done) return;
+        done = true;
+        document.removeEventListener('pointermove', mv);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', cancel);
+        window.removeEventListener('blur', cancel);
+        guide.remove(); origin.remove(); label.remove();
+        document.body.classList.remove('resizing');
+        resizing = null;
+        if (commitIt && moved && Math.abs(lastW - startW) > 2) setWidth(id, lastW);
+        else if (moved) render();
+      };
+      const up = () => end(true);
+      const cancel = () => end(false);
+      document.addEventListener('pointermove', mv);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', cancel);
+      window.addEventListener('blur', cancel);
+      try { g.setPointerCapture(ev.pointerId); } catch (e) {}
+    });
+  });
+
+  // drag to move
+  sc.querySelectorAll('[data-grab]').forEach(h => {
+    h.addEventListener('pointerdown', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      const fid = h.dataset.grab;
+      drag = { fid, overId:null, ok:false };
+      document.body.classList.add('dragging');
+      const chip = el('<div class="dragchip"><span style="color:#9a9a9a;display:inline-flex">' + ICON.grip + '</span><span>' + esc(lab(fid)) + '</span><span id="chipno"></span></div>');
+      document.body.appendChild(chip);
+      const pinsNow = pinnedList();
+      const fPinned = pinsNow.indexOf(fid) !== -1;
+      const groupedNow = isGrouped();
+
+      // allowed zone + dimming
+      const zoneEls = [];
+      const allCols = tableColumns();
+      const sx = () => sc.scrollLeft;
+      let acc = SELW, zoneStart = null, zoneEnd = null;
+      allCols.forEach(c => {
+        const same = fPinned ? c.pinned
+          : (!c.pinned && (groupedNow ? c.cat === F[fid].cat : true));
+        if (same) { if (zoneStart === null) zoneStart = acc; zoneEnd = acc + c.width; }
+        acc += c.width;
+      });
+      const total = acc;
+      let zoneEl = null, labEl = null, dimA = null, dimB = null;
+      if (zoneStart !== null) {
+        zoneEl = el('<div class="okzone"></div>');
+        sw.appendChild(zoneEl); zoneEls.push(zoneEl);
+        labEl = el('<div class="zonelabel">' + (fPinned ? 'Pinned — reorder within the pinned columns'
+          : (groupedNow ? esc(catName(F[fid].cat)) + ' — move within this group only'
+                        : 'Groups are off — move it anywhere')) + '</div>');
+        labEl.style.top = '-26px';
+        sw.appendChild(labEl); zoneEls.push(labEl);
+        dimA = el('<div class="dimzone"></div>'); sw.appendChild(dimA); zoneEls.push(dimA);
+        dimB = el('<div class="dimzone"></div>'); sw.appendChild(dimB); zoneEls.push(dimB);
+      }
+      const viewW = sw.clientWidth;
+      const placeZones = () => {
+        if (!zoneEl) return;
+        const off = sx();
+        const a = Math.max(0, zoneStart - off), b = Math.min(viewW, zoneEnd - off);
+        zoneEl.style.left = a + 'px';
+        zoneEl.style.width = Math.max(0, b - a) + 'px';
+        labEl.style.left = Math.max(0, a) + 'px';
+        dimA.style.left = '0px';
+        dimA.style.width = Math.max(0, a) + 'px';
+        dimB.style.left = b + 'px';
+        dimB.style.width = Math.max(0, viewW - b) + 'px';
+      };
+      placeZones();
+      sc.addEventListener('scroll', placeZones);
+      let line = null, barrier = null;
+
+      const mv = e2 => {
+        chip.style.left = (e2.clientX + 14) + 'px';
+        chip.style.top = (e2.clientY - 16) + 'px';
+        const th = document.elementFromPoint(e2.clientX, e2.clientY);
+        const cell = th && th.closest ? th.closest('th[data-col]') : null;
+        const overId = cell ? cell.dataset.col : null;
+        drag.overId = overId;
+        if (line) { line.remove(); line = null; }
+        if (barrier) { barrier.remove(); barrier = null; }
+        const no = document.getElementById('chipno');
+        drag.ok = false;
+        if (!overId || overId === fid) { if (no) no.textContent = ''; return; }
+        const tPinned = pinsNow.indexOf(overId) !== -1;
+        const okSame = fPinned ? tPinned
+          : (!tPinned && (groupedNow ? F[overId].cat === F[fid].cat : true));
+        if (okSame) {
+          drag.ok = true;
+          if (no) { no.textContent = ''; no.className = ''; }
+          const b = sw.getBoundingClientRect();
+          const cb = cell.getBoundingClientRect();
+          line = el('<div class="dropline"></div>');
+          line.style.left = (cb.left - b.left - 1.5) + 'px';
+          line.style.top = (grouped ? 30 : 0) + 'px';
+          sw.appendChild(line);
+        } else {
+          if (no) { no.className = 'no'; no.textContent = 'CANNOT DROP HERE'; }
+          if (tPinned && !fPinned) {
+            let acc2 = SELW, edge = SELW;
+            allCols.forEach(c => { if (c.pinned) edge = acc2 + c.width; acc2 += c.width; });
+            barrier = el('<div class="barrier"></div>');
+            barrier.style.left = (edge - sx() - 2) + 'px';
+            sw.appendChild(barrier);
+          }
+        }
+      };
+      let ended = false;
+      const finish = (commitIt) => {
+        if (ended) return;
+        ended = true;
+        document.removeEventListener('pointermove', mv);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', cancel);
+        window.removeEventListener('blur', cancel);
+        sc.removeEventListener('scroll', placeZones);
+        chip.remove(); zoneEls.forEach(z => z.remove());
+        if (line) line.remove(); if (barrier) barrier.remove();
+        document.body.classList.remove('dragging');
+        const d = drag; drag = null;
+        if (commitIt && d && d.ok && d.overId) dropBefore(d.fid, d.overId);
+        else { render(); announce('Move cancelled'); }
+      };
+      const up = () => finish(true);
+      const cancel = () => finish(false);
+      document.addEventListener('pointermove', mv);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', cancel);
+      window.addEventListener('blur', cancel);
+      try { h.setPointerCapture(ev.pointerId); } catch (e) {}
+      mv(ev);
+    });
+  });
+
+  return wrap;
+}
+
+let mdrag = null;
+
+/* ---------- modal ---------- */
+function openModal() {
+  S.menuOpen = true;
+  S.colMenu = null; S.grpMenu = null;
+  forgetScroll('modal-list');
+  commit('Hidden columns');
+}
+function closeModal() {
+  S.menuOpen = false;
+  commit('Hidden columns closed');
+}
+function allCollapsed() { return CATS.every(c => S.collapsed[c.id]); }
+
+/* ---------- dev panel ---------- */
+function renderDev() {
+  const d = $('dev');
+  d.className = S.devMin ? 'min' : '';
+  d.innerHTML = '';
+  const h = el('<header><span>Prototype controls</span></header>');
+  const t = el('<button aria-label="Toggle">' + (S.devMin ? '▲' : '▼') + '</button>');
+  t.onclick = () => { S.devMin = !S.devMin; commit(); };
+  h.appendChild(t); d.appendChild(h);
+  if (S.devMin) return;
+  const b = el('<div class="db"></div>');
+  const row = el('<div class="row"></div>');
+  const st = el('<button class="mini">' + (S.devState ? 'Hide' : 'Show') + ' state</button>');
+  st.onclick = () => { S.devState = !S.devState; commit(); };
+  const rs = el('<button class="mini">Reset everything</button>');
+  rs.onclick = () => {
+    const keep = { devMin:S.devMin, devState:S.devState };
+    S = seed(); Object.assign(S, keep);
+    toastMsg = null; commit('Reset to the default columns');
+  };
+  row.appendChild(st); row.appendChild(rs);
+  b.appendChild(row);
+  if (S.devState) {
+    b.appendChild(el('<pre>' + esc(JSON.stringify({
+      grouped: isGrouped(),
+      pinned: pinnedList(),
+      groupOrder: catOrder().map(c => catName(c)),
+      hiddenGroups: hiddenGroups(),
+      hiddenColumns: FIELDS.filter(f => !visibleOf(f.id)).map(f => f.id),
+      widths: S.cols.widths,
+      collapsed: Object.keys(S.cols.collapsed).filter(k => S.cols.collapsed[k]),
+      aliases: S.cols.alias
+    }, null, 2)) + '</pre>'));
+  }
+  d.appendChild(b);
+}
+
+/* Every change rebuilds the DOM, which would otherwise throw you back to the
+   top of the list the moment you tick anything. Scroll positions are captured
+   before the rebuild and put back after it. */
+const scrollMemo = {};
+function captureScroll() {
+  document.querySelectorAll('[data-scroll]').forEach(n => {
+    scrollMemo[n.dataset.scroll] = { t: n.scrollTop, l: n.scrollLeft };
+  });
+}
+function restoreScroll() {
+  document.querySelectorAll('[data-scroll]').forEach(n => {
+    const m = scrollMemo[n.dataset.scroll];
+    if (!m) return;
+    if (m.t) n.scrollTop = m.t;
+    if (m.l) n.scrollLeft = m.l;
+  });
+}
+function forgetScroll(key) { delete scrollMemo[key]; }
+
+/* A drag that never gets its pointerup — pointer capture lost, window blurred,
+   the tab switched — used to leave the floating chip and the zone overlays
+   stranded on top of everything. Nothing else can clear them, so every render
+   sweeps them away unless a drag is genuinely in progress. */
+function dragActive() { return !!(drag || mdrag || resizing); }
+function sweepDragFurniture() {
+  if (dragActive()) return;
+  document.querySelectorAll('.dragchip, .dimzone, .okzone, .zonelabel, .dropline, .barrier, ' +
+    '.rszguide, .rszorigin, .rszlabel').forEach(n => n.remove());
+  document.body.classList.remove('dragging');
+  document.body.classList.remove('resizing');
+}
+
+
+/* ---------- render ---------- */
+function render() {
+  sweepDragFurniture();
+  captureScroll();
+  const sh = $('shell');
+  sh.innerHTML = '';
+  sh.appendChild(renderAppbar());
+  sh.appendChild(renderToolbar());
+  sh.appendChild(renderTable());
+
+  const ov = $('overlay'); ov.innerHTML = '';
+  if (S.menuOpen) ov.appendChild(columnsModal());
+  const cmEl = renderColMenu();
+  if (cmEl) ov.appendChild(cmEl);
+  const gmEl = renderGrpMenu();
+  if (gmEl) ov.appendChild(gmEl);
+  const tw = $('toastwrap'); tw.innerHTML = '';
+  if (toastMsg) {
+    const t = el('<div id="toast" role="status"><span>✓</span><span>' + esc(toastMsg) + '</span></div>');
+    const b = el('<button>Dismiss</button>');
+    b.onclick = () => { toastMsg = null; render(); };
+    t.appendChild(b); tw.appendChild(t);
+  }
+  applyScale();
+  renderDev();
+  restoreScroll();
+}
+
+/* A read-only hook so the prototype can be driven and inspected by a test
+   harness. The dev panel already shows this state; this just makes it reachable
+   from outside the script. */
+window.__debug = {
+  get S() { return S; },
+  F, FIELDS, CATS, CATNAME,
+  render, change, dropBefore, pinnedList, isGrouped, tableColumns, visibleOf, widthOf,
+  catIsHidden, catCanHide, togglePin, setVisible, toggleGrouping, toggleCategory, lab, catName,
+  canUnpin, showGroupAndUnpin, setCollapsed, setGroupCollapsed, isCollapsed, cycleSort, viewRows, sortDirOf, hiddenThings, hiddenCount, showEverything,
+  allHiddenColumns, hiddenGroups, restoreAllCount,
+  autosizeColumn, autosizeAll, fittedWidth, setWidth, headerNeed, naturalWidth,
+  catOrder, flatOrder, aliasOf, setAlias, canonLab, openModal, closeModal
+};
+
+document.addEventListener('click', () => {
+  let ch = false;
+  if (S.colMenu) { S.colMenu = null; ch = true; }
+  if (S.grpMenu) { S.grpMenu = null; ch = true; }
+  if (ch) commit();
+});
+document.addEventListener('contextmenu', () => {
+  if (S.colMenu || S.grpMenu) { S.colMenu = null; S.grpMenu = null; commit(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (S.colMenu || S.grpMenu) { S.colMenu = null; S.grpMenu = null; return commit(); }
+    if (S.menuOpen) closeModal();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
