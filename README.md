@@ -139,6 +139,16 @@ Output goes to `dist/design-lab`. Vercel runs this automatically on push.
 
 ---
 
+## Access protection
+
+The deployed site is behind a shared username/password (HTTP Basic Auth), enforced by `middleware.ts` at the repo root — Vercel Routing Middleware that runs before every request, so the app, JSON, and prototype files are all covered.
+
+- Credentials are the `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` environment variables in the Vercel project settings. To change the password, update the variable and redeploy.
+- If either variable is missing, the site returns `503` rather than going unprotected.
+- Local dev (`ng serve`) doesn't run middleware, so localhost stays open.
+
+---
+
 ## GitHub config
 
 Repo owner, repo name, and branch are set in `src/environments/environment.ts`:

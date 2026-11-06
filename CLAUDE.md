@@ -116,6 +116,12 @@ Set in `src/environments/environment.ts` and `environment.prod.ts`. The `origin`
 Build: `npx @angular/cli build` (from the `design-lab` directory, with `source ~/.zshrc` to load Node).
 Push triggers Vercel auto-deploy. Run push from the `design-lab` directory, not from `~`.
 
+## Access protection (Basic Auth middleware)
+- `middleware.ts` (repo root, outside `src/` so the Angular build ignores it) is Vercel Routing Middleware gating **every** path with HTTP Basic Auth — app shell, JSON, and `/prototypes/*` files, including the card/detail iframes (same origin, so the browser reuses the credentials).
+- Credentials: `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` env vars in Vercel. **Fails closed** — returns 503 if either is unset. Uses `next()` from `@vercel/functions` to pass authorised requests through.
+- `ng serve` does not run middleware; localhost is unprotected. Test logic by calling the default export with a `Request` directly.
+- Only gates the deployed site. Data still lives in the GitHub repo, so repo visibility governs access there.
+
 ## PRD
 Original PRD v0.2 is at `/Users/chukwukaezeoke/Downloads/Design_Lab_PRD_v0.2.docx`
 v0 and v1 are shipped. Remaining items tracked in the PRD.
@@ -127,5 +133,5 @@ v0 and v1 are shipped. Remaining items tracked in the PRD.
 - Multi-page ZIP upload is shipped, but **editing** a prototype with a new ZIP overwrites files by path and does NOT delete files from the prior version that are absent in the new ZIP (stale files linger). Needs a recursive folder-list + delete flow to fully clean up.
 - ~~Folders (collections)~~ DONE: Folders tab + `/folder/:id`, many-to-many/flat/folder-side membership in `collections.json` (see "Folders (collections)"). Deferred: nested folders; per-prototype "in N folders" chips; member-thumbnail mosaics on folder cards; archiving folders (delete only).
 - Figma component reference (F-13) — depends on Figma MCP availability
-- Auth model for stakeholder sharing (F-15) — TBD
+- Auth model for stakeholder sharing (F-15) — shared-password Basic Auth in place (see "Access protection"); per-user auth still TBD
 - New creator names added via the combobox are session-only; consider a flow to persist them to the CREATORS constant or to prototypes.json
