@@ -21,8 +21,10 @@ declare global {
 }
 
 export default function middleware(request: Request): Response {
-  const user = process.env.BASIC_AUTH_USER;
-  const password = process.env.BASIC_AUTH_PASSWORD;
+  // Trimmed: values pasted into the Vercel dashboard often carry a stray
+  // trailing space or newline, which would make the correct password fail.
+  const user = process.env.BASIC_AUTH_USER?.trim();
+  const password = process.env.BASIC_AUTH_PASSWORD?.trim();
 
   // Fail closed: if the env vars are missing, don't silently expose the site.
   if (!user || !password) {
@@ -35,7 +37,9 @@ export default function middleware(request: Request): Response {
   if (scheme === 'Basic' && encoded) {
     let decoded = '';
     try {
-      decoded = atob(encoded);
+      // Browsers send UTF-8 bytes; decode them so non-ASCII passwords match.
+      const bytes = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
+      decoded = new TextDecoder().decode(bytes);
     } catch {
       // Malformed base64 — fall through to the 401 below.
     }
