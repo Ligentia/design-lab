@@ -4,16 +4,25 @@
 // in the Vercel dashboard. Not run by `ng serve`, so local dev stays open.
 import { next } from '@vercel/functions';
 
-// Node.js runtime: env vars are read at request time. (The default edge runtime
-// only inlines `process.env.X` references at build, which silently missed them.)
 export const config = {
-  runtime: 'nodejs',
   matcher: '/:path*',
 };
 
+// Edge runtime only exposes env vars referenced as `process.env.NAME` (dot
+// access) — bracket access comes through undefined. Typed here so dot access
+// passes `noPropertyAccessFromIndexSignature`.
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      BASIC_AUTH_USER?: string;
+      BASIC_AUTH_PASSWORD?: string;
+    }
+  }
+}
+
 export default function middleware(request: Request): Response {
-  const user = process.env['BASIC_AUTH_USER'];
-  const password = process.env['BASIC_AUTH_PASSWORD'];
+  const user = process.env.BASIC_AUTH_USER;
+  const password = process.env.BASIC_AUTH_PASSWORD;
 
   // Fail closed: if the env vars are missing, don't silently expose the site.
   if (!user || !password) {
