@@ -118,7 +118,7 @@ Push triggers Vercel auto-deploy. Run push from the `design-lab` directory, not 
 
 ## Access protection (Basic Auth middleware)
 - `middleware.ts` (repo root, outside `src/` so the Angular build ignores it) is Vercel Routing Middleware gating **every** path with HTTP Basic Auth — app shell, JSON, and `/prototypes/*` files, including the card/detail iframes (same origin, so the browser reuses the credentials).
-- Credentials: `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` env vars in Vercel. **Fails closed** — returns 503 if either is unset. Uses `next()` from `@vercel/functions` to pass authorised requests through.
+- Credentials: `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` env vars in Vercel. **Fails closed** — returns 503 if either is unset. Uses `next()` from `@vercel/functions` to pass authorised requests through. Runs on the **Node.js runtime** (`config.runtime`) — on the default edge runtime, env vars read with bracket access were not inlined and came through undefined (site 503d).
 - `ng serve` does not run middleware; localhost is unprotected. Test logic by calling the default export with a `Request` directly.
 - Only gates the deployed site. Data still lives in the GitHub repo, so repo visibility governs access there.
 

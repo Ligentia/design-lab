@@ -4,7 +4,10 @@
 // in the Vercel dashboard. Not run by `ng serve`, so local dev stays open.
 import { next } from '@vercel/functions';
 
+// Node.js runtime: env vars are read at request time. (The default edge runtime
+// only inlines `process.env.X` references at build, which silently missed them.)
 export const config = {
+  runtime: 'nodejs',
   matcher: '/:path*',
 };
 
