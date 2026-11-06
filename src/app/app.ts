@@ -41,6 +41,9 @@ import { UiStateService } from './core/services/ui-state.service';
           </svg>
           {{ isAssetsRoute() ? 'Add asset' : isFoldersRoute() ? 'Add folder' : 'Add prototype' }}
         </button>
+
+        <!-- Plain href (not routerLink): /logout is handled by middleware.ts on Vercel. -->
+        <a class="logout" href="/logout">Log out</a>
       </div>
     </header>
 
@@ -60,6 +63,8 @@ import { UiStateService } from './core/services/ui-state.service';
     .tab.active { color: var(--color-text-primary); background: var(--color-surface-hover); }
     .add-btn { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-medium); font-family: var(--font-sans); color: #fff; background: var(--color-accent); border: none; border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; transition: background var(--transition-fast); white-space: nowrap; margin-left: auto; }
     .add-btn:hover { background: var(--color-accent-hover); }
+    .logout { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-secondary); text-decoration: none; padding: 6px 10px; border-radius: var(--radius-sm); white-space: nowrap; transition: color var(--transition-fast), background var(--transition-fast); }
+    .logout:hover { color: var(--color-text-primary); background: var(--color-surface-hover); }
     .main { flex: 1; max-width: 1280px; margin: 0 auto; width: 100%; padding: var(--space-8) var(--space-6); box-sizing: border-box; }
     @media (max-width: 640px) { .header-inner { padding: 0 var(--space-4); } .main { padding: var(--space-6) var(--space-4); } .brand-name { display: none; } }
   `]

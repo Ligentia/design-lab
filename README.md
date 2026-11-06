@@ -141,11 +141,14 @@ Output goes to `dist/design-lab`. Vercel runs this automatically on push.
 
 ## Access protection
 
-The deployed site is behind a shared username/password (HTTP Basic Auth), enforced by `middleware.ts` at the repo root — Vercel Routing Middleware that runs before every request, so the app, JSON, and prototype files are all covered.
+The deployed site is behind a shared username/password login, enforced by `middleware.ts` at the repo root — Vercel Routing Middleware that runs before every request, so the app, JSON, and prototype files are all covered.
 
-- Credentials are the `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` environment variables in the Vercel project settings. To change the password, update the variable and redeploy.
+- Visitors without a session are sent to a **sign-in page** (`/login`). A successful sign-in sets a session cookie and returns them to the page they asked for.
+- **Sessions expire after 8 hours**, however active the user is — then they sign in again. Set the optional `SESSION_HOURS` env var in Vercel to change this.
+- **Log out** link in the header (`/logout`) ends the session immediately.
+- Credentials are the `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` environment variables in the Vercel project settings. To change the password, update the variable and redeploy — **this logs everyone out**, since sessions are signed with the credentials.
 - If either variable is missing, the site returns `503` rather than going unprotected.
-- Local dev (`ng serve`) doesn't run middleware, so localhost stays open.
+- Local dev (`ng serve`) doesn't run middleware, so localhost stays open (and the Log out link goes nowhere).
 
 ---
 
