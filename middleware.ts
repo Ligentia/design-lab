@@ -12,7 +12,9 @@
 // noindex header). The JSON is bundled at deploy time — every Design Lab save
 // commits to main and redeploys, so toggles go live in about a minute.
 import { next } from '@vercel/functions';
-import prototypes from './prototypes.json' with { type: 'json' };
+// Plain JSON import (no `with { type: 'json' }`) — Vercel's middleware bundler
+// rejects import attributes ("Expected ';' but found 'with'").
+import prototypes from './prototypes.json';
 
 export const config = {
   matcher: '/:path*',
