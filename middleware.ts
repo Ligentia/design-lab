@@ -6,7 +6,13 @@
 // Sessions expire after SESSION_HOURS (default 8) regardless of activity. The
 // cookie is HMAC-signed with a key derived from the credentials, so changing
 // the password in Vercel (and redeploying) logs everyone out.
+//
+// Public prototypes: files inside the folder of a prototype marked
+// `"public": true` in prototypes.json are served without a session (with a
+// noindex header). The JSON is bundled at deploy time — every Design Lab save
+// commits to main and redeploys, so toggles go live in about a minute.
 import { next } from '@vercel/functions';
+import prototypes from './prototypes.json' with { type: 'json' };
 
 export const config = {
   matcher: '/:path*',
@@ -27,6 +33,7 @@ declare global {
 
 const COOKIE = 'dl_session';
 const DEFAULT_SESSION_HOURS = 8;
+const PUBLIC_FOLDERS = publicFolders(prototypes);
 
 export default async function middleware(request: Request): Promise<Response> {
   // Trimmed: values pasted into the Vercel dashboard often carry a stray
@@ -71,6 +78,10 @@ export default async function middleware(request: Request): Promise<Response> {
     return loginPage(returnTo, false);
   }
 
+  if (isPublicPath(url.pathname, PUBLIC_FOLDERS)) {
+    return next({ headers: { 'X-Robots-Tag': 'noindex, nofollow' } });
+  }
+
   if (await hasValidSession(request, user, password)) {
     return next();
   }
@@ -82,6 +93,42 @@ export default async function middleware(request: Request): Promise<Response> {
     return redirect(`/login?next=${encodeURIComponent(url.pathname + url.search)}`);
   }
   return new Response('Authentication required.', { status: 401 });
+}
+
+// ── Public prototypes ────────────────────────────────────────────────────────
+
+// Folders of prototypes marked public and not archived. Anything that isn't a
+// plain "prototypes/<slug>[/<slug>…]" path is ignored, so a bad entry in the
+// JSON can never open up "/" or another part of the site.
+export function publicFolders(list: unknown): Set<string> {
+  const folders = new Set<string>();
+  if (!Array.isArray(list)) return folders;
+  for (const p of list) {
+    if (!p || p.public !== true || p.archived === true || typeof p.folder !== 'string') continue;
+    const folder = p.folder.trim().replace(/^\/+|\/+$/g, '');
+    const segments = folder.split('/');
+    const valid =
+      segments.length >= 2 &&
+      segments[0] === 'prototypes' &&
+      segments.every((s: string) => /^[A-Za-z0-9._-]+$/.test(s) && s !== '.' && s !== '..');
+    if (valid) folders.add(folder);
+  }
+  return folders;
+}
+
+// Only real files (last segment has an extension) inside a public folder.
+// Extensionless paths are rewritten to the Angular shell by vercel.json, which
+// must stay behind sign-in.
+export function isPublicPath(pathname: string, folders: Set<string>): boolean {
+  // Refuse anything that could climb out of the folder if decoded later
+  // (e.g. "/prototypes/pub/..%2Fprivate/index.html").
+  if (/%2f|%5c|\\|\.\./i.test(pathname)) return false;
+  const last = pathname.slice(pathname.lastIndexOf('/') + 1);
+  if (!last.includes('.')) return false;
+  for (const folder of folders) {
+    if (pathname.startsWith(`/${folder}/`)) return true;
+  }
+  return false;
 }
 
 // ── Session token: "<expiresMs>.<base64url HMAC-SHA256>" ─────────────────────

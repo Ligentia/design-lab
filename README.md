@@ -150,6 +150,20 @@ The deployed site is behind a shared username/password login, enforced by `middl
 - If either variable is missing, the site returns `503` rather than going unprotected.
 - Local dev (`ng serve`) doesn't run middleware, so localhost stays open (and the Log out link goes nowhere).
 
+### Public prototype links
+
+Individual prototypes can be opened **without signing in**, for sharing with stakeholders:
+
+1. In the Add / Edit prototype form, turn on **Public link** (off by default) and save.
+2. The save commits to GitHub, which redeploys the site — the prototype is public about a minute later.
+3. On the prototype's detail page, click **Copy public link** and send it.
+
+- Public visitors see only that prototype (its folder: pages, images, styles). The dashboard, other prototypes, and all titles/descriptions stay behind sign-in.
+- Public prototypes show a **Public** badge on their card and a status line on the detail page.
+- Turning the switch off, or archiving the prototype, makes it private again after the redeploy.
+- Public prototypes are sent with `X-Robots-Tag: noindex` so search engines don't list them — but anyone with the link can open it.
+- Files from the shared `/assets` folder stay private, so a public prototype should include its own files.
+
 ---
 
 ## GitHub config

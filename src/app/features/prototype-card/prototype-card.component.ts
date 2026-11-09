@@ -46,6 +46,7 @@ import { PrototypeService } from '../../core/services/prototype.service';
           <span class="date updated" *ngIf="prototype.updatedAt && prototype.updatedAt !== prototype.date">
             Updated {{ prototype.updatedAt | date:'MMM d, y' }}
           </span>
+          <span class="public-badge" *ngIf="prototype.public && !prototype.archived" title="Anyone with the link can view">Public</span>
         </div>
         <h3 class="title">{{ prototype.title }}</h3>
         <p *ngIf="prototype.description" class="description">{{ prototype.description }}</p>
@@ -169,6 +170,14 @@ import { PrototypeService } from '../../core/services/prototype.service';
     .meta .creator { font-weight: var(--weight-medium); color: var(--color-text-secondary); }
     .meta .date::before { content: '·'; margin-right: var(--space-2); }
     .meta .updated { color: var(--color-accent); }
+    .public-badge {
+      margin-left: auto;
+      font-weight: var(--weight-medium);
+      color: var(--color-tag-text);
+      background: var(--color-tag-bg);
+      border-radius: var(--radius-full);
+      padding: 1px 8px;
+    }
     .title {
       font-size: var(--text-base);
       font-weight: var(--weight-semibold);

@@ -187,6 +187,16 @@ const PAT_KEY = 'dl_github_pat';
             </div>
           </div>
 
+          <!-- Public link toggle — off by default; middleware.ts reads this at deploy -->
+          <label class="public-toggle">
+            <input type="checkbox" [(ngModel)]="form.public" />
+            <span class="switch" aria-hidden="true"></span>
+            <span class="public-text">
+              <span class="label">Public link</span>
+              <span class="hint">Anyone with the link can view this prototype without signing in. Takes about a minute to go live after saving.</span>
+            </span>
+          </label>
+
           <p *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</p>
         </div>
 
@@ -227,6 +237,14 @@ const PAT_KEY = 'dl_github_pat';
     .hint { font-size: var(--text-xs); color: var(--color-text-tertiary); margin: 0; }
     .input { font-size: var(--text-sm); font-family: var(--font-sans); color: var(--color-text-primary); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 8px 12px; outline: none; background: var(--color-surface); transition: border-color var(--transition-fast); width: 100%; box-sizing: border-box; }
     .input:focus { border-color: var(--color-accent); }
+    .public-toggle { display: flex; align-items: flex-start; gap: var(--space-3); cursor: pointer; }
+    .public-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .public-toggle .switch { flex-shrink: 0; width: 32px; height: 18px; margin-top: 1px; border-radius: var(--radius-full); background: var(--color-border-strong); position: relative; transition: background var(--transition-fast); }
+    .public-toggle .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform var(--transition-fast); }
+    .public-toggle input:checked + .switch { background: var(--color-accent); }
+    .public-toggle input:checked + .switch::after { transform: translateX(14px); }
+    .public-toggle input:focus-visible + .switch { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .public-text { display: flex; flex-direction: column; gap: 2px; }
     .textarea { resize: vertical; min-height: 64px; }
     .select { cursor: pointer; }
 
@@ -587,6 +605,8 @@ export class AddPrototypeModalComponent implements OnInit {
       date: this.editing?.date ?? new Date().toISOString().slice(0, 10),
       tags: this.form.tags,
       folder: this.form.folder!.trim(),
+      // Only written when on, so private prototypes keep a tidy JSON entry.
+      ...(this.form.public ? { public: true } : {}),
     };
 
     this.saved.emit({ prototype, pat: this.pat, files: this.uploadedFiles.length ? this.uploadedFiles : undefined });

@@ -9,6 +9,8 @@ export interface Prototype {
   folder: string;
   thumbnail?: string;
   archived?: boolean;
+  // Viewable without signing in (enforced by middleware.ts). Absent = private.
+  public?: boolean;
 }
 
 export const CREATORS = ['Craig', 'Chuka', 'Adrian'] as const;

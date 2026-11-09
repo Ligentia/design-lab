@@ -99,6 +99,17 @@ import { environment } from '../../../environments/environment';
               </svg>
               {{ copied() ? 'Link copied!' : 'Copy shareable link' }}
             </button>
+            <div class="access" [class.is-public]="isPublic(p)">
+              <span class="access-dot" aria-hidden="true"></span>
+              <span>{{ isPublic(p) ? 'Public — anyone with the link can view' : 'Private — sign-in required' }}</span>
+            </div>
+            <button class="btn-public" *ngIf="isPublic(p)" (click)="copyPublicLink(p)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+              </svg>
+              {{ publicCopied() ? 'Public link copied!' : 'Copy public link' }}
+            </button>
             <button class="btn-secondary" *ngIf="!iframeError" (click)="download(p)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
@@ -156,6 +167,17 @@ import { environment } from '../../../environments/environment';
       transition: background var(--transition-fast);
     }
     .btn-primary:hover { background: var(--color-accent-hover); }
+    .access { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: calc(var(--space-2) * -1); }
+    .access-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-text-tertiary); flex-shrink: 0; }
+    .access.is-public .access-dot { background: var(--color-accent); }
+    .btn-public {
+      display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+      font-size: var(--text-sm); font-weight: var(--weight-medium); font-family: var(--font-sans);
+      color: var(--color-accent); background: var(--color-accent-subtle); border: 1px solid transparent; border-radius: var(--radius-sm);
+      padding: 10px 20px; cursor: pointer; width: 100%;
+      transition: border-color var(--transition-fast);
+    }
+    .btn-public:hover { border-color: var(--color-accent); }
     .state-msg { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--space-10) 0; }
     .state-msg.error { color: var(--color-danger); }
     .link { color: var(--color-accent); margin-left: var(--space-2); }
@@ -172,6 +194,7 @@ export class PrototypeDetailComponent implements OnInit {
 
   proto = signal<Prototype | null>(null);
   copied = signal(false);
+  publicCopied = signal(false);
   iframeError = false;
   private _urlCache = new Map<string, SafeResourceUrl>();
 
@@ -229,6 +252,18 @@ export class PrototypeDetailComponent implements OnInit {
   }
 
   download(p: Prototype) { this.svc.downloadAsZip(p); }
+
+  // Mirrors middleware.ts: archived prototypes are never served publicly.
+  isPublic(p: Prototype): boolean {
+    return !!p.public && !p.archived;
+  }
+
+  copyPublicLink(p: Prototype) {
+    navigator.clipboard.writeText(this.prototypeUrl(p)).then(() => {
+      this.publicCopied.set(true);
+      setTimeout(() => this.publicCopied.set(false), 2000);
+    });
+  }
 
   copyShareLink() {
     const id = this.route.snapshot.paramMap.get('id');
