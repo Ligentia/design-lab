@@ -159,7 +159,7 @@ Individual prototypes can be opened **without signing in**, for sharing with sta
 3. On the prototype's detail page, click **Copy public link** and send it.
 
 - Public visitors see only that prototype (its folder: pages, images, styles). The dashboard, other prototypes, and all titles/descriptions stay behind sign-in.
-- Public prototypes show a **Public** badge on their card and a status line on the detail page.
+- Every card shows an access badge — **Public** (blue) or **Private** (grey) — and the detail page shows a matching status line.
 - Turning the switch off, or archiving the prototype, makes it private again after the redeploy.
 - Public prototypes are sent with `X-Robots-Tag: noindex` so search engines don't list them — but anyone with the link can open it.
 - Files from the shared `/assets` folder stay private, so a public prototype should include its own files.
