@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal, ChangeDetectorRef, ChangeDetectionSt
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { PrototypeService } from '../../core/services/prototype.service';
+import { PrototypeService, isPublicPrototype } from '../../core/services/prototype.service';
 import { Prototype } from '../../core/models/prototype.model';
 import { environment } from '../../../environments/environment';
 
@@ -253,13 +253,12 @@ export class PrototypeDetailComponent implements OnInit {
 
   download(p: Prototype) { this.svc.downloadAsZip(p); }
 
-  // Mirrors middleware.ts: archived prototypes are never served publicly.
   isPublic(p: Prototype): boolean {
-    return !!p.public && !p.archived;
+    return isPublicPrototype(p);
   }
 
   copyPublicLink(p: Prototype) {
-    navigator.clipboard.writeText(this.prototypeUrl(p)).then(() => {
+    navigator.clipboard.writeText(`${environment.publicSiteUrl}/${p.folder}/index.html`).then(() => {
       this.publicCopied.set(true);
       setTimeout(() => this.publicCopied.set(false), 2000);
     });

@@ -150,13 +150,19 @@ The deployed site is behind a shared username/password login, enforced by `middl
 - If either variable is missing, the site returns `503` rather than going unprotected.
 - Local dev (`ng serve`) doesn't run middleware, so localhost stays open (and the Log out link goes nowhere).
 
+### Public gallery — https://design-lab-4public.vercel.app
+
+A second address on the same Vercel project, with **no sign-in**. It shows a gallery of every public prototype (live preview, title, description, creator, date, tags); selecting one opens it full screen. Nothing else is served on that address — the app, data, sign-in page and private prototypes all return "Page not found", even for signed-in users. The dashboard's **View public page ↗** link opens it.
+
 ### Public prototype links
 
 Individual prototypes can be opened **without signing in**, for sharing with stakeholders:
 
 1. In the Add / Edit prototype form, turn on **Public link** (off by default) and save.
 2. The save commits to GitHub, which redeploys the site — the prototype is public about a minute later.
-3. On the prototype's detail page, click **Copy public link** and send it.
+3. On the prototype's detail page, click **Copy public link** and send it — the link uses the public address. (Links shared earlier on `design-lab-hazel` keep working.)
+
+The dashboard's **Access** filter (All / Public / Private, pick one) narrows the grid alongside Creators, Tags and search.
 
 - Public visitors see only that prototype (its folder: pages, images, styles). The dashboard, other prototypes, and all titles/descriptions stay behind sign-in.
 - Every card shows an access badge — **Public** (blue) or **Private** (grey) — and the detail page shows a matching status line.

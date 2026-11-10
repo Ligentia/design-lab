@@ -11,6 +11,10 @@
 // `"public": true` in prototypes.json are served without a session (with a
 // noindex header). The JSON is bundled at deploy time — every Design Lab save
 // commits to main and redeploys, so toggles go live in about a minute.
+//
+// Public address (PUBLIC_HOST): a separate Vercel domain on the same project
+// that never shows the app or sign-in. It serves only the public gallery at
+// "/" and public prototype files; everything else is a 404.
 import { next } from '@vercel/functions';
 // Plain JSON import (no `with { type: 'json' }`) — Vercel's middleware bundler
 // rejects import attributes ("Expected ';' but found 'with'").
@@ -36,6 +40,10 @@ declare global {
 const COOKIE = 'dl_session';
 const DEFAULT_SESSION_HOURS = 8;
 const PUBLIC_FOLDERS = publicFolders(prototypes);
+const PUBLIC_PROTOTYPES = galleryEntries(prototypes, PUBLIC_FOLDERS);
+// Must match `publicSiteUrl` in src/environments/environment*.ts.
+const PUBLIC_HOST = 'design-lab-4public.vercel.app';
+const NOINDEX = { 'X-Robots-Tag': 'noindex, nofollow' };
 
 export default async function middleware(request: Request): Promise<Response> {
   // Trimmed: values pasted into the Vercel dashboard often carry a stray
@@ -49,6 +57,13 @@ export default async function middleware(request: Request): Promise<Response> {
   }
 
   const url = new URL(request.url);
+
+  if (url.hostname === PUBLIC_HOST) {
+    if (url.pathname === '/' || url.pathname === '/index.html') return galleryPage(PUBLIC_PROTOTYPES);
+    if (isPublicPath(url.pathname, PUBLIC_FOLDERS)) return next({ headers: NOINDEX });
+    return notFoundPage();
+  }
+
   const sessionHours = Number(process.env.SESSION_HOURS) || DEFAULT_SESSION_HOURS;
 
   if (url.pathname === '/logout') {
@@ -80,8 +95,10 @@ export default async function middleware(request: Request): Promise<Response> {
     return loginPage(returnTo, false);
   }
 
+  // Kept on the private address too, so links shared before the public
+  // address existed keep working.
   if (isPublicPath(url.pathname, PUBLIC_FOLDERS)) {
-    return next({ headers: { 'X-Robots-Tag': 'noindex, nofollow' } });
+    return next({ headers: NOINDEX });
   }
 
   if (await hasValidSession(request, user, password)) {
@@ -131,6 +148,150 @@ export function isPublicPath(pathname: string, folders: Set<string>): boolean {
     if (pathname.startsWith(`/${folder}/`)) return true;
   }
   return false;
+}
+
+// ── Public gallery ───────────────────────────────────────────────────────────
+
+interface GalleryEntry {
+  title: string;
+  description: string;
+  creator: string;
+  date: string;
+  tags: string[];
+  folder: string;
+}
+
+// Display data for public prototypes only, newest first. Only folders that
+// passed publicFolders() are included, and every field is type-checked.
+export function galleryEntries(list: unknown, folders: Set<string>): GalleryEntry[] {
+  if (!Array.isArray(list)) return [];
+  const text = (v: unknown) => (typeof v === 'string' ? v : '');
+  const entries: GalleryEntry[] = [];
+  for (const p of list) {
+    if (!p || p.public !== true || p.archived === true || typeof p.folder !== 'string') continue;
+    const folder = p.folder.trim().replace(/^\/+|\/+$/g, '');
+    if (!folders.has(folder)) continue;
+    entries.push({
+      title: text(p.title) || 'Untitled prototype',
+      description: text(p.description),
+      creator: text(p.creator),
+      date: text(p.date),
+      tags: Array.isArray(p.tags) ? p.tags.filter((t: unknown): t is string => typeof t === 'string') : [],
+      folder,
+    });
+  }
+  return entries.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function formatDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return '';
+  return `${MONTHS[Number(m[2]) - 1] ?? ''} ${Number(m[3])}, ${m[1]}`;
+}
+
+function galleryPage(entries: GalleryEntry[]): Response {
+  const cards = entries
+    .map((p) => {
+      const href = escapeHtml(`/${p.folder}/index.html`);
+      const meta = [p.creator, formatDate(p.date)].filter(Boolean).map(escapeHtml).join(' · ');
+      const tags = p.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+      return `
+      <a class="card" href="${href}" target="_blank" rel="noopener">
+        <div class="thumb"><iframe src="${href}" sandbox="allow-scripts" loading="lazy" tabindex="-1" scrolling="no" title=""></iframe></div>
+        <div class="body">
+          ${meta ? `<div class="meta">${meta}</div>` : ''}
+          <h2>${escapeHtml(p.title)}</h2>
+          ${p.description ? `<p class="desc">${escapeHtml(p.description)}</p>` : ''}
+          ${tags ? `<div class="tags">${tags}</div>` : ''}
+        </div>
+      </a>`;
+    })
+    .join('');
+
+  const body = entries.length
+    ? `<div class="grid">${cards}</div>`
+    : `<p class="empty">No prototypes are shared right now.</p>`;
+
+  return htmlResponse(
+    'Shared prototypes · Design Lab',
+    `
+  <header class="top"><div class="inner">${BRAND_SVG}<span>Design Lab</span><span class="sep">·</span><span class="muted">Shared prototypes</span></div></header>
+  <main class="inner">
+    <h1>Shared prototypes</h1>
+    <p class="lead">Prototypes from the Ligentix design team. Select one to open it full screen.</p>
+    ${body}
+  </main>
+  <script>
+    // Scale each 1280px-wide live preview to its card (same approach as the app's cards).
+    const fit = (thumb) => { const f = thumb.querySelector('iframe'); f.style.transform = 'scale(' + thumb.clientWidth / 1280 + ')'; };
+    const ro = new ResizeObserver((items) => items.forEach((i) => fit(i.target)));
+    document.querySelectorAll('.thumb').forEach((t) => { fit(t); ro.observe(t); });
+  </script>`,
+    200,
+  );
+}
+
+function notFoundPage(): Response {
+  return htmlResponse(
+    'Page not found · Design Lab',
+    `
+  <main class="inner center">
+    <h1>Page not found</h1>
+    <p class="lead">This page doesn't exist or isn't shared publicly.</p>
+    <a class="btn" href="/">View shared prototypes</a>
+  </main>`,
+    404,
+  );
+}
+
+const BRAND_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
+
+// Shared shell for the public pages; styles mirror src/styles/tokens.css.
+function htmlResponse(title: string, content: string, status: number): Response {
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>${escapeHtml(title)}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #111113; background: #f7f7f8; -webkit-font-smoothing: antialiased; }
+    .inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .top { background: #fff; border-bottom: 1px solid #e4e4e7; }
+    .top .inner { height: 56px; display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; }
+    .top .sep, .top .muted { color: #9b9ba4; font-weight: 500; }
+    main.inner { padding-top: 32px; padding-bottom: 48px; }
+    h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
+    .lead { font-size: 0.9375rem; color: #6b6b74; margin: 0 0 28px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e4e4e7; border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+      box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 12px rgba(0,0,0,.06); transition: box-shadow 200ms ease, transform 200ms ease; }
+    .card:hover { box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.10); transform: translateY(-1px); }
+    .thumb { aspect-ratio: 16 / 10; overflow: hidden; background: #f7f7f8; border-bottom: 1px solid #e4e4e7; position: relative; }
+    .thumb iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; pointer-events: none; }
+    .body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .meta { font-size: 0.75rem; color: #6b6b74; font-weight: 500; }
+    h2 { font-size: 0.9375rem; font-weight: 600; margin: 0; line-height: 1.3; }
+    .desc { font-size: 0.8125rem; color: #6b6b74; margin: 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; padding-top: 6px; }
+    .tag { font-size: 0.75rem; font-weight: 500; color: #0044cc; background: #eff4ff; border-radius: 999px; padding: 2px 8px; }
+    .empty { font-size: 0.9375rem; color: #6b6b74; padding: 48px 0; }
+    .center { text-align: center; padding-top: 96px !important; }
+    .btn { display: inline-block; font-size: 0.8125rem; font-weight: 500; color: #fff; background: #0066ff; border-radius: 6px; padding: 10px 16px; text-decoration: none; }
+    .btn:hover { background: #0052cc; }
+  </style>
+</head>
+<body>${content}
+</body>
+</html>`;
+  return new Response(html, {
+    status,
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', ...NOINDEX },
+  });
 }
 
 // ── Session token: "<expiresMs>.<base64url HMAC-SHA256>" ─────────────────────

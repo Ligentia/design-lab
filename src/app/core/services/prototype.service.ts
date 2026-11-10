@@ -3,6 +3,15 @@ import { firstValueFrom } from 'rxjs';
 import { GithubService } from './github.service';
 import { Prototype } from '../models/prototype.model';
 
+// Dashboard Access filter values (also the chip labels). Pick-one, unlike tags.
+export const ACCESS_OPTIONS = ['Public', 'Private'] as const;
+export type AccessOption = typeof ACCESS_OPTIONS[number];
+
+// Mirrors middleware.ts: archived prototypes are never served publicly.
+export function isPublicPrototype(p: Prototype): boolean {
+  return !!p.public && !p.archived;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PrototypeService {
   private github = inject(GithubService);
@@ -14,12 +23,15 @@ export class PrototypeService {
   private _search = signal('');
   private _activeTags = signal<Set<string>>(new Set());
   private _activeCreators = signal<Set<string>>(new Set());
+  private _activeAccess = signal<AccessOption | null>(null);
 
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly search = this._search.asReadonly();
   readonly activeTags = this._activeTags.asReadonly();
   readonly activeCreators = this._activeCreators.asReadonly();
+  // As a Set so it plugs into TagFilterComponent's activeTags input.
+  readonly activeAccess = computed(() => new Set<string>(this._activeAccess() ? [this._activeAccess()!] : []));
   readonly sha = this._sha.asReadonly();
   readonly all = this._prototypes.asReadonly();
 
@@ -43,6 +55,7 @@ export class PrototypeService {
     const q = this._search().toLowerCase().trim();
     const active = this._activeTags();
     const activeCreators = this._activeCreators();
+    const access = this._activeAccess();
     return this._prototypes()
       .filter((p) => {
         if (p.archived) return false;
@@ -52,7 +65,9 @@ export class PrototypeService {
           active.size === 0 || p.tags.some((t) => active.has(t));
         const matchesCreators =
           activeCreators.size === 0 || activeCreators.has(p.creator);
-        return matchesSearch && matchesTags && matchesCreators;
+        const matchesAccess =
+          !access || (access === 'Public') === isPublicPrototype(p);
+        return matchesSearch && matchesTags && matchesCreators && matchesAccess;
       })
       .sort((a, b) => b.date.localeCompare(a.date));
   });
@@ -92,6 +107,16 @@ export class PrototypeService {
     this._activeTags.set(current);
   }
 
+  // Pick-one: selecting an option replaces the other; re-clicking it goes back to All.
+  toggleAccess(option: string) {
+    const next = option as AccessOption;
+    this._activeAccess.set(this._activeAccess() === next ? null : next);
+  }
+
+  clearAccess() {
+    this._activeAccess.set(null);
+  }
+
   toggleCreator(creator: string) {
     const current = new Set(this._activeCreators());
     current.has(creator) ? current.delete(creator) : current.add(creator);
@@ -110,6 +135,7 @@ export class PrototypeService {
     this._search.set('');
     this._activeTags.set(new Set());
     this._activeCreators.set(new Set());
+    this._activeAccess.set(null);
   }
 
   async uploadFiles(

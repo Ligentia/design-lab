@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Prototype } from '../../core/models/prototype.model';
-import { PrototypeService } from '../../core/services/prototype.service';
+import { PrototypeService, isPublicPrototype } from '../../core/services/prototype.service';
 
 @Component({
   selector: 'dl-prototype-card',
@@ -47,7 +47,7 @@ import { PrototypeService } from '../../core/services/prototype.service';
             Updated {{ prototype.updatedAt | date:'MMM d, y' }}
           </span>
           <!-- Mirrors middleware.ts: archived prototypes are never public -->
-          <span *ngIf="prototype.public && !prototype.archived; else privateBadge" class="access-badge public" title="Anyone with the link can view">Public</span>
+          <span *ngIf="isPublic; else privateBadge" class="access-badge public" title="Anyone with the link can view">Public</span>
           <ng-template #privateBadge><span class="access-badge" title="Sign-in required">Private</span></ng-template>
         </div>
         <h3 class="title">{{ prototype.title }}</h3>
@@ -264,6 +264,10 @@ import { PrototypeService } from '../../core/services/prototype.service';
 export class PrototypeCardComponent implements AfterViewInit, OnDestroy {
   @Input({ required: true }) prototype!: Prototype;
   @Input() isArchived = false;
+
+  get isPublic(): boolean {
+    return isPublicPrototype(this.prototype);
+  }
   @Output() edit = new EventEmitter<Prototype>();
   @Output() archive = new EventEmitter<Prototype>();
   @Output() restore = new EventEmitter<Prototype>();

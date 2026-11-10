@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrototypeService } from '../../core/services/prototype.service';
+import { PrototypeService, ACCESS_OPTIONS } from '../../core/services/prototype.service';
+import { environment } from '../../../environments/environment';
 import { UiStateService } from '../../core/services/ui-state.service';
 import { PrototypeCardComponent } from '../prototype-card/prototype-card.component';
 import { TagFilterComponent } from '../tag-filter/tag-filter.component';
@@ -24,7 +25,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     <div class="dashboard">
       <!-- Toolbar -->
       <div class="toolbar">
-        <dl-search-bar (searched)="svc.setSearch($event)" />
+        <div class="search-row">
+          <dl-search-bar (searched)="svc.setSearch($event)" />
+          <a class="public-page-link" [href]="publicSiteUrl" target="_blank" rel="noopener">View public page ↗</a>
+        </div>
+        <dl-tag-filter
+          label="Access"
+          [tags]="accessOptions"
+          [activeTags]="svc.activeAccess()"
+          (toggle)="svc.toggleAccess($event)"
+          [showAll]="true"
+          (selectAll)="svc.clearAccess()"
+          [showClear]="false"
+        />
         <dl-tag-filter
           label="Creators"
           [tags]="svc.allCreators()"
@@ -44,7 +57,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
           [showClear]="false"
         />
         <button
-          *ngIf="svc.activeTags().size > 0 || svc.activeCreators().size > 0"
+          *ngIf="svc.activeTags().size > 0 || svc.activeCreators().size > 0 || svc.activeAccess().size > 0"
           class="clear-link"
           (click)="svc.clearFilters()"
         >
@@ -98,6 +111,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styles: [`
     .dashboard { display: flex; flex-direction: column; gap: var(--space-6); }
     .toolbar { display: flex; flex-direction: column; gap: var(--space-4); }
+    .search-row { display: flex; align-items: center; gap: var(--space-4); }
+    .search-row dl-search-bar { flex: 1; min-width: 0; }
+    .public-page-link { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+    .public-page-link:hover { text-decoration: underline; }
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -137,6 +154,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class DashboardComponent implements OnInit {
   svc = inject(PrototypeService);
+  readonly accessOptions = [...ACCESS_OPTIONS];
+  readonly publicSiteUrl = environment.publicSiteUrl;
   private ui = inject(UiStateService);
   private cdr = inject(ChangeDetectorRef);
   showModal = signal(false);
