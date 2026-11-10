@@ -162,6 +162,8 @@ Individual prototypes can be opened **without signing in**, for sharing with sta
 2. The save commits to GitHub, which redeploys the site — the prototype is public about a minute later.
 3. On the prototype's detail page, click **Copy public link** and send it — the link uses the public address. (Links shared earlier on `design-lab-hazel` keep working.)
 
+A yellow notice at the top of the dashboard reminds the team that public prototypes can be reached by search engines and web crawlers, so nothing confidential should be made public.
+
 The dashboard's **Access** filter (All / Public / Private, pick one) narrows the grid alongside Creators, Tags and search.
 
 - Public visitors see only that prototype (its folder: pages, images, styles). The dashboard, other prototypes, and all titles/descriptions stay behind sign-in.

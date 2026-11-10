@@ -23,6 +23,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="dashboard">
+      <!-- Crawler notice — this dashboard only exists on the private address -->
+      <aside class="callout" role="note">
+        <svg class="callout-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+        <div>
+          <p class="callout-title">Public prototypes can be reached by search engines and web crawlers</p>
+          <p class="callout-text">
+            Anyone with a public link can open the prototype, including automated crawlers. We ask search engines not to list
+            public prototypes, and major ones like Google and Bing respect that, but not every crawler does. Don't make a
+            prototype public if it contains anything confidential.
+          </p>
+        </div>
+      </aside>
+
       <!-- Toolbar -->
       <div class="toolbar">
         <div class="search-row">
@@ -111,6 +126,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styles: [`
     .dashboard { display: flex; flex-direction: column; gap: var(--space-6); }
     .toolbar { display: flex; flex-direction: column; gap: var(--space-4); }
+    .callout { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-4) var(--space-5); border-radius: var(--radius-md); background: #fff7e8; border: 1px solid #f3d9a4; color: #7a4b00; }
+    .callout-icon { flex-shrink: 0; margin-top: 1px; }
+    .callout-title { margin: 0 0 2px; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-primary); }
+    .callout-text { margin: 0; font-size: var(--text-sm); line-height: 1.5; color: var(--color-text-secondary); }
     .search-row { display: flex; align-items: center; gap: var(--space-4); }
     .search-row dl-search-bar { flex: 1; min-width: 0; }
     .public-page-link { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-accent); text-decoration: none; white-space: nowrap; }
