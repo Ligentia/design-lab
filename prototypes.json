@@ -4,6 +4,18 @@
     "title": "Views B (v2)",
     "description": "",
     "creator": "Adrian",
+    "date": "2026-11-12",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/views-b-v2",
+    "public": true
+  },
+  {
+    "id": "views-b-v2",
+    "title": "Views B (v2)",
+    "description": "",
+    "creator": "Adrian",
     "date": "2026-11-11",
     "tags": [
       "prototype"
