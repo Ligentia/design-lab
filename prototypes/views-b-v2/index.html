@@ -95,8 +95,15 @@
   /* the whole header is the handle */
   thead { user-select:none; -webkit-user-select:none; }
   .headrow th[data-grab], .bandrow th[data-bgrab] { cursor:grab; }
+  /* the column name is the handle: it highlights on hover, and pressing on it
+     and dragging moves the column. A click on its own does nothing — sorting
+     lives in the Sort icon and More options. */
+  .headrow th[data-grab] .lbl { cursor:grab; border-radius:4px; padding:2px 5px; margin:-2px -5px; }
+  .headrow th[data-grab] .lbl:hover { background:#e4e4e4; }
+  .headrow th[data-grab]:active .lbl { cursor:grabbing; }
   .headrow th[data-grab]:active, .bandrow th[data-bgrab]:active { cursor:grabbing; }
   .sortmark { font-size:12px; font-weight:700; color:var(--ink); flex:0 0 auto; }
+  .sortmark sup { font-size:9px; margin-left:1px; }
   /* the widget: three icons, shown on hover or focus, kept open while its menu is */
   .hw { position:absolute; right:11px; top:50%; transform:translateY(-50%); display:flex; gap:1px;
         padding:2px; background:#fff; border:1px solid var(--line); border-radius:6px;
@@ -427,10 +434,11 @@
 <script>
 /* ==========================================================
    VIEW B — v1
-   Built from View A v1. No grabber: press on a column header (or a
-   group band) and drag to move it. Each header has a small widget
-   that appears on hover, with four icon buttons — Sort, Collapse,
-   Resize to fit, and Other, which holds everything else. Hover an icon for its name.
+   Built from View A v1, to Craig's design. No grabber: press on a
+   column heading, title included, and drag to move it. Hovering a
+   heading shows a widget of three icons — Sort, More options (⋮) in
+   the middle, and Expand to fit. More options holds sorting (including
+   extra sort levels), pin, move left or right, collapse and hide.
    ========================================================== */
 
 /* ---------- catalogue ---------- */
@@ -696,8 +704,9 @@ const TOTAL_ROWS = DATA.length;
 function matchedTotal() { return TOTAL_ROWS; }
 
 /* ---------- sorting ----------
-   One column at a time. Clicking the title or the icon cycles it:
-   ascending, descending, then back to the original order. */
+   One or more sort levels, applied in order. The Sort icon cycles a column
+   through ascending, descending and off; More options can sort a column on its
+   own, add it as another sort level, or remove its sort. */
 const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
 function sortKey(id, v) {
   if (id === 'releaseDate') {
@@ -709,25 +718,58 @@ function sortKey(id, v) {
   if (id === 'runtime') { const m = /(\d+)h (\d+)m/.exec(v); return m ? +m[1] * 60 + +m[2] : 0; }
   return v;
 }
+function sortLevels() {
+  const st = S.sort;
+  return (Array.isArray(st) ? st : (st ? [st] : [])).filter(l => F[l.id]);
+}
 function viewRows() {
   const idx = DATA.map((_, i) => i);
-  const st = S.sort;
-  if (!st || !F[st.id]) return idx;
-  const dir = st.dir === 'desc' ? -1 : 1;
+  const levels = sortLevels();
+  if (!levels.length) return idx;
   return idx.sort((a, b) => {
-    const ka = sortKey(st.id, cellText(a, st.id)), kb = sortKey(st.id, cellText(b, st.id));
-    const c = (typeof ka === 'number' && typeof kb === 'number')
-      ? ka - kb : String(ka).localeCompare(String(kb), 'en-GB', { numeric:true, sensitivity:'base' });
-    return c ? c * dir : a - b;
+    for (const l of levels) {
+      const ka = sortKey(l.id, cellText(a, l.id)), kb = sortKey(l.id, cellText(b, l.id));
+      const c = (typeof ka === 'number' && typeof kb === 'number')
+        ? ka - kb : String(ka).localeCompare(String(kb), 'en-GB', { numeric:true, sensitivity:'base' });
+      if (c) return l.dir === 'desc' ? -c : c;
+    }
+    return a - b;
   });
 }
-function sortDirOf(id) { return S.sort && S.sort.id === id ? S.sort.dir : null; }
+function sortDirOf(id) { const l = sortLevels().find(x => x.id === id); return l ? l.dir : null; }
+function sortLevelOf(id) {
+  const levels = sortLevels();
+  return levels.length > 1 ? levels.findIndex(x => x.id === id) + 1 : 0;
+}
+const dirWord = d => d === 'asc' ? 'ascending' : 'descending';
+function sortedMsg() {
+  const levels = sortLevels();
+  return levels.length ? 'Sorted by ' + levels.map(l => lab(l.id) + ', ' + dirWord(l.dir)).join(', then ') : 'Sort removed';
+}
+/** the Sort icon: ascending, descending, off */
 function cycleSort(id) {
-  const d = sortDirOf(id);
-  S.sort = d === null ? { id, dir:'asc' } : (d === 'asc' ? { id, dir:'desc' } : null);
+  const levels = sortLevels(), d = sortDirOf(id);
+  if (d === null) S.sort = [{ id, dir:'asc' }];
+  else if (d === 'asc') S.sort = levels.map(l => l.id === id ? { id, dir:'desc' } : l);
+  else S.sort = levels.filter(l => l.id !== id);
   S.ui.page = 0;
-  commit(S.sort ? 'Sorted by ' + lab(id) + (S.sort.dir === 'asc' ? ', ascending' : ', descending')
-                : 'Sort removed from ' + lab(id));
+  commit(sortedMsg());
+}
+/** sort by this column on its own */
+function sortOnly(id, dir) { S.sort = [{ id, dir }]; S.ui.page = 0; commit(sortedMsg()); }
+/** keep the current sort and break ties with this column */
+function addSortLevel(id) {
+  const levels = sortLevels();
+  if (!levels.length || sortDirOf(id)) return;
+  S.sort = levels.concat([{ id, dir:'asc' }]); S.ui.page = 0; commit(sortedMsg());
+}
+function removeSort(id) { S.sort = sortLevels().filter(l => l.id !== id); S.ui.page = 0; commit(sortedMsg()); }
+/** can this column move one place left or right? */
+function canMove(id, dir) {
+  if (pinnedList().indexOf(id) !== -1) return false;
+  const vis = tableColumns().filter(c => !c.pinned).map(c => c.id);
+  const i = vis.indexOf(id);
+  return i !== -1 && i + dir >= 0 && i + dir < vis.length;
 }
 
 
@@ -1021,6 +1063,8 @@ const ICON = {
   fit: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
     '<path d="M5.6 2.5v9M8.4 2.5v9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>' +
     '<path d="M3.9 5.3 1.4 7l2.5 1.7zM10.1 5.3 12.6 7l-2.5 1.7z" fill="currentColor"/></svg>',
+  moreV: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="currentColor">' +
+    '<circle cx="7" cy="2.8" r="1.35"/><circle cx="7" cy="7" r="1.35"/><circle cx="7" cy="11.2" r="1.35"/></svg>',
   more: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="currentColor">' +
     '<circle cx="2.8" cy="7" r="1.35"/><circle cx="7" cy="7" r="1.35"/><circle cx="11.2" cy="7" r="1.35"/></svg>',
   eye: on => '<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true">' +
@@ -1302,69 +1346,60 @@ function renderColMenu() {
   const cm = S.colMenu;
   if (!cm || !F[cm.id]) return null;
   const id = cm.id, f = F[id];
-  const pins = pinnedList();
-  const isPin = pins.indexOf(id) !== -1;
+  const isPin = pinnedList().indexOf(id) !== -1;
+  const sorted = sortDirOf(id), anySort = sortLevels().length > 0;
 
   const m = el('<div class="colmenu" role="menu" style="left:' + cm.x + 'px;top:' + cm.y + 'px"></div>');
   m.onclick = e => e.stopPropagation();
   m.appendChild(el('<div class="hdr">' + esc(lab(f.id)) + '</div>'));
   const close = () => { S.colMenu = null; };
+  const sep = () => m.appendChild(el('<div class="sep"></div>'));
   const item = (icon, label, opts) => {
     const o = opts || {};
-    const b = el('<button class="mi ' + (o.on ? 'on' : '') + '" role="menuitem"' +
+    const b = el('<button class="mi" role="menuitem"' +
       (o.disabled ? ' disabled' : '') + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
       '<span class="ic">' + (icon || '') + '</span><span class="lb">' + esc(label) + '</span>' +
-      (o.note ? '<span class="mnote">' + esc(o.note) + '</span>' : '') +
-      (o.tick ? '<span class="tick">✓</span>' : '') +
-      (o.chev ? '<span class="chev">' + (o.on ? '⌄' : '›') + '</span>' : '') + '</button>');
+      (o.tick ? '<span class="tick">✓</span>' : '') + '</button>');
     if (!o.disabled && o.fn) b.onclick = () => o.fn();
     m.appendChild(b);
     return b;
   };
 
+  // sorting
+  item('', 'Sort ascending', { tick: sorted === 'asc', fn: () => { close(); sortOnly(id, 'asc'); } });
+  item('', 'Sort descending', { tick: sorted === 'desc', fn: () => { close(); sortOnly(id, 'desc'); } });
+  item('', 'Add as another sort level', { disabled: !anySort || !!sorted,
+    title: !anySort ? 'Sort by another column first' : (sorted ? lab(id) + ' is already sorted' : 'Keeps the current sort and breaks ties by ' + lab(id)),
+    fn: () => { close(); addSortLevel(id); } });
+  item('', 'Remove sort', { disabled: !sorted, title: sorted ? '' : lab(id) + ' is not sorted',
+    fn: () => { close(); removeSort(id); } });
+  sep();
+
+  // position
   if (isPin) {
     const cu = canUnpin(id);
-    item(ICON.pin(true), 'Unpin', { disabled: !cu.ok,
-      title: cu.ok ? 'Returns it to ' + (isGrouped() ? catName(f.cat) : 'the table') : cu.why,
+    item(ICON.pin(true), 'Unpin', { disabled: !cu.ok, title: cu.ok ? 'Returns it to the table' : cu.why,
       fn: () => { close(); togglePin(id); } });
-    if (cu.hiddenGroup) {
-      item('', 'Show ' + catName(f.cat) + ' and unpin', {
-        title: 'Brings the group back and returns ' + lab(f.id) + ' to it, as one change',
-        fn: () => { close(); showGroupAndUnpin(id); } });
-    }
   } else {
-    item(ICON.pin(false), 'Pin to the left', {
-      title:'Held at the left edge as the rest of the table scrolls' +
-        (isGrouped() ? ', outside ' + catName(f.cat) : ''),
+    item(ICON.pin(false), 'Pin to the left', { title:'Held at the left edge as the rest of the table scrolls',
       fn: () => { close(); togglePin(id); } });
   }
+  item('', 'Move left', { disabled: !canMove(id, -1), title: isPin ? 'Pinned columns stay at the left' : '',
+    fn: () => { close(); moveFlat(id, -1); } });
+  item('', 'Move right', { disabled: !canMove(id, 1), title: isPin ? 'Pinned columns stay at the left' : '',
+    fn: () => { close(); moveFlat(id, 1); } });
+  sep();
 
-  item(ICON.eye(false), 'Hide column', { disabled: f.required,
-    title: f.required ? f.label + ' is required and cannot be hidden'
-                      : 'Takes it off the table. “Hidden · bring back” unhides it.',
-    fn: () => { close(); setVisible(id, false); } });
-  if (isGrouped()) item(ICON.eye(false), 'Hide column group', { note: catName(f.cat), disabled: !catCanHide(f.cat) || isPin,
-    title: isPin ? 'This column is pinned, so it sits outside its group'
-                 : (catCanHide(f.cat) ? 'Hides every column in ' + catName(f.cat)
-                                      : catName(f.cat) + ' holds a required column, so it cannot be hidden'),
-    fn: () => { close(); toggleCategory(f.cat); } });
-
+  // shape
   const col = isCollapsed(id);
-  if (col) {
-    m.appendChild(el('<div class="sep"></div>'));
-    item('', 'Expand column', { title:'Opens ' + lab(id) + ' back out to its full width',
-      fn: () => { close(); setCollapsed(id, false); } });
-  }
-  if (isGrouped() && !isPin) {
-    m.appendChild(el('<div class="sep"></div>'));
-    const gAll = groupAllCollapsed(f.cat);
-    item('', (gAll ? 'Expand' : 'Collapse') + ' the ' + catName(f.cat) + ' group', {
-      fn: () => { close(); setGroupCollapsed(f.cat, !gAll); } });
-  }
-
-  m.appendChild(el('<div class="sep"></div>'));
+  item('', col ? 'Expand column' : 'Collapse column', {
+    title: col ? 'Opens ' + lab(id) + ' back out to its full width' : 'Narrows ' + lab(id) + ' to a strip with its title running down it',
+    fn: () => { close(); setCollapsed(id, !col); } });
+  item(ICON.eye(false), 'Hide column', { disabled: f.required,
+    title: f.required ? f.label + ' is required and cannot be hidden' : 'Takes it off the table. “Hidden · bring back” unhides it.',
+    fn: () => { close(); setVisible(id, false); } });
+  sep();
   item('', 'Autosize all columns', { fn: () => { close(); autosizeAll(); } });
-
   return m;
 }
 
@@ -1377,9 +1412,8 @@ function colWidget(id, sorted, open) {
   const sortLabel = sorted === null ? 'Sort ascending' : (sorted === 'asc' ? 'Sort descending' : 'Clear sort');
   return '<span class="hw' + (open ? ' open' : '') + '" role="group" aria-label="Options for ' + esc(lab(id)) + '">' +
     hwBtn('data-wsort', id, sortLabel, ICON.sort(sorted), !!sorted) +
-    hwBtn('data-wcollapse', id, 'Collapse column', ICON.collapse(false)) +
-    hwBtn('data-wfit', id, 'Resize to fit', ICON.fit) +
-    hwBtn('data-wother', id, 'Other options', ICON.more, open) +
+    hwBtn('data-wother', id, 'More options', ICON.moreV, open) +
+    hwBtn('data-wfit', id, 'Expand to fit', ICON.fit) +
     '</span>';
 }
 function groupWidget(cid, open) {
@@ -1539,7 +1573,7 @@ function renderTable() {
           '<button class="cexp" data-expand="' + c.id + '" aria-label="Expand ' + esc(lab(c.id)) +
             '" data-tip="Expand column">' + ICON.collapse(true) + '</button>' +
           '<button class="sdots' + (S.colMenu && S.colMenu.id === c.id ? ' open' : '') + '" data-wother="' + c.id +
-            '" aria-haspopup="menu" aria-label="Options for ' + esc(lab(c.id)) + '" data-tip="Other options">' + ICON.more + '</button>' +
+            '" aria-haspopup="menu" aria-label="More options for ' + esc(lab(c.id)) + '" data-tip="More options">' + ICON.moreV + '</button>' +
         '</span></th>';
       return;
     }
@@ -1550,8 +1584,9 @@ function renderTable() {
       (isPin ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (sorted ? 'sorted' : '') + '"' +
       (sorted ? ' aria-sort="' + (sorted === 'asc' ? 'ascending' : 'descending') + '"' : '') + '>' +
       '<span class="th-in">' +
-        '<span class="lbl">' + esc(lab(c.id)) + '</span>' +
-        (sorted ? '<span class="sortmark" aria-hidden="true">' + (sorted === 'asc' ? '↑' : '↓') + '</span>' : '') +
+        '<span class="lbl" title="Drag to move ' + esc(lab(c.id)) + '">' + esc(lab(c.id)) + '</span>' +
+        (sorted ? '<span class="sortmark" aria-hidden="true">' + (sorted === 'asc' ? '↑' : '↓') +
+          (sortLevelOf(c.id) ? '<sup>' + sortLevelOf(c.id) + '</sup>' : '') + '</span>' : '') +
         (isPin ? '<span class="acts">' : '') +
           (isPin
             ? '<button class="iconbtn on" data-unpin="' + c.id + '"' +
@@ -1642,11 +1677,6 @@ function renderTable() {
     ev.stopPropagation();
     S.colMenu = null; S.grpMenu = null;
     cycleSort(b.dataset.wsort);
-  });
-  sc.querySelectorAll('[data-wcollapse]').forEach(b => b.onclick = ev => {
-    ev.stopPropagation();
-    S.colMenu = null; S.grpMenu = null;
-    setCollapsed(b.dataset.wcollapse, true);
   });
   sc.querySelectorAll('[data-wfit]').forEach(b => b.onclick = ev => {
     ev.stopPropagation();
@@ -2085,7 +2115,7 @@ window.__debug = {
   F, FIELDS, CATS, CATNAME,
   render, change, dropBefore, pinnedList, isGrouped, tableColumns, visibleOf, widthOf,
   catIsHidden, catCanHide, togglePin, setVisible, toggleGrouping, toggleCategory, lab, catName,
-  canUnpin, showGroupAndUnpin, setCollapsed, setGroupCollapsed, isCollapsed, cycleSort, viewRows, sortDirOf, hiddenThings, hiddenCount, showEverything,
+  canUnpin, showGroupAndUnpin, sortOnly, addSortLevel, removeSort, sortLevels, canMove, moveFlat, setCollapsed, setGroupCollapsed, isCollapsed, cycleSort, viewRows, sortDirOf, hiddenThings, hiddenCount, showEverything,
   allHiddenColumns, hiddenGroups, restoreAllCount,
   autosizeColumn, autosizeAll, fittedWidth, setWidth, headerNeed, naturalWidth,
   catOrder, flatOrder, aliasOf, setAlias, canonLab, openModal, closeModal
