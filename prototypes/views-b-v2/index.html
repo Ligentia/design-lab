@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>View B — v1</title>
+<title>View C — v1</title>
 <style>
   :root {
     --surface:#fff; --raise:#f6f6f6; --band:#eeeeee; --sunk:#fbfbfb;
@@ -77,7 +77,6 @@
   .cexp { display:inline-flex; align-items:center; justify-content:center; width:22px; height:18px;
           border-radius:var(--rs); padding:0; position:relative; }
   .cexp:hover { background:#dcdcdc; }
-  .cexp svg { display:block; color:#4d4d4d; }
   .cexp .chev { font-size:15px; line-height:1; color:#4d4d4d; font-weight:600; }
   tbody td.cstrip { padding:12px 0; vertical-align:top; text-align:center; cursor:pointer;
                     background:#f4f4f4; border-bottom:0; border-left:1px solid var(--soft);
@@ -95,35 +94,38 @@
   /* the whole header is the handle */
   thead { user-select:none; -webkit-user-select:none; }
   .headrow th[data-grab], .bandrow th[data-bgrab] { cursor:grab; }
-  /* the column name is the handle: it highlights on hover, and pressing on it
-     and dragging moves the column. A click on its own does nothing — sorting
-     lives in the Sort icon and More options. */
-  .headrow th[data-grab] .lbl { cursor:grab; border-radius:4px; padding:2px 5px; margin:-2px -5px; }
-  .headrow th[data-grab] .lbl:hover { background:#e4e4e4; }
-  .headrow th[data-grab]:active .lbl { cursor:grabbing; }
   .headrow th[data-grab]:active, .bandrow th[data-bgrab]:active { cursor:grabbing; }
   .sortmark { font-size:12px; font-weight:700; color:var(--ink); flex:0 0 auto; }
-  .sortmark sup { font-size:9px; margin-left:1px; }
-  /* the widget: three icons, shown on hover or focus, kept open while its menu is */
-  .hw { position:absolute; right:11px; top:50%; transform:translateY(-50%); display:flex; gap:1px;
-        padding:2px; background:#fff; border:1px solid var(--line); border-radius:6px;
-        box-shadow:0 1px 5px rgba(0,0,0,.13); opacity:0; pointer-events:none;
-        transition:opacity .1s ease-out; z-index:2; cursor:default; }
-  th:hover > .hw, th:focus-within > .hw, .hw.open { opacity:1; pointer-events:auto; }
-  @media (hover: none) { .hw { opacity:1; pointer-events:auto; } }
-  .hwb { position:relative; width:24px; height:22px; display:inline-flex; align-items:center;
-         justify-content:center; border-radius:4px; color:#595959; padding:0; }
-  .hwb:hover { background:#ececec; color:var(--ink); }
-  .hwb.on { color:var(--ink); background:#efefef; }
-  .hwb svg { display:block; }
-  .bandrow .hw { right:6px; padding:1px; }
-  /* on a column heading the widget sits just below the heading, over the first
-     row, so it never covers the column title. It overlaps the heading's bottom
-     edge by a few pixels, so moving the pointer down onto it keeps it open. */
-  .headrow .hw { top:calc(100% - 6px); transform:none; right:6px; }
-  /* its hover-over names then appear below the widget */
-  .headrow .hw [data-tip]:hover::after, .headrow .hw [data-tip]:focus-visible::after { top:calc(100% + 6px); }
-  .bandrow .hwb { width:22px; height:20px; }
+  /* the ⋯ button: shown on hover or focus, kept while its menu is open */
+  .hdots { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+           border-radius:50%; color:#333; padding:0; flex:0 0 28px; margin-left:auto;
+           opacity:0; transition:opacity .1s ease-out; }
+  th:hover .hdots, th:focus-within .hdots, .hdots.open { opacity:1; }
+  .hdots:hover, .hdots.open { background:#e4e4e4; }
+  .hdots svg { display:block; }
+  @media (hover: none) { .hdots { opacity:1; } }
+  .bandrow .hdots { width:22px; height:22px; flex-basis:22px; }
+  .th-in .acts { margin-left:0; padding-left:4px; }
+  /* the column menu */
+  .cmenu { position:fixed; z-index:220; width:220px; background:#fff; border-radius:8px; padding:6px 0;
+           box-shadow:0 2px 6px rgba(0,0,0,.08), 0 10px 28px rgba(0,0,0,.16); font-size:14px; color:#333; }
+  .ci { display:flex; align-items:center; gap:8px; width:100%; height:40px; padding:0 14px 0 18px;
+        text-align:left; position:relative; cursor:pointer; outline-offset:-2px; }
+  .ci:hover:not([disabled]), .csub:focus-within { background:#f3f3f3; }
+  .ci[disabled] { opacity:.4; cursor:not-allowed; }
+  .ci .cl { flex:1 1 auto; white-space:nowrap; }
+  .ci .cnote { font-size:11.5px; color:var(--mid); white-space:nowrap; }
+  .ci .ctick { font-size:12px; color:#333; }
+  .carr { width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent;
+          border-left:6px solid #8a8a8a; flex:0 0 auto; }
+  .csep { border-top:1px solid #e6e6e6; margin:6px 0; }
+  .csubmenu { position:absolute; left:calc(100% - 4px); top:-6px; display:none; width:168px; }
+  .cmenu.flip .csubmenu { left:auto; right:calc(100% - 4px); }
+  .csub:hover > .csubmenu, .csub:focus-within > .csubmenu { display:block; }
+  .btn.sm { height:30px; padding:0 12px; font-size:12px; }
+  /* wrapped cells */
+  tbody td.wrap .cv { white-space:normal; overflow:visible; line-height:1.4; padding:8px 0; }
+  tbody td.wrap { vertical-align:top; }
   /* hover-over names, quicker than a title attribute */
   [data-tip]:hover::after, [data-tip]:focus-visible::after {
     content:attr(data-tip); position:absolute; top:calc(100% + 7px); right:-2px; z-index:30;
@@ -422,6 +424,8 @@
   #dev .row { display:flex; gap:6px; flex-wrap:wrap; }
   @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
   .mi .mnote { margin-left:auto; padding-left:10px; font-size:11px; color:var(--mid); white-space:nowrap; }
+  .headrow th .lbl[data-csort] { cursor:pointer; border-radius:4px; padding:2px 5px; margin:-2px -5px; }
+  .headrow th .lbl[data-csort]:hover { background:#e4e4e4; }
 </style>
 </head>
 <body>
@@ -433,12 +437,11 @@
 
 <script>
 /* ==========================================================
-   VIEW B — v1
-   Built from View A v1, to Craig's design. No grabber: press on a
-   column heading, title included, and drag to move it. Hovering a
-   heading shows a widget of three icons — Sort, More options (⋮) in
-   the middle, and Expand to fit. More options holds sorting (including
-   extra sort levels), pin, move left or right, collapse and hide.
+   VIEW C — v1
+   Built from View B v1. Press on a header and drag to move it. Hover a
+   header for a ⋯ button whose menu holds Sort (ascending, descending, off);
+   clicking the column title also sorts it.
+   a status section (pin, collapse, autosize, group) and Hide column.
    ========================================================== */
 
 /* ---------- catalogue ---------- */
@@ -622,7 +625,7 @@ function catName(cid) { return CATNAME[cid] || cid; }
 /* ---------- state ---------- */
 function blankColumns() {
   return { vis:{}, widths:{}, pinned:[], catOrder:null, catFieldOrder:{}, catHidden:{},
-           grouped:false, flatOrder:null, alias:{}, collapsed:{} };
+           grouped:false, flatOrder:null, alias:{}, collapsed:{}, wrap:{} };
 }
 function seed() {
   return {
@@ -701,12 +704,11 @@ function moveFlat(fid, dir) {
 }
 
 const TOTAL_ROWS = DATA.length;
-function matchedTotal() { return TOTAL_ROWS; }
+function matchedTotal() { return viewRows().length; }
 
 /* ---------- sorting ----------
-   One or more sort levels, applied in order. The Sort icon cycles a column
-   through ascending, descending and off; More options can sort a column on its
-   own, add it as another sort level, or remove its sort. */
+   One column at a time. Clicking the title or the icon cycles it:
+   ascending, descending, then back to the original order. */
 const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
 function sortKey(id, v) {
   if (id === 'releaseDate') {
@@ -718,58 +720,37 @@ function sortKey(id, v) {
   if (id === 'runtime') { const m = /(\d+)h (\d+)m/.exec(v); return m ? +m[1] * 60 + +m[2] : 0; }
   return v;
 }
-function sortLevels() {
-  const st = S.sort;
-  return (Array.isArray(st) ? st : (st ? [st] : [])).filter(l => F[l.id]);
+function cmpVals(id, va, vb) {
+  const ka = sortKey(id, va), kb = sortKey(id, vb);
+  return (typeof ka === 'number' && typeof kb === 'number')
+    ? ka - kb : String(ka).localeCompare(String(kb), 'en-GB', { numeric:true, sensitivity:'base' });
 }
 function viewRows() {
   const idx = DATA.map((_, i) => i);
-  const levels = sortLevels();
-  if (!levels.length) return idx;
-  return idx.sort((a, b) => {
-    for (const l of levels) {
-      const ka = sortKey(l.id, cellText(a, l.id)), kb = sortKey(l.id, cellText(b, l.id));
-      const c = (typeof ka === 'number' && typeof kb === 'number')
-        ? ka - kb : String(ka).localeCompare(String(kb), 'en-GB', { numeric:true, sensitivity:'base' });
-      if (c) return l.dir === 'desc' ? -c : c;
-    }
-    return a - b;
-  });
+  const st = S.sort;
+  if (!st || !F[st.id]) return idx;
+  const dir = st.dir === 'desc' ? -1 : 1;
+  return idx.sort((a, b) => cmpVals(st.id, cellText(a, st.id), cellText(b, st.id)) * dir || a - b);
 }
-function sortDirOf(id) { const l = sortLevels().find(x => x.id === id); return l ? l.dir : null; }
-function sortLevelOf(id) {
-  const levels = sortLevels();
-  return levels.length > 1 ? levels.findIndex(x => x.id === id) + 1 : 0;
-}
-const dirWord = d => d === 'asc' ? 'ascending' : 'descending';
-function sortedMsg() {
-  const levels = sortLevels();
-  return levels.length ? 'Sorted by ' + levels.map(l => lab(l.id) + ', ' + dirWord(l.dir)).join(', then ') : 'Sort removed';
-}
-/** the Sort icon: ascending, descending, off */
-function cycleSort(id) {
-  const levels = sortLevels(), d = sortDirOf(id);
-  if (d === null) S.sort = [{ id, dir:'asc' }];
-  else if (d === 'asc') S.sort = levels.map(l => l.id === id ? { id, dir:'desc' } : l);
-  else S.sort = levels.filter(l => l.id !== id);
+function setSort(id, dir) {
+  S.sort = dir ? { id, dir } : null;
   S.ui.page = 0;
-  commit(sortedMsg());
+  commit(dir ? 'Sorted by ' + lab(id) + (dir === 'asc' ? ', ascending' : ', descending') : 'Sort cleared');
 }
-/** sort by this column on its own */
-function sortOnly(id, dir) { S.sort = [{ id, dir }]; S.ui.page = 0; commit(sortedMsg()); }
-/** keep the current sort and break ties with this column */
-function addSortLevel(id) {
-  const levels = sortLevels();
-  if (!levels.length || sortDirOf(id)) return;
-  S.sort = levels.concat([{ id, dir:'asc' }]); S.ui.page = 0; commit(sortedMsg());
+
+/* ---------- text wrapping ---------- */
+function isWrapped(id) { return !!S.cols.wrap[id]; }
+function setWrap(id, on) {
+  if (isWrapped(id) === on) return;
+  change((on ? 'Wrapped the text in ' : 'Stopped wrapping the text in ') + lab(id), d => { d.wrap[id] = on; });
 }
-function removeSort(id) { S.sort = sortLevels().filter(l => l.id !== id); S.ui.page = 0; commit(sortedMsg()); }
-/** can this column move one place left or right? */
-function canMove(id, dir) {
-  if (pinnedList().indexOf(id) !== -1) return false;
-  const vis = tableColumns().filter(c => !c.pinned).map(c => c.id);
-  const i = vis.indexOf(id);
-  return i !== -1 && i + dir >= 0 && i + dir < vis.length;
+function sortDirOf(id) { return S.sort && S.sort.id === id ? S.sort.dir : null; }
+function cycleSort(id) {
+  const d = sortDirOf(id);
+  S.sort = d === null ? { id, dir:'asc' } : (d === 'asc' ? { id, dir:'desc' } : null);
+  S.ui.page = 0;
+  commit(S.sort ? 'Sorted by ' + lab(id) + (S.sort.dir === 'asc' ? ', ascending' : ', descending')
+                : 'Sort removed from ' + lab(id));
 }
 
 
@@ -1060,13 +1041,8 @@ const ICON = {
     return '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="none" stroke="currentColor" ' +
       'stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="' + p + '"/></svg>';
   },
-  fit: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
-    '<path d="M5.6 2.5v9M8.4 2.5v9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>' +
-    '<path d="M3.9 5.3 1.4 7l2.5 1.7zM10.1 5.3 12.6 7l-2.5 1.7z" fill="currentColor"/></svg>',
-  moreV: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="currentColor">' +
-    '<circle cx="7" cy="2.8" r="1.35"/><circle cx="7" cy="7" r="1.35"/><circle cx="7" cy="11.2" r="1.35"/></svg>',
-  more: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="currentColor">' +
-    '<circle cx="2.8" cy="7" r="1.35"/><circle cx="7" cy="7" r="1.35"/><circle cx="11.2" cy="7" r="1.35"/></svg>',
+  more: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">' +
+    '<circle cx="3.2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.8" cy="8" r="1.5"/></svg>',
   eye: on => '<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true">' +
     '<ellipse cx="8" cy="6" rx="7.3" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.2"/>' +
     (on ? '<circle cx="8" cy="6" r="2.7" fill="currentColor"/>'
@@ -1168,7 +1144,7 @@ function renderToolbar() {
    furniture needs. */
 const W_MIN = 84, W_MAX = 420;
 const CELL_PAD = 24;                      // 12 either side
-const TH_FURNITURE = 24;                  // padding, and a little air
+const TH_FURNITURE = 52;                  // padding, the ⋯ button and its gap
 const TH_PIN_EXTRA = 26;                  // the pin marker on a pinned column, and its gap
 function naturalWidth(id) { return F[id].defaultWidth; }
 function headerNeed(id) {
@@ -1323,6 +1299,18 @@ function renderGrpMenu() {
   }
 
   m.appendChild(el('<div class="sep"></div>'));
+  const shownHere = groupShowing(cid);
+  if (!groupAllCollapsed(cid)) {
+    item('', 'Collapse group', { disabled: !shownHere.length,
+      title:'Narrows every column in ' + catName(cid) + ' to a strip. Its place in the table is kept.',
+      fn: () => { close(); setGroupCollapsed(cid, true); } });
+  }
+  if (groupAnyCollapsed(cid)) {
+    item('', 'Expand group', { title:'Opens every collapsed column in ' + catName(cid) + ' back out',
+      fn: () => { close(); setGroupCollapsed(cid, false); } });
+  }
+
+  m.appendChild(el('<div class="sep"></div>'));
 
   item('', 'Move group left', { disabled: at <= 0, fn: () => { close(); moveCategory(cid, -1); } });
   item('', 'Move group right', { disabled: at === -1 || at >= order.length - 1,
@@ -1346,85 +1334,79 @@ function renderColMenu() {
   const cm = S.colMenu;
   if (!cm || !F[cm.id]) return null;
   const id = cm.id, f = F[id];
-  const isPin = pinnedList().indexOf(id) !== -1;
-  const sorted = sortDirOf(id), anySort = sortLevels().length > 0;
-
-  const m = el('<div class="colmenu" role="menu" style="left:' + cm.x + 'px;top:' + cm.y + 'px"></div>');
+  const sorted = sortDirOf(id);
+  const flip = false;
+  const m = el('<div class="cmenu' + (flip ? ' flip' : '') + '" role="menu" aria-label="Options for ' + esc(lab(id)) +
+    '" style="left:' + cm.x + 'px;top:' + cm.y + 'px"></div>');
   m.onclick = e => e.stopPropagation();
-  m.appendChild(el('<div class="hdr">' + esc(lab(f.id)) + '</div>'));
   const close = () => { S.colMenu = null; };
-  const sep = () => m.appendChild(el('<div class="sep"></div>'));
-  const item = (icon, label, opts) => {
-    const o = opts || {};
-    const b = el('<button class="mi" role="menuitem"' +
-      (o.disabled ? ' disabled' : '') + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
-      '<span class="ic">' + (icon || '') + '</span><span class="lb">' + esc(label) + '</span>' +
-      (o.tick ? '<span class="tick">✓</span>' : '') + '</button>');
-    if (!o.disabled && o.fn) b.onclick = () => o.fn();
-    m.appendChild(b);
+  const btn = (label, fn, o) => {
+    o = o || {};
+    const b = el('<button class="ci" role="menuitem"' + (o.disabled ? ' disabled' : '') +
+      (o.title ? ' title="' + esc(o.title) + '"' : '') + '><span class="cl">' + esc(label) + '</span>' +
+      (o.note ? '<span class="cnote">' + esc(o.note) + '</span>' : '') +
+      (o.tick ? '<span class="ctick">✓</span>' : '') + '</button>');
+    if (!o.disabled) b.onclick = fn;
     return b;
   };
+  const sub = (label, children, note) => {
+    const d = el('<div class="ci csub" role="menuitem" aria-haspopup="menu" tabindex="0"><span class="cl">' +
+      esc(label) + '</span>' + (note ? '<span class="cnote">' + esc(note) + '</span>' : '') +
+      '<span class="carr" aria-hidden="true"></span></div>');
+    const sm = el('<div class="cmenu csubmenu" role="menu"></div>');
+    children.forEach(c => sm.appendChild(c));
+    d.appendChild(sm);
+    return d;
+  };
 
-  // sorting
-  item('', 'Sort ascending', { tick: sorted === 'asc', fn: () => { close(); sortOnly(id, 'asc'); } });
-  item('', 'Sort descending', { tick: sorted === 'desc', fn: () => { close(); sortOnly(id, 'desc'); } });
-  item('', 'Add as another sort level', { disabled: !anySort || !!sorted,
-    title: !anySort ? 'Sort by another column first' : (sorted ? lab(id) + ' is already sorted' : 'Keeps the current sort and breaks ties by ' + lab(id)),
-    fn: () => { close(); addSortLevel(id); } });
-  item('', 'Remove sort', { disabled: !sorted, title: sorted ? '' : lab(id) + ' is not sorted',
-    fn: () => { close(); removeSort(id); } });
-  sep();
-
-  // position
+  /* one level only: no submenus */
+  m.appendChild(btn('Sort ascending',  () => { close(); setSort(id, 'asc'); },  { tick: sorted === 'asc' }));
+  m.appendChild(btn('Sort descending', () => { close(); setSort(id, 'desc'); }, { tick: sorted === 'desc' }));
+  m.appendChild(btn('Sort off', () => { close(); setSort(id, null); },
+    { disabled: !sorted, title: sorted ? 'Back to the original order' : 'This column is not sorted' }));
+  /* status: where the column sits and how it is shown */
+  m.appendChild(el('<div class="csep"></div>'));
+  const isPin = pinnedList().indexOf(id) !== -1;
   if (isPin) {
     const cu = canUnpin(id);
-    item(ICON.pin(true), 'Unpin', { disabled: !cu.ok, title: cu.ok ? 'Returns it to the table' : cu.why,
-      fn: () => { close(); togglePin(id); } });
+    m.appendChild(cu.hiddenGroup
+      ? btn('Show group and unpin', () => { close(); showGroupAndUnpin(id); },
+          { title: 'Brings ' + catName(f.cat) + ' back and returns ' + lab(id) + ' to it' })
+      : btn('Unpin', () => { close(); togglePin(id); },
+          { disabled: !cu.ok, title: cu.ok ? 'Returns it to ' + (isGrouped() ? catName(f.cat) : 'the table') : cu.why }));
   } else {
-    item(ICON.pin(false), 'Pin to the left', { title:'Held at the left edge as the rest of the table scrolls',
-      fn: () => { close(); togglePin(id); } });
+    m.appendChild(btn('Pin to the left', () => { close(); togglePin(id); },
+      { title: 'Held at the left edge as the rest of the table scrolls' }));
   }
-  item('', 'Move left', { disabled: !canMove(id, -1), title: isPin ? 'Pinned columns stay at the left' : '',
-    fn: () => { close(); moveFlat(id, -1); } });
-  item('', 'Move right', { disabled: !canMove(id, 1), title: isPin ? 'Pinned columns stay at the left' : '',
-    fn: () => { close(); moveFlat(id, 1); } });
-  sep();
-
-  // shape
   const col = isCollapsed(id);
-  item('', col ? 'Expand column' : 'Collapse column', {
-    title: col ? 'Opens ' + lab(id) + ' back out to its full width' : 'Narrows ' + lab(id) + ' to a strip with its title running down it',
-    fn: () => { close(); setCollapsed(id, !col); } });
-  item(ICON.eye(false), 'Hide column', { disabled: f.required,
-    title: f.required ? f.label + ' is required and cannot be hidden' : 'Takes it off the table. “Hidden · bring back” unhides it.',
-    fn: () => { close(); setVisible(id, false); } });
-  sep();
-  item('', 'Autosize all columns', { fn: () => { close(); autosizeAll(); } });
-  return m;
-}
+  m.appendChild(btn(col ? 'Expand column' : 'Collapse column', () => { close(); setCollapsed(id, !col); },
+    { title: col ? 'Opens it back out to its full width'
+                 : 'Narrows it to a strip with its title running down it. Click the strip to open it again.' }));
+  m.appendChild(btn('Autosize column', () => { close(); autosizeColumn(id); },
+    { disabled: col, title: col ? 'Expand it first' : 'Fits the width to the widest value on this page' }));
+  m.appendChild(btn('Autosize all columns', () => { close(); autosizeAll(); }));
+  if (isGrouped()) {
+    const gAll = groupAllCollapsed(f.cat);
+    m.appendChild(btn((gAll ? 'Expand' : 'Collapse') + ' column group', () => { close(); setGroupCollapsed(f.cat, !gAll); },
+      { note: catName(f.cat), disabled: isPin, title: isPin ? 'This column is pinned, so it sits outside its group' : '' }));
+    m.appendChild(btn('Turn off column groups', () => { close(); toggleGrouping(); },
+      { title: 'One flat list where any column can go anywhere. Your grouped arrangement is kept.' }));
+  }
 
-/** one icon button in a header widget; the label is its hover-over */
-function hwBtn(attr, id, label, icon, on) {
-  return '<button class="hwb' + (on ? ' on' : '') + '" ' + attr + '="' + id + '" aria-label="' + esc(label) +
-    '" data-tip="' + esc(label) + '">' + icon + '</button>';
-}
-function colWidget(id, sorted, open) {
-  const sortLabel = sorted === null ? 'Sort ascending' : (sorted === 'asc' ? 'Sort descending' : 'Clear sort');
-  return '<span class="hw' + (open ? ' open' : '') + '" role="group" aria-label="Options for ' + esc(lab(id)) + '">' +
-    hwBtn('data-wsort', id, sortLabel, ICON.sort(sorted), !!sorted) +
-    hwBtn('data-wother', id, 'More options', ICON.moreV, open) +
-    hwBtn('data-wfit', id, 'Expand to fit', ICON.fit) +
-    '</span>';
-}
-function groupWidget(cid, open) {
-  const all = groupAllCollapsed(cid), any = groupAnyCollapsed(cid);
-  /* Collapse while anything in the group is still open; Expand as soon as
-     anything in it is collapsed — both at once when it is part-way. */
-  return '<span class="hw' + (open ? ' open' : '') + '" role="group" aria-label="Options for the ' + esc(catName(cid)) + ' group">' +
-    (all ? '' : hwBtn('data-gcollapse', cid, 'Collapse group', ICON.collapse(false))) +
-    (any ? hwBtn('data-gexpand', cid, 'Expand group', ICON.collapse(true)) : '') +
-    hwBtn('data-gother', cid, 'Other group options', ICON.more, open) +
-    '</span>';
+  m.appendChild(el('<div class="csep"></div>'));
+  m.appendChild(btn('Hide column', () => { close(); setVisible(id, false); }, {
+    disabled: f.required,
+    title: f.required ? lab(id) + ' is required and cannot be hidden'
+                      : 'Takes it off the table. “Hidden · bring back” unhides it.' }));
+  if (isGrouped()) {
+    m.appendChild(btn('Hide column group', () => { close(); toggleCategory(f.cat); }, {
+      note: catName(f.cat),
+      disabled: !catCanHide(f.cat) || isPin,
+      title: isPin ? 'This column is pinned, so it sits outside its group'
+                   : (catCanHide(f.cat) ? 'Hides every column in ' + catName(f.cat)
+                                        : catName(f.cat) + ' holds a required column, so it cannot be hidden') }));
+  }
+  return m;
 }
 
 /* The row-select column is not a column in the sense the rest of this file means.
@@ -1549,7 +1531,10 @@ function renderTable() {
       '"' + (pinned ? ' style="left:' + SELW + 'px"' : ' data-bgrab="' + r.key + '"') +
       ' data-band="' + r.key + '"><span class="band-in" style="width:' + Math.max(0, r.w - 17) + 'px">' +
       '<span class="bname">' + (pinned ? esc('Pinned to the left') : esc(catName(r.key))) + '</span>' +
-      '</span>' + (pinned ? '' : groupWidget(r.key, !!(S.grpMenu && S.grpMenu.cid === r.key))) + '</th>';
+      (pinned ? '' : '<button class="hdots' + (S.grpMenu && S.grpMenu.cid === r.key ? ' open' : '') +
+        '" data-gmenu="' + r.key + '" aria-haspopup="menu" aria-expanded="' + !!(S.grpMenu && S.grpMenu.cid === r.key) +
+        '" aria-label="Options for the ' + esc(catName(r.key)) + ' group">' + ICON.more + '</button>') +
+      '</span></th>';
   });
   html += '</tr>';
   }
@@ -1571,9 +1556,10 @@ function renderTable() {
         (lastPin ? 'pinedge' : '') + '">' +
         '<span class="cin">' +
           '<button class="cexp" data-expand="' + c.id + '" aria-label="Expand ' + esc(lab(c.id)) +
-            '" data-tip="Expand column">' + ICON.collapse(true) + '</button>' +
-          '<button class="sdots' + (S.colMenu && S.colMenu.id === c.id ? ' open' : '') + '" data-wother="' + c.id +
-            '" aria-haspopup="menu" aria-label="More options for ' + esc(lab(c.id)) + '" data-tip="More options">' + ICON.moreV + '</button>' +
+            '" data-tip="Expand column">' +
+            '<span class="chev" aria-hidden="true">›</span></button>' +
+          '<button class="sdots' + (S.colMenu && S.colMenu.id === c.id ? ' open' : '') + '" data-cmenu="' + c.id +
+            '" aria-haspopup="menu" aria-label="Options for ' + esc(lab(c.id)) + '" data-tip="Options">' + ICON.more + '</button>' +
         '</span></th>';
       return;
     }
@@ -1584,9 +1570,11 @@ function renderTable() {
       (isPin ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (sorted ? 'sorted' : '') + '"' +
       (sorted ? ' aria-sort="' + (sorted === 'asc' ? 'ascending' : 'descending') + '"' : '') + '>' +
       '<span class="th-in">' +
-        '<span class="lbl" title="Drag to move ' + esc(lab(c.id)) + '">' + esc(lab(c.id)) + '</span>' +
-        (sorted ? '<span class="sortmark" aria-hidden="true">' + (sorted === 'asc' ? '↑' : '↓') +
-          (sortLevelOf(c.id) ? '<sup>' + sortLevelOf(c.id) + '</sup>' : '') + '</span>' : '') +
+        '<span class="lbl" data-csort="' + c.id + '" title="Click to sort ' + esc(lab(c.id)) + ', or drag to move it">' + esc(lab(c.id)) + '</span>' +
+        (sorted ? '<span class="sortmark" aria-hidden="true" title="Sorted ' + (sorted === 'asc' ? 'ascending' : 'descending') +
+          '">' + (sorted === 'asc' ? '↑' : '↓') + '</span>' : '') +
+        '<button class="hdots' + (menuOpen ? ' open' : '') + '" data-cmenu="' + c.id + '" aria-haspopup="menu" aria-expanded="' +
+          menuOpen + '" aria-label="Options for ' + esc(lab(c.id)) + '">' + ICON.more + '</button>' +
         (isPin ? '<span class="acts">' : '') +
           (isPin
             ? '<button class="iconbtn on" data-unpin="' + c.id + '"' +
@@ -1599,7 +1587,7 @@ function renderTable() {
               '">' + ICON.pin(true) + '</button>'
             : '') +
         (isPin ? '</span>' : '') +
-      '</span>' + colWidget(c.id, sorted, menuOpen) + '<span class="rsz" data-rsz="' + c.id +
+      '</span><span class="rsz" data-rsz="' + c.id +
       '" title="Drag the edge to resize — the dashed line shows where it will land. ' +
       'Double-click it to fit the column to its widest value."></span>';
     html += '</th>';
@@ -1622,7 +1610,8 @@ function renderTable() {
           (c.pinned ? ' style="left:' + leftOf[c.id] + 'px"' : '') + '><span class="vlab">' + esc(lab(c.id)) + '</span></td>';
         return;
       }
-      html += '<td class="' + (c.pinned ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (c.collapsed ? 'collapsed' : '') + '"' +
+      html += '<td class="' + (c.pinned ? 'pinned ' : '') + (lastPin ? 'pinedge ' : '') + (c.collapsed ? 'collapsed ' : '') +
+        (isWrapped(c.id) ? 'wrap' : '') + '"' +
         (c.pinned ? ' style="left:' + leftOf[c.id] + 'px"' : '') + '>' +
         (c.collapsed ? '' : '<div class="cv" style="width:' + (c.width - 24) + 'px" title="' +
         esc(cellText(r, c.id)) + '">' + esc(cellText(r, c.id)) + '</div>') + '</td>';
@@ -1669,45 +1658,31 @@ function renderTable() {
     S.colMenu = null; S.grpMenu = null;
     setCollapsed(b.dataset.expand, false);
   });
-  const menuBelow = b => {
+  const menuBelow = (b, w) => {
     const r = b.getBoundingClientRect();
-    return { x: Math.min(r.left, window.innerWidth - 268), y: Math.min(r.bottom + 6, window.innerHeight - 340) };
+    return { x: Math.max(8, Math.min(r.left - 90, window.innerWidth - w)), y: Math.max(8, Math.min(r.bottom + 8, window.innerHeight - 470)) };
   };
-  sc.querySelectorAll('[data-wsort]').forEach(b => b.onclick = ev => {
+  /* clicking the column title sorts it: ascending, descending, then off.
+     Pressing and dragging it still moves the column instead. */
+  sc.querySelectorAll('[data-csort]').forEach(t => t.onclick = ev => {
     ev.stopPropagation();
     S.colMenu = null; S.grpMenu = null;
-    cycleSort(b.dataset.wsort);
+    cycleSort(t.dataset.csort);
   });
-  sc.querySelectorAll('[data-wfit]').forEach(b => b.onclick = ev => {
+  sc.querySelectorAll('[data-cmenu]').forEach(b => b.onclick = ev => {
     ev.stopPropagation();
-    S.colMenu = null; S.grpMenu = null;
-    autosizeColumn(b.dataset.wfit);
-  });
-  sc.querySelectorAll('[data-wother]').forEach(b => b.onclick = ev => {
-    ev.stopPropagation();
-    const id = b.dataset.wother;
+    const id = b.dataset.cmenu;
     S.grpMenu = null;
     if (S.colMenu && S.colMenu.id === id) { S.colMenu = null; return commit(); }
-    S.colMenu = Object.assign({ id }, menuBelow(b));
+    S.colMenu = Object.assign({ id }, menuBelow(b, 230));
     commit('Options for ' + lab(id));
   });
-  sc.querySelectorAll('[data-gcollapse]').forEach(b => b.onclick = ev => {
+  sc.querySelectorAll('[data-gmenu]').forEach(b => b.onclick = ev => {
     ev.stopPropagation();
-    const cid = b.dataset.gcollapse;
-    S.colMenu = null; S.grpMenu = null;
-    setGroupCollapsed(cid, true);
-  });
-  sc.querySelectorAll('[data-gexpand]').forEach(b => b.onclick = ev => {
-    ev.stopPropagation();
-    S.colMenu = null; S.grpMenu = null;
-    setGroupCollapsed(b.dataset.gexpand, false);
-  });
-  sc.querySelectorAll('[data-gother]').forEach(b => b.onclick = ev => {
-    ev.stopPropagation();
-    const cid = b.dataset.gother;
+    const cid = b.dataset.gmenu;
     S.colMenu = null;
     if (S.grpMenu && S.grpMenu.cid === cid) { S.grpMenu = null; return commit(); }
-    S.grpMenu = Object.assign({ cid }, menuBelow(b));
+    S.grpMenu = Object.assign({ cid }, menuBelow(b, 270));
     commit('Options for the ' + catName(cid) + ' group');
   });
 
@@ -2115,7 +2090,7 @@ window.__debug = {
   F, FIELDS, CATS, CATNAME,
   render, change, dropBefore, pinnedList, isGrouped, tableColumns, visibleOf, widthOf,
   catIsHidden, catCanHide, togglePin, setVisible, toggleGrouping, toggleCategory, lab, catName,
-  canUnpin, showGroupAndUnpin, sortOnly, addSortLevel, removeSort, sortLevels, canMove, moveFlat, setCollapsed, setGroupCollapsed, isCollapsed, cycleSort, viewRows, sortDirOf, hiddenThings, hiddenCount, showEverything,
+  canUnpin, showGroupAndUnpin, setSort, matchedTotal, setCollapsed, setGroupCollapsed, isCollapsed, cycleSort, viewRows, sortDirOf, hiddenThings, hiddenCount, showEverything,
   allHiddenColumns, hiddenGroups, restoreAllCount,
   autosizeColumn, autosizeAll, fittedWidth, setWidth, headerNeed, naturalWidth,
   catOrder, flatOrder, aliasOf, setAlias, canonLab, openModal, closeModal
