@@ -1,7 +1,7 @@
 [
   {
     "id": "views-b-v2",
-    "title": "Views B (v2)",
+    "title": "Views C (v2)",
     "description": "",
     "creator": "Adrian",
     "date": "2026-11-12",
@@ -9,20 +9,21 @@
       "prototype"
     ],
     "folder": "prototypes/views-b-v2",
-    "public": true
+    "public": true,
+    "updatedAt": "2026-11-13"
   },
   {
     "id": "views-b-v2",
-    "title": "Views B (v2)",
+    "title": "Views C (v2)",
     "description": "",
     "creator": "Adrian",
-    "date": "2026-11-11",
+    "date": "2026-11-12",
     "tags": [
       "prototype"
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-12"
+    "updatedAt": "2026-11-13"
   },
   {
     "id": "views-a-v2",
