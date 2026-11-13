@@ -1,5 +1,16 @@
 [
   {
+    "id": "design-notes",
+    "title": "Design Notes",
+    "description": "",
+    "creator": "Chuka",
+    "date": "2026-11-13",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/design-notes"
+  },
+  {
     "id": "views-b-v2",
     "title": "Views C (v2)",
     "description": "",
