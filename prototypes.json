@@ -1,5 +1,17 @@
 [
   {
+    "id": "views-b-v3",
+    "title": "Views B (V3)",
+    "description": "",
+    "creator": "Adrian",
+    "date": "2026-11-18",
+    "tags": [
+      "prototype"
+    ],
+    "folder": "prototypes/views-b-v3",
+    "public": true
+  },
+  {
     "id": "views-c-v2",
     "title": "Views C (v2)",
     "description": "",
