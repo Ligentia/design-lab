@@ -10,7 +10,8 @@
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-18"
+    "updatedAt": "2026-11-18",
+    "archived": true
   },
   {
     "id": "design-notes",
@@ -34,7 +35,8 @@
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-18"
+    "updatedAt": "2026-11-18",
+    "archived": true
   },
   {
     "id": "views-b-v2",
@@ -47,7 +49,8 @@
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-18"
+    "updatedAt": "2026-11-18",
+    "archived": true
   },
   {
     "id": "views-a-v2",
