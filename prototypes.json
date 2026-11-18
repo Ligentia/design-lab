@@ -1,7 +1,7 @@
 [
   {
     "id": "views-b-v2",
-    "title": "Views B (v2_",
+    "title": "Views B (v2)",
     "description": "",
     "creator": "Adrian",
     "date": "2026-11-18",
@@ -9,7 +9,8 @@
       "prototype"
     ],
     "folder": "prototypes/views-b-v2",
-    "public": true
+    "public": true,
+    "updatedAt": "2026-11-18"
   },
   {
     "id": "design-notes",
@@ -24,29 +25,29 @@
   },
   {
     "id": "views-b-v2",
-    "title": "Views C (v2)",
+    "title": "Views B (v2)",
     "description": "",
     "creator": "Adrian",
-    "date": "2026-11-12",
+    "date": "2026-11-18",
     "tags": [
       "prototype"
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-13"
+    "updatedAt": "2026-11-18"
   },
   {
     "id": "views-b-v2",
-    "title": "Views C (v2)",
+    "title": "Views B (v2)",
     "description": "",
     "creator": "Adrian",
-    "date": "2026-11-12",
+    "date": "2026-11-18",
     "tags": [
       "prototype"
     ],
     "folder": "prototypes/views-b-v2",
     "public": true,
-    "updatedAt": "2026-11-13"
+    "updatedAt": "2026-11-18"
   },
   {
     "id": "views-a-v2",
