@@ -71,7 +71,8 @@
     "tags": [],
     "folder": "prototypes/views-version-a",
     "public": true,
-    "updatedAt": "2026-11-09"
+    "updatedAt": "2026-11-09",
+    "archived": true
   },
   {
     "id": "design-notes",
