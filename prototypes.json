@@ -1,5 +1,16 @@
 [
   {
+    "id": "thoughtspot-theming-findings",
+    "title": "thoughtspot-theming-findings",
+    "description": "",
+    "creator": "Chuka",
+    "date": "2026-11-19",
+    "tags": [
+      "design team"
+    ],
+    "folder": "prototypes/thoughtspot-theming-findings"
+  },
+  {
     "id": "views-b-v3",
     "title": "Views B (V3)",
     "description": "",
