@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ThoughtSpot theming: findings (draft)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #1c2330;
+  --ink-soft: #4a5466;
+  --rule: #d9dee6;
+  --accent: #1f5f8b;
+  --ph-bg: #eef2f6;
+  --ph-line: #9aa8b8;
+  --good: #2e7d4f;  --good-bg: #e3f2e9;
+  --part: #9a6200;  --part-bg: #fbf0d9;
+  --bad:  #b3362b;  --bad-bg:  #f9e3e0;
+  --unk:  #5a5f8a;  --unk-bg:  #e8e9f4;
+  --draft-bg: #fff4c2; --draft-ink: #5c4a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #12161d;
+    --surface: #1a2029;
+    --ink: #e6eaf0;
+    --ink-soft: #a7b1c0;
+    --rule: #2e3644;
+    --accent: #7ab8e6;
+    --ph-bg: #1f2632;
+    --ph-line: #55627a;
+    --good: #7fd1a0;  --good-bg: #1d3327;
+    --part: #f0bf63;  --part-bg: #362a12;
+    --bad:  #f28b80;  --bad-bg:  #3a1f1c;
+    --unk:  #b3b7e6;  --unk-bg:  #262842;
+    --draft-bg: #3a3212; --draft-ink: #f3df86;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+.draft {
+  background: var(--draft-bg);
+  color: var(--draft-ink);
+  font-size: 0.9rem;
+  padding: 0.6rem 1.25rem;
+  text-align: center;
+}
+main {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 5rem;
+}
+h1, h2, h3 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+h1 { font-size: clamp(2rem, 5vw, 2.75rem); margin: 0 0 1rem; }
+h2 {
+  font-size: 1.6rem;
+  margin: 3.5rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+h3 { font-size: 1.2rem; margin: 2.25rem 0 0.5rem; }
+p, ul, ol { max-width: 68ch; margin: 0 0 1rem; }
+li { margin-bottom: 0.35rem; }
+a { color: var(--accent); }
+.lede { font-size: 1.2rem; color: var(--ink-soft); }
+.byline { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 2rem; }
+
+/* Status pills */
+.status {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  vertical-align: 0.15em;
+}
+.s-good { color: var(--good); background: var(--good-bg); }
+.s-part { color: var(--part); background: var(--part-bg); }
+.s-bad  { color: var(--bad);  background: var(--bad-bg); }
+.s-unk  { color: var(--unk);  background: var(--unk-bg); }
+h3 .status { margin-left: 0.5rem; font-family: "Source Sans 3", system-ui, sans-serif; }
+
+/* At a glance table */
+.table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.95rem; }
+th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 700; color: var(--ink-soft); }
+td a { text-decoration: none; }
+td a:hover { text-decoration: underline; }
+
+/* Glossary */
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1.25rem; margin: 1rem 0 0; max-width: 68ch; }
+dt { font-weight: 700; }
+dd { margin: 0; color: var(--ink-soft); }
+@media (max-width: 560px) { dl { grid-template-columns: 1fr; } dd { margin-bottom: 0.6rem; } }
+
+/* Figures and placeholders */
+.shot { margin: 1.5rem 0 2rem; }
+.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); }
+.shot img + img { margin-top: 1rem; }
+.annotated { position: relative; }
+.annotated svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.ph {
+  aspect-ratio: 16 / 9;
+  background: var(--ph-bg);
+  border: 2px dashed var(--ph-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 1.5rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.ph strong { color: var(--ink); display: block; margin-bottom: 0.25rem; }
+.ph.tall { aspect-ratio: 9 / 14; }
+.ph.none { aspect-ratio: auto; padding: 2rem 1.5rem; border-style: dotted; }
+figcaption { font-size: 0.9rem; color: var(--ink-soft); margin-top: 0.5rem; }
+figcaption b { color: var(--ink); }
+/* Figure 12: desktop full width, then in-between and phone at matching heights */
+.widths { display: grid; grid-template-columns: 1.284fr 0.79fr; gap: 1rem; margin-top: 1rem; align-items: start; }
+.shot figure { margin: 0; }
+.shot figure figcaption { margin-top: 0.35rem; }
+@media (max-width: 640px) { .widths { grid-template-columns: 1fr; } }
+
+.figref { font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.figref:hover { text-decoration: underline; }
+
+/* Callouts */
+.note {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  max-width: 68ch;
+}
+.note p:last-child { margin-bottom: 0; }
+.blocked { border-left-color: var(--unk); }
+
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="draft">Draft for review. Check before sharing outside Ligentia.</div>
+
+<main>
+
+<header>
+  <h1>Making ThoughtSpot boards look better: what we found</h1>
+  <p class="lede">We can improve the layout of ThoughtSpot boards in the theme builder, but only some of those changes carry through to the saved board. The result doesn’t look much clearer than the original. Other styling settings don’t reach what users see either, and the tool that might fix this hasn’t been switched on for us.</p>
+  <p class="byline">Prepared by the Ligentia Design team (Craig Wetherall and Chukwuka Ezeoke). Draft, 18 November 2026.</p>
+</header>
+
+<section id="background">
+  <h2>Why we looked at this</h2>
+  <p>ThoughtSpot is the tool behind a series of our reports and dashboards. Out of the box, these boards look plain and cluttered <a class="figref" href="#fig-1">(Figure 1)</a>. We were asked to find out how far we could improve them.</p>
+  <p>ThoughtSpot pointed us to the manual mode of its theme builder, which gives more control over the default styles. This report covers what that achieved and what got in the way.</p>
+
+  <figure class="shot" id="fig-1">
+    <img src="images/fig-1a-default-cpg-analysis.png" alt="The CPG Analysis tab of a ThoughtSpot board with default styling: a Goodpack logo, a large dashboard title, and a grid of white cards holding tables and bar and line charts in ThoughtSpot’s default blue, teal and yellow, on a pale blue background.">
+    <img src="images/fig-1b-default-business-information.png" alt="The Business Information tab of the same board: blue section headers reading Container Description and General Information, four cards of justified text that is cut off at the bottom, an SKU comparison table and cards of bullet-point notes.">
+    <figcaption><b>Figure 1.</b> Two tabs of a ThoughtSpot board with the default styling.</figcaption>
+  </figure>
+
+  <h3>A few terms used in this report</h3>
+  <dl>
+    <dt>Board</dt><dd>A ThoughtSpot dashboard: one page of charts and figures. ThoughtSpot calls this a Liveboard.</dd>
+    <dt>Card</dt><dd>A single box on a board holding one chart, table or block of text.</dd>
+    <dt>Group</dt><dd>A container that holds several related cards together under one title.</dd>
+    <dt>Theme builder</dt><dd>Where default styles (colours, text sizes and so on) are set. These styles should then apply to every board.</dd>
+    <dt>Edit mode and view mode</dt><dd>Edit mode is what we see while building a board. View mode is what everyone else sees. They should look the same; often they don’t.</dd>
+  </dl>
+</section>
+
+<section id="summary">
+  <h2>At a glance</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Area</th><th scope="col">What we found</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr><td><a href="#layout">Layout and grouping</a></td><td>Clearer in the theme builder, but only partly carries through to the saved board. The saved board looks little better than the original.</td><td><span class="status s-part">Partly carries through</span></td></tr>
+        <tr><td><a href="#chart-colours">Chart colours</a></td><td>Our colour palette is accepted in settings but has no effect on charts.</td><td><span class="status s-bad">Doesn’t work</span></td></tr>
+        <tr><td><a href="#group-backgrounds">Group backgrounds</a></td><td>Visible while editing, disappear when the board is viewed.</td><td><span class="status s-bad">Doesn’t carry through</span></td></tr>
+        <tr><td><a href="#theme-not-saved">Theme changes not kept</a></td><td>Changes in the theme builder only last until the page is refreshed or we’re logged out, and then some styling is lost. Workaround: keep an up-to-date exported JSON file and import it every time.</td><td><span class="status s-part">Workaround only</span></td></tr>
+        <tr><td><a href="#card-spacing">Spacing between cards</a></td><td>No setting to control it. More space would make boards look cleaner.</td><td><span class="status s-bad">No control</span></td></tr>
+        <tr><td><a href="#line-height">Text line spacing</a></td><td>Too tight to read comfortably. A bullet-point workaround helps but indents the text.</td><td><span class="status s-part">Workaround only</span></td></tr>
+        <tr><td><a href="#chart-titles">Chart titles and subtitles</a></td><td>Can’t be removed, so need text written for them.</td><td><span class="status s-part">Limited control</span></td></tr>
+        <tr><td><a href="#titles">Card and page titles</a></td><td>Colour, size, weight and padding only. A lighter weight looks a little cleaner.</td><td><span class="status s-part">Limited control</span></td></tr>
+        <tr><td><a href="#responsiveness">Different screen sizes</a></td><td>Unpredictable: gaps, oversized cards and cropped text.</td><td><span class="status s-bad">Unreliable</span></td></tr>
+        <tr><td><a href="#spotter-code">Spotter Code</a></td><td>Could let us fix some of the above. Not yet switched on for us.</td><td><span class="status s-unk">Not tested</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="improvements">
+  <h2>What we tried to improve</h2>
+
+  <h3 id="layout">Layout and grouping <span class="status s-part">Partly carries through</span></h3>
+  <p>Our main aim was clearer structure. In the theme builder’s manual mode, we placed related charts and figures together inside clear containers, each with its own title. In the theme builder, this makes it much easier to see what belongs together <a class="figref" href="#fig-2">(Figure 2)</a>.</p>
+  <figure class="shot" id="fig-2">
+    <img src="images/fig-2a-theme-builder-cpg-analysis.png" alt="The CPG Analysis tab open in the theme builder’s manual mode, with the settings menu on the left. The board has a logo card, a title card with a short description, and a grouped section titled Cost Per Good Pack Analysis holding two charts on a light grey background.">
+    <img src="images/fig-2b-theme-builder-business-information.png" alt="The Business Information tab in the theme builder’s manual mode. Content is organised into titled groups (Container Description, SKU Comparison and General Information), each with a light grey background around its cards.">
+    <figcaption><b>Figure 2.</b> The same two tabs in the theme builder: clear groups and titles.</figcaption>
+  </figure>
+
+  <p>When the board is saved, only some of this carries through <a class="figref" href="#fig-3">(Figure 3)</a>. The main loss is the group background colour, covered under <a href="#group-backgrounds">group backgrounds</a> below. As a result, the saved board doesn’t look much clearer than the original <a class="figref" href="#fig-1">(Figure 1)</a>, so in practice the improvement is lost.</p>
+
+  <figure class="shot" id="fig-3">
+    <img src="images/fig-3a-saved-cpg-analysis.png" alt="The saved CPG Analysis tab. The logo, title and Cost Per Good Pack Analysis group are still there, but the group has no background colour, so its charts sit on plain white like every other card.">
+    <img src="images/fig-3b-saved-business-information.png" alt="The saved Business Information tab. The Container Description, SKU Comparison and General Information groups are all white with no background colour, so the groups are hard to tell apart and the text is still cut off at the bottom of the container cards.">
+    <figcaption><b>Figure 3.</b> The same two tabs once saved: the group backgrounds are gone and most of the clarity is lost.</figcaption>
+  </figure>
+
+  <h3 id="titles">Card and page titles <span class="status s-part">Limited control</span></h3>
+  <p>For card titles and the main title at the top of the board, we can change the colour, the text size, the text weight and the padding around the text. Nothing else.</p>
+  <p>We reduced the weight of the text, which makes it look a little cleaner.</p>
+</section>
+
+<section id="issues">
+  <h2>What’s getting in the way</h2>
+  <p>These issues stop us finishing the work. Most are cases where a setting exists but doesn’t affect what users actually see.</p>
+
+  <h3 id="chart-colours">Chart colours <span class="status s-bad">Doesn’t work</span></h3>
+  <p>Charts use ThoughtSpot’s default colours. There is a setting where we can add our own colour palette <a class="figref" href="#fig-4">(Figure 4)</a>, and we did. It made no difference to the charts on the board <a class="figref" href="#fig-5">(Figure 5)</a>.</p>
+  <p>Our colours don’t even reach the theme, let alone the live board. As far as we can tell, the colour setting doesn’t work.</p>
+
+  <figure class="shot" id="fig-4">
+    <img src="images/fig-4-colour-palette-settings.png" alt="The Chart Colour Palettes setting in ThoughtSpot, showing eight primary colours (blues, grey, teal, purple, orange, slate and red) and four rows of lighter and darker secondary shades of each. The Disable Colour Rotation box is ticked.">
+    <figcaption><b>Figure 4.</b> Our colour palette, set in ThoughtSpot.</figcaption>
+  </figure>
+  <figure class="shot" id="fig-5">
+    <img src="images/fig-5-charts-default-colours.png" alt="Charts on the CPG Analysis tab after the palette was set. They still use ThoughtSpot’s default colours: bright blue and grey bars, light blue and red bars, and yellow and blue bars, none of which match the palette in Figure 4.">
+    <figcaption><b>Figure 5.</b> The charts afterwards: still default colours.</figcaption>
+  </figure>
+
+  <h3 id="group-backgrounds">Group backgrounds disappear in view mode <span class="status s-bad">Doesn’t carry through</span></h3>
+  <p>In edit mode, each group has a background colour that separates its cards from the rest of the board <a class="figref" href="#fig-6">(Figure 6)</a>. This is what makes the grouping work visually.</p>
+  <p>In view mode, which is what everyone else sees, the grouping stays but the background colour is gone <a class="figref" href="#fig-7">(Figure 7)</a>. The cards are left with awkward white space between them, and the sections are much harder to tell apart.</p>
+
+  <figure class="shot" id="fig-6">
+    <img src="images/fig-6-edit-mode-group-background.png" alt="Two groups in edit mode, titled Some Title Here and Total Truck Cost Monthly, plus a Top Trade Lanes By Truck Cost chart. Each group has a light grey-blue background, and the white cards inside it stand out clearly against it.">
+    <figcaption><b>Figure 6.</b> Edit mode: the group background is visible.</figcaption>
+  </figure>
+  <figure class="shot" id="fig-7">
+    <img src="images/fig-7-view-mode-no-background.png" alt="The same groups in view mode. The background colour is gone, so the groups and the cards inside them are all plain white, with empty white space where the card edges used to be.">
+    <figcaption><b>Figure 7.</b> View mode: the background is gone, leaving white gaps.</figcaption>
+  </figure>
+
+  <h3 id="theme-not-saved">Theme changes aren’t kept <span class="status s-part">Workaround only</span></h3>
+  <p>Visual changes we make in the theme builder only last until the page is refreshed or we’re logged out. After that, some of the styling is lost and the board goes partly back to how it looked before.</p>
+  <p>To get around this, we keep an exported JSON file of the theme and update it after every change. Each time we come back to the theme builder, we have to import that file again to see the full styling. This works, but it’s easy to forget, and anyone without the latest file will lose changes.</p>
+
+  <h3 id="card-spacing">Spacing between cards <span class="status s-bad">No control</span></h3>
+  <p>We can’t change the space between cards. The default spacing isn’t wrong as such, but the cards sit close together <a class="figref" href="#fig-8">(Figure 8)</a>. A little more space would make the board look cleaner and more appealing.</p>
+
+  <figure class="shot" id="fig-8">
+    <div class="annotated">
+      <img src="images/fig-8-card-spacing.png" alt="Part of a board with two groups side by side above a third, wider group. Dotted lines mark the narrow gaps between the groups and between the two cards inside the left-hand group.">
+      <svg viewBox="0 0 2242 1352" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke="#e02424" stroke-width="4" stroke-dasharray="10 7">
+          <!-- Gap between the two top groups -->
+          <line x1="727" y1="16" x2="727" y2="736"/>
+          <line x1="759" y1="16" x2="759" y2="736"/>
+          <!-- Gap between the top row and the bottom group -->
+          <line x1="31" y1="737" x2="2180" y2="737"/>
+          <line x1="31" y1="770" x2="2180" y2="770"/>
+          <!-- Gap between the two cards inside the left group -->
+          <line x1="49" y1="420" x2="708" y2="420"/>
+          <line x1="49" y1="436" x2="708" y2="436"/>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>Figure 8.</b> The default spacing between cards, which we can’t change. Red dotted lines mark the gaps.</figcaption>
+  </figure>
+
+  <h3 id="line-height">Text line spacing <span class="status s-part">Workaround only</span></h3>
+  <p>In blocks of text, the lines sit too close together. It looks untidy and is hard to read <a class="figref" href="#fig-9">(Figure 9)</a>.</p>
+  <p>We found that turning the text into a bullet point adds more space between lines. It looks neater, but every line then has a bullet and the whole block is indented <a class="figref" href="#fig-10">(Figure 10)</a>. That isn’t a real fix.</p>
+
+  <figure class="shot" id="fig-9">
+    <div class="annotated">
+      <img src="images/fig-9-default-line-spacing.png" alt="The Business Information tab with plain text blocks. The lines in the introduction and in the four container description cards sit so close together that they almost touch.">
+      <svg viewBox="0 0 2218 1016" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke="#e02424" stroke-width="4" stroke-dasharray="10.0 7.0">
+          <rect x="61" y="154" width="2026" height="140" rx="12"/>
+          <rect x="79" y="650" width="432" height="307" rx="12"/>
+          <rect x="611" y="650" width="454" height="304" rx="12"/>
+          <rect x="1142" y="650" width="450" height="307" rx="12"/>
+          <rect x="1674" y="650" width="452" height="303" rx="12"/>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>Figure 9.</b> Default line spacing. The outlined text blocks show lines packed tightly together.</figcaption>
+  </figure>
+  <figure class="shot" id="fig-10">
+    <div class="annotated">
+      <img src="images/fig-10-bullet-workaround.png" alt="The same text formatted as bullet points. The lines are spaced further apart and easier to read, but each block starts with a bullet and is indented, so less text fits in each container card.">
+      <svg viewBox="0 0 2208 1030" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke="#e02424" stroke-width="4" stroke-dasharray="10.0 7.0">
+          <rect x="73" y="156" width="1997" height="182" rx="12"/>
+          <rect x="91" y="664" width="371" height="301" rx="12"/>
+          <rect x="623" y="664" width="372" height="301" rx="12"/>
+          <rect x="1157" y="664" width="372" height="301" rx="12"/>
+          <rect x="1689" y="664" width="363" height="301" rx="12"/>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>Figure 10.</b> Bullet-point workaround. The outlined blocks have more space between lines, but each now starts with a bullet and is indented.</figcaption>
+  </figure>
+
+  <h3 id="chart-titles">Chart titles and subtitles <span class="status s-part">Limited control</span></h3>
+  <p>Some charts come with their own title and subtitle, and these can’t be removed. When we place a chart inside a titled group, we end up with a title inside a title, and we have to write text for both <a class="figref" href="#fig-11">(Figure 11)</a>.</p>
+
+  <figure class="shot" id="fig-11">
+    <div class="annotated">
+      <img src="images/fig-11-chart-title-in-group.png" alt="Groups titled Total Truck Cost Monthly and Top Trade Lanes By Truck Cost. Under each group title, the chart inside adds its own title and subtitle, here filled with test text reading This Is A Description and this is an instruction.">
+      <svg viewBox="0 0 2978 1426" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke="#e02424" stroke-width="5" stroke-dasharray="12.5 8.75">
+          <rect x="54" y="942" width="294" height="95" rx="12"/>
+          <rect x="1036" y="156" width="294" height="95" rx="12"/>
+        </g>
+      </svg>
+    </div>
+
+    <figcaption><b>Figure 11.</b> A chart’s fixed title and subtitle inside a titled group. The outlined text is the chart’s own title and subtitle, which sit below the group title and can’t be removed.</figcaption>
+  </figure>
+
+  <h3 id="responsiveness">Different screen sizes <span class="status s-bad">Unreliable</span></h3>
+  <p>Boards don’t adjust well to different screen sizes, or to people using a browser window that isn’t full screen.</p>
+  <p>At full desktop width, some cards stretch and end up with far too much empty space. At small, phone-like widths the layout is mostly fine. Between the two, roughly tablet to small laptop size, the layout becomes unpredictable. It can leave large random gaps and can even crop text <a class="figref" href="#fig-12">(Figure 12)</a>.</p>
+  <p>We can’t realistically test every screen size people might use, so we can’t say with confidence what a given user will see.</p>
+
+  <figure class="shot" id="fig-12">
+    <figure>
+      <img src="images/fig-12a-desktop-width.png" alt="The Business Information tab at full desktop width. The introduction card stretches across the whole board, leaving a large empty area below three lines of text, and the four container cards sit in one row.">
+      <figcaption>Desktop width</figcaption>
+    </figure>
+    <div class="widths">
+      <figure>
+        <img src="images/fig-12b-in-between-width.png" alt="The same tab at an in-between width. The introduction card now fills only the left half of the board, leaving a large empty gap to its right, and the container cards drop to two per row.">
+        <figcaption>In-between width</figcaption>
+      </figure>
+      <figure>
+        <img src="images/fig-12c-phone-width.png" alt="The same tab at a narrow, phone-like width. The cards stack in a single column and read well, but in the header the star and lock icons overlap the CPG Analysis tab name.">
+        <figcaption>Phone width</figcaption>
+      </figure>
+    </div>
+    <figcaption><b>Figure 12.</b> The same board at three widths. The in-between width is where things break.</figcaption>
+  </figure>
+</section>
+
+<section id="spotter-code">
+  <h2>What we haven’t been able to test: Spotter Code <span class="status s-unk">Not tested</span></h2>
+  <p>Spotter Code should, in theory, let us look at the code behind a board and adjust it by hand. That could get around some of the limits above.</p>
+  <p>We haven’t been able to try it. We first raised it with ThoughtSpot by email on 2 November 2026 <a class="figref" href="#fig-13">(Figure 13)</a>, after our admin confirmed that the feature doesn’t appear for them either, despite having full admin access. They think it may not be enabled on our ThoughtSpot instance, or may not be included in our current licence.</p>
+  <p>We have been in touch with ThoughtSpot several times since, and they referred us to their customer services team, but it still hasn’t been switched on for our account.</p>
+
+  <div class="note blocked">
+    <p>Until we have access, we don’t know:</p>
+    <ul>
+      <li>what Spotter Code looks like or how easy it is to use</li>
+      <li>whether changes made with it can be applied to a theme</li>
+      <li>whether those changes would carry through to individual boards</li>
+      <li>whether it would fix the colour, background, spacing or screen-size problems</li>
+    </ul>
+  </div>
+
+  <figure class="shot" id="fig-13">
+    <img src="images/fig-13-spotter-code-email.png" alt="An email titled Chuka from Ligentia | SpotterCode issue, sent on Monday 2 November 2026 to two thoughtspot.com addresses, with the names in the addresses blurred. It explains that a ThoughtSpot contact said Spotter Code needed turning on by an admin, that our admin can’t see the feature despite full admin access, and asks ThoughtSpot to confirm or give more information.">
+    <figcaption><b>Figure 13.</b> Our first email to ThoughtSpot asking about Spotter Code access, sent 2 November 2026.</figcaption>
+  </figure>
+</section>
+
+<section id="next-steps">
+  <h2>Where this leaves us</h2>
+  <p>We can design a clearer, better organised board in the theme builder, but we can’t yet deliver it. Too little of the theming carries through to the saved board: colours don’t apply, group backgrounds disappear and layouts break at common screen sizes. As things stand, the boards people see are not noticeably better than the default.</p>
+  <p>Spotter Code is the main open question. It may solve some of these problems, or none of them. We won’t know until it’s switched on.</p>
+</section>
+
+</main>
+</body>
+</html>
