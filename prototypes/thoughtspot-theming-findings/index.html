@@ -157,6 +157,73 @@ figcaption b { color: var(--ink); }
 .blocked { border-left-color: var(--unk); }
 
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Before/after comparison slider (Figure 2) */
+.compare-item + .compare-item { margin-top: 1.5rem; }
+.compare {
+  --pos: 50%;
+  position: relative;
+  display: grid;
+  aspect-ratio: 3024 / 1606;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  user-select: none;
+  touch-action: pan-y;
+}
+.compare img {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  border: 0;
+}
+.compare .after { clip-path: inset(0 0 0 var(--pos)); }
+.compare .divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--pos);
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.compare .divider::after {
+  content: "\2039\2002\203A";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 50%;
+  background: #fff;
+  color: #1c2330;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  display: flex; align-items: center; justify-content: center;
+  font: 700 1.1rem/1 "Source Sans 3", system-ui, sans-serif;
+}
+.compare:has(input:focus-visible) .divider::after { outline: 3px solid var(--accent); outline-offset: 2px; }
+.compare .tag {
+  position: absolute;
+  top: 0.6rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(28, 35, 48, 0.85);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+.compare .tag-before { left: 0.6rem; }
+.compare .tag-after { right: 0.6rem; }
+.compare input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
 </style>
 </head>
 <body>
@@ -219,17 +286,57 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <h3 id="layout">Layout and grouping <span class="status s-part">Partly carries through</span></h3>
   <p>Our main aim was clearer structure. In the theme builder’s manual mode, we placed related charts and figures together inside clear containers, each with its own title. In the theme builder, this makes it much easier to see what belongs together <a class="figref" href="#fig-2">(Figure 2)</a>.</p>
   <figure class="shot" id="fig-2">
-    <img src="images/fig-2a-theme-builder-cpg-analysis.png" alt="The CPG Analysis tab open in the theme builder’s manual mode, with the settings menu on the left. The board has a logo card, a title card with a short description, and a grouped section titled Cost Per Good Pack Analysis holding two charts on a light grey background.">
-    <img src="images/fig-2b-theme-builder-business-information.png" alt="The Business Information tab in the theme builder’s manual mode. Content is organised into titled groups (Container Description, SKU Comparison and General Information), each with a light grey background around its cards.">
-    <figcaption><b>Figure 2.</b> The same two tabs in the theme builder: clear groups and titles.</figcaption>
+    <figure class="compare-item">
+      <div class="compare">
+        <img class="before" src="images/fig-1a-default-cpg-analysis.png" alt="Before: the CPG Analysis tab with default styling, a grid of white cards with tables and charts on a pale blue background.">
+        <img class="after" src="images/fig-2a-theme-builder-cpg-analysis.png" alt="After: the same tab in the theme builder’s manual mode, with the settings menu on the left, a logo and title card, and a grouped section titled Cost Per Good Pack Analysis holding two charts on a light grey background.">
+        <span class="tag tag-before" aria-hidden="true">Before</span>
+        <span class="tag tag-after" aria-hidden="true">After</span>
+        <span class="divider" aria-hidden="true"></span>
+        <input type="range" min="0" max="100" value="50" aria-label="Compare before and after, CPG Analysis tab">
+      </div>
+      <figcaption>CPG Analysis tab</figcaption>
+    </figure>
+    <figure class="compare-item">
+      <div class="compare">
+        <img class="before" src="images/fig-1b-default-business-information.png" alt="Before: the Business Information tab with default styling, blue section headers and cards of justified text cut off at the bottom.">
+        <img class="after" src="images/fig-2b-theme-builder-business-information.png" alt="After: the same tab in the theme builder, organised into titled groups (Container Description, SKU Comparison and General Information), each with a light grey background around its cards.">
+        <span class="tag tag-before" aria-hidden="true">Before</span>
+        <span class="tag tag-after" aria-hidden="true">After</span>
+        <span class="divider" aria-hidden="true"></span>
+        <input type="range" min="0" max="100" value="50" aria-label="Compare before and after, Business Information tab">
+      </div>
+      <figcaption>Business Information tab</figcaption>
+    </figure>
+    <figcaption><b>Figure 2.</b> Before and after: the default board (Figure 1) against the same tabs in the theme builder, with clear groups and titles. Drag the handle, or use the arrow keys, to compare.</figcaption>
   </figure>
 
   <p>When the board is saved, only some of this carries through <a class="figref" href="#fig-3">(Figure 3)</a>. The main loss is the group background colour, covered under <a href="#group-backgrounds">group backgrounds</a> below. As a result, the saved board doesn’t look much clearer than the original <a class="figref" href="#fig-1">(Figure 1)</a>, so in practice the improvement is lost.</p>
 
   <figure class="shot" id="fig-3">
-    <img src="images/fig-3a-saved-cpg-analysis.png" alt="The saved CPG Analysis tab. The logo, title and Cost Per Good Pack Analysis group are still there, but the group has no background colour, so its charts sit on plain white like every other card.">
-    <img src="images/fig-3b-saved-business-information.png" alt="The saved Business Information tab. The Container Description, SKU Comparison and General Information groups are all white with no background colour, so the groups are hard to tell apart and the text is still cut off at the bottom of the container cards.">
-    <figcaption><b>Figure 3.</b> The same two tabs once saved: the group backgrounds are gone and most of the clarity is lost.</figcaption>
+    <figure class="compare-item">
+      <div class="compare">
+        <img class="before" src="images/fig-2a-theme-builder-cpg-analysis.png" alt="In the theme builder: the CPG Analysis tab with a grouped section titled Cost Per Good Pack Analysis holding two charts on a light grey background.">
+        <img class="after" src="images/fig-3a-saved-cpg-analysis.png" alt="Saved: the same tab once saved. The logo, title and group are still there, but the group has no background colour, so its charts sit on plain white like every other card.">
+        <span class="tag tag-before" aria-hidden="true">Theme builder</span>
+        <span class="tag tag-after" aria-hidden="true">Saved</span>
+        <span class="divider" aria-hidden="true"></span>
+        <input type="range" min="0" max="100" value="50" aria-label="Compare theme builder and saved board, CPG Analysis tab">
+      </div>
+      <figcaption>CPG Analysis tab</figcaption>
+    </figure>
+    <figure class="compare-item">
+      <div class="compare">
+        <img class="before" src="images/fig-2b-theme-builder-business-information.png" alt="In the theme builder: the Business Information tab organised into titled groups, each with a light grey background around its cards.">
+        <img class="after" src="images/fig-3b-saved-business-information.png" alt="Saved: the same tab once saved. The groups are all white with no background colour, so they are hard to tell apart, and the text is still cut off at the bottom of the container cards.">
+        <span class="tag tag-before" aria-hidden="true">Theme builder</span>
+        <span class="tag tag-after" aria-hidden="true">Saved</span>
+        <span class="divider" aria-hidden="true"></span>
+        <input type="range" min="0" max="100" value="50" aria-label="Compare theme builder and saved board, Business Information tab">
+      </div>
+      <figcaption>Business Information tab</figcaption>
+    </figure>
+    <figcaption><b>Figure 3.</b> The theme builder (Figure 2) against the same tabs once saved: the group backgrounds are gone and most of the clarity is lost. Drag the handle, or use the arrow keys, to compare.</figcaption>
   </figure>
 
   <h3 id="titles">Card and page titles <span class="status s-part">Limited control</span></h3>
@@ -399,5 +506,13 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </section>
 
 </main>
+<script>
+  // Before/after sliders: the range input sets where the "after" image starts.
+  document.querySelectorAll('.compare input[type="range"]').forEach(function (input) {
+    var update = function () { input.parentElement.style.setProperty('--pos', input.value + '%'); };
+    input.addEventListener('input', update);
+    update();
+  });
+</script>
 </body>
 </html>
