@@ -150,6 +150,23 @@ The deployed site is behind a shared username/password login, enforced by `middl
 - If either variable is missing, the site returns `503` rather than going unprotected.
 - Local dev (`ng serve`) doesn't run middleware, so localhost stays open (and the Log out link goes nowhere).
 
+### Guest logins (time-limited)
+
+Visitors can be given their own username and password for the private site, valid until a set date.
+
+1. Generate the login (paste the current `GUEST_USERS` value from Vercel after `--list`, or leave it off for the first guest):
+   ```bash
+   node scripts/add-guest.mjs --user acme-review --expires 2026-12-05 --list '<current GUEST_USERS>'
+   ```
+   It prints a generated password and the updated list. Expired guests are dropped from the list automatically.
+2. In Vercel → Settings → Environment Variables, set `GUEST_USERS` to the printed list (type **Config**, so it stays viewable; environment **Production**) and redeploy.
+3. Send the visitor the site address, username and password. The password can't be recovered later — only a hash is stored.
+
+- Access ends at **23:59 UK time** on the expiry date, automatically — even mid-session. Sessions are still capped at 8 hours.
+- **Revoke early** by deleting the guest's entry and redeploying; only that guest is signed out.
+- Guests see everything the team sees but can't change anything (saving needs a GitHub token). The header shows "Guest: name · access until date".
+- Changing the team password signs out guests too.
+
 ### Public gallery — https://design-lab-4public.vercel.app
 
 A second address on the same Vercel project, with **no sign-in**. It shows a gallery of every public prototype (live preview, title, description, creator, date, tags); selecting one opens it full screen. Nothing else is served on that address — the app, data, sign-in page and private prototypes all return "Page not found", even for signed-in users. The dashboard's **View public page ↗** link opens it.
