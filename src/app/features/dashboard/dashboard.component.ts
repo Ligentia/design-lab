@@ -201,8 +201,8 @@ export class DashboardComponent implements OnInit {
     try {
       if (this.editingPrototype()) {
         prototype.updatedAt = new Date().toISOString().slice(0, 10);
-        if (files?.length) await this.svc.uploadFiles(prototype, pat, files, track);
-        await this.svc.updatePrototype(prototype, pat);
+        if (files?.length) await this.svc.updatePrototypeWithFiles(prototype, pat, files, track);
+        else await this.svc.updatePrototype(prototype, pat);
       } else {
         await this.svc.addPrototype(prototype, pat, files, track);
       }
