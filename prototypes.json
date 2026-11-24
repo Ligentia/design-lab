@@ -58,7 +58,8 @@
     "tags": [
       "prototype"
     ],
-    "folder": "prototypes/design-notes"
+    "folder": "prototypes/design-notes",
+    "updatedAt": "2026-11-24"
   },
   {
     "id": "views-b-v2",
@@ -118,13 +119,12 @@
     "title": "Design Notes",
     "description": "",
     "creator": "Chuka",
-    "date": "2026-10-09",
+    "date": "2026-11-13",
     "tags": [
-      "design team",
-      "internal tools"
+      "prototype"
     ],
     "folder": "prototypes/design-notes",
-    "archived": true
+    "updatedAt": "2026-11-24"
   },
   {
     "id": "swift-v2-playground",
