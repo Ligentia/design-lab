@@ -12,7 +12,7 @@ https://github.com/Ligentia/design-lab (primary). `github.com/dshyone/design-lab
 ## Stack
 - Angular 17+ standalone components, signals-based state
 - CSS custom properties (SwiftDS-aligned design tokens in `src/styles/tokens.css`)
-- GitHub Contents API as backend (no server — reads/writes JSON files in this repo)
+- GitHub Contents API as backend (no server — reads/writes JSON files in this repo); prototype file uploads use the Git Data API (see "Uploads are one commit")
 - Deployed to Vercel — auto-deploys on every push to `main`
 
 ## Architecture
@@ -31,7 +31,7 @@ GitHub repo (source of truth)
 - `/folders` — folders (collections) list; `/folder/:id` — folder page listing its prototypes
 
 ## Key files
-- `src/app/core/services/github.service.ts` — GitHub API read/write (getPrototypes, savePrototypes, getAssets, saveAssets, getCollections, saveCollections, uploadFile)
+- `src/app/core/services/github.service.ts` — GitHub API read/write (getPrototypes, savePrototypes, getAssets, saveAssets, getCollections, saveCollections, commitFiles)
 - `src/app/core/services/prototype.service.ts` — signal-based prototype state; addPrototype uploads file then updates JSON
 - `src/app/core/services/asset.service.ts` — signal-based asset state
 - `src/app/core/services/collection.service.ts` — signal-based folder (collection) state; add/update/deleteCollection persist collections.json
@@ -74,7 +74,16 @@ Collection { id, name, description?, creator, date, updatedAt?, prototypeIds[] }
   - **Require a root `index.html`** (entry page) — otherwise the modal sets `errorMsg` and clears `uploadedFiles`, blocking submit. This is why the preview components can stay hardcoded to `index.html` (no `entryFile` field needed).
   - Skips `entry.dir`, `__MACOSX`, and dotfiles at any depth; content stays base64 (handles binary assets).
 - The non-ZIP (individual files) branch is unchanged: a lone `.html` is still renamed to `index.html` (single-page path).
-- **Upload progress**: `addPrototype`/`uploadFiles` take an optional `onProgress(done, total)` callback fired after each file's PUT. The dashboard stores it in an `uploadProgress` signal and passes it to the modal (`progress` is a **signal `input()`**); the modal footer shows a bar + "Uploading file X of N" / "Finalising…". Because the callback fires in async promise continuations (no triggering event), the dashboard calls `cdr.markForCheck()` after each update so the value propagates to the modal (same zoneless caveat as below). Component-style budget in `angular.json` was raised (8kB warn / 12kB error) since the add-prototype modal's inline styles grew past the old 8kB error cap.
+- **Upload progress**: `addPrototype`/`updatePrototypeWithFiles` take an optional `onProgress(done, total)` callback fired after each file's blob upload. The dashboard stores it in an `uploadProgress` signal and passes it to the modal (`progress` is a **signal `input()`**); the modal footer shows a bar + "Uploading file X of N" / "Finalising…". Because the callback fires in async promise continuations (no triggering event), the dashboard calls `cdr.markForCheck()` after each update so the value propagates to the modal (same zoneless caveat as below). Component-style budget in `angular.json` was raised (8kB warn / 12kB error) since the add-prototype modal's inline styles grew past the old 8kB error cap.
+
+## Uploads are one commit
+- **Every commit to `main` is a Vercel deployment.** Uploads used to go through the Contents API, which commits once per file. On 2026-11-24 two ~90-file ZIP uploads made 183 commits in an afternoon and Vercel refused the rest ("Deployment rate limited — retry in 24 hours"). The live site was left mid-upload: the page had been updated but its images had not. Vercel does not retry rate-limited commits, so recovery is one Redeploy of the latest `main` after the limit resets.
+- So adding a prototype with files, or editing one with new files, goes through `GithubService.commitFiles()`: each file becomes a **blob** (no commit, no deploy; 4 in parallel), then one **tree** on top of the head's tree, one **commit**, and one **ref update**. The files and the `prototypes.json` change land together. One upload = one deployment, and the site can't go live half-updated.
+- **Lost-update guard:** `commitFiles` takes `expect: { path, sha }`. Before committing, it checks that `prototypes.json`'s blob SHA on the head still equals the SHA loaded into `PrototypeService._sha` (a Contents API `sha` *is* the blob SHA). On a mismatch it throws `GithubConflictError` (status 409) and writes nothing — the same protection the Contents API `sha` gave.
+- **Head moved mid-upload** (ref PATCH returns 422 = not a fast-forward): it rebuilds the tree and commit on the new head, reusing the blobs, and re-checks the guard. Up to 3 attempts.
+- Metadata-only saves (edit without files, archive/restore, assets, collections) are still single Contents API PUTs — already one commit each.
+- Tests: `github.service.spec.ts` (mocked HTTP). ⚠️ `src/app/app.spec.ts` is a stale scaffold spec importing a non-existent `App` and breaks `ng test` compilation; move it aside to run the suite (or delete it).
+- Now that an upload builds the folder in one tree, deleting stale files on re-upload (see Open items) is a matter of adding `sha: null` tree entries for paths under the folder that aren't in the new ZIP.
 
 ## Folders (collections)
 - **UI term is "Folders"; code entity is `Collection`** — because `Prototype.folder` already means a GitHub storage path. Model in `collection.model.ts`; persisted as `collections.json` at the repo root.

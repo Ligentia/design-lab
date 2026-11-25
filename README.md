@@ -21,7 +21,7 @@ Internal tool for the Ligentix product design team to centralise, browse, and sh
 
 - Angular 17+ (standalone components, signals, lazy-loaded routes)
 - CSS custom properties (SwiftDS-aligned design tokens)
-- GitHub Contents API — reads/writes JSON metadata and uploads raw prototype files
+- GitHub Contents API — reads/writes JSON metadata; prototype files are uploaded with the Git Data API as a single commit
 - Deployed to Vercel — auto-deploys on every push to `main`
 
 ---
@@ -73,7 +73,8 @@ A prototype can be more than one page. Zip its folder and drop the `.zip` in —
 
 - The ZIP **must contain an `index.html` at its top level** — that's the entry page the preview loads. If it doesn't, the modal blocks the upload.
 - A single wrapping folder is fine: a "Compress"-style ZIP that nests everything under `my-proto/` is unwrapped automatically so `index.html` lands at the prototype root.
-- While it uploads, the modal shows a **progress bar** — "Uploading file X of N" per file, then "Finalising…" as the metadata saves — so you can see how far along a multi-file upload is.
+- While it uploads, the modal shows a **progress bar** — "Uploading file X of N" per file, then "Finalising…" while the commit is made — so you can see how far along a multi-file upload is.
+- **However many files it has, an upload is one commit**, and so one Vercel deployment. It used to be one commit per file, which hit Vercel's daily deployment limit on large ZIPs and left the live site half-updated. If someone else saved `prototypes.json` while you were uploading, the save stops with a message to reload, and nothing is written.
 - **Known limitation:** editing a prototype and uploading a new ZIP overwrites files by path but does **not** delete files from the previous version that are absent in the new ZIP — stale files remain in the folder.
 
 ### Via CLI

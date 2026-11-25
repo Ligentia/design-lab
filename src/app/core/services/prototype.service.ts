@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GithubService } from './github.service';
+import { GithubService, encodePrototypes } from './github.service';
 import { Prototype } from '../models/prototype.model';
 
 // Dashboard Access filter values (also the chip labels). Pick-one, unlike tags.
@@ -138,40 +138,58 @@ export class PrototypeService {
     this._activeAccess.set(null);
   }
 
-  async uploadFiles(
-    prototype: Prototype,
-    pat: string,
-    files: { name: string; content: string }[],
-    onProgress?: (done: number, total: number) => void
-  ) {
-    let done = 0;
-    for (const file of files) {
-      await firstValueFrom(
-        this.github.uploadFile(`${prototype.folder}/${file.name}`, file.content, pat)
-      );
-      onProgress?.(++done, files.length);
-    }
-  }
-
   async addPrototype(
     prototype: Prototype,
     pat: string,
     files?: { name: string; content: string }[],
     onProgress?: (done: number, total: number) => void
   ) {
-    if (files?.length) {
-      let done = 0;
-      for (const file of files) {
-        await firstValueFrom(
-          this.github.uploadFile(`${prototype.folder}/${file.name}`, file.content, pat)
-        );
-        onProgress?.(++done, files.length);
-      }
+    const list = [prototype, ...this._prototypes()];
+    if (!files?.length) {
+      const res: any = await firstValueFrom(this.github.savePrototypes(list, this._sha(), pat));
+      this._prototypes.set(list);
+      if (res?.content?.sha) this._sha.set(res.content.sha);
+      return;
     }
-    const updated = [prototype, ...this._prototypes()];
-    const res: any = await firstValueFrom(this.github.savePrototypes(updated, this._sha(), pat));
-    this._prototypes.set(updated);
-    if (res?.content?.sha) this._sha.set(res.content.sha);
+    await this.commitWithFiles(list, prototype, pat, files, `Add prototype ${prototype.folder}`, onProgress);
+  }
+
+  /** Edit with new files: the files and the metadata change land as one commit. */
+  updatePrototypeWithFiles(
+    updated: Prototype,
+    pat: string,
+    files: { name: string; content: string }[],
+    onProgress?: (done: number, total: number) => void
+  ) {
+    const list = this._prototypes().map((p) => (p.id === updated.id ? updated : p));
+    return this.commitWithFiles(list, updated, pat, files, `Update prototype ${updated.folder}`, onProgress);
+  }
+
+  // One commit = one Vercel deployment, however many files the prototype has.
+  // See GithubService.commitFiles for why this matters.
+  private async commitWithFiles(
+    list: Prototype[],
+    prototype: Prototype,
+    pat: string,
+    files: { name: string; content: string }[],
+    action: string,
+    onProgress?: (done: number, total: number) => void
+  ) {
+    const blobs = await this.github.commitFiles(
+      [
+        ...files.map((f) => ({ path: `${prototype.folder}/${f.name}`, content: f.content })),
+        { path: 'prototypes.json', content: encodePrototypes(list) },
+      ],
+      `${action} (${files.length} ${files.length === 1 ? 'file' : 'files'}) via Design Lab`,
+      pat,
+      // The progress bar counts the prototype's files, not prototypes.json.
+      {
+        expect: { path: 'prototypes.json', sha: this._sha() },
+        onProgress: (done) => onProgress?.(Math.min(done, files.length), files.length),
+      }
+    );
+    this._prototypes.set(list);
+    this._sha.set(blobs.get('prototypes.json')!);
   }
 
   updatePrototype(updated: Prototype, pat: string) {
