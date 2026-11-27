@@ -74,6 +74,7 @@ A prototype can be more than one page. Zip its folder and drop the `.zip` in —
 - The ZIP **must contain an `index.html` at its top level** — that's the entry page the preview loads. If it doesn't, the modal blocks the upload.
 - A single wrapping folder is fine: a "Compress"-style ZIP that nests everything under `my-proto/` is unwrapped automatically so `index.html` lands at the prototype root.
 - While it uploads, the modal shows a **progress bar** — "Uploading file X of N" per file, then "Finalising…" while the commit is made — so you can see how far along a multi-file upload is.
+- **Titles must be unique.** A prototype's id comes from its title, so adding one with an existing title (or into another prototype's folder) is refused before anything uploads — edit the existing prototype instead.
 - **However many files it has, an upload is one commit**, and so one Vercel deployment. It used to be one commit per file, which hit Vercel's daily deployment limit on large ZIPs and left the live site half-updated. If someone else saved `prototypes.json` while you were uploading, the save stops with a message to reload, and nothing is written.
 - **Known limitation:** editing a prototype and uploading a new ZIP overwrites files by path but does **not** delete files from the previous version that are absent in the new ZIP — stale files remain in the folder.
 

@@ -85,6 +85,11 @@ Collection { id, name, description?, creator, date, updatedAt?, prototypeIds[] }
 - Tests: `github.service.spec.ts` (mocked HTTP). ⚠️ `src/app/app.spec.ts` is a stale scaffold spec importing a non-existent `App` and breaks `ng test` compilation; move it aside to run the suite (or delete it).
 - Now that an upload builds the folder in one tree, deleting stale files on re-upload (see Open items) is a matter of adding `sha: null` tree entries for paths under the folder that aren't in the new ZIP.
 
+## Prototype ids must be unique
+- `id` is slugged from the title at creation and never changes; edits, archive and restore all match by id (`map(p => p.id === updated.id ? updated : p)`). So two entries with one id can never be told apart again — every edit rewrites both, and archiving one archives both.
+- `PrototypeService.assertUnique()` runs before any upload: **add** refuses an existing id (archived count) or folder; **edit** refuses moving into another prototype's folder (its files would be overwritten). It throws `DuplicatePrototypeError`, which the dashboard shows verbatim. Tests: `prototype.service.spec.ts`.
+- History: Design Notes was duplicated on 2026-11-13 (removed 2026-11-27). `views-b-v2` still has **three identical archived copies** from the same bug — safe to dedupe (they're identical; "Views C (v2)" has its own id and folder), left pending the owner's OK.
+
 ## Folders (collections)
 - **UI term is "Folders"; code entity is `Collection`** — because `Prototype.folder` already means a GitHub storage path. Model in `collection.model.ts`; persisted as `collections.json` at the repo root.
 - **Many-to-many, flat, folder-side membership**: a `Collection` holds `prototypeIds[]` (denormalised) so a prototype can be in many folders and adding/removing membership rewrites only `collections.json`, never prototypes. No `entryFile`/parent fields; no nesting.

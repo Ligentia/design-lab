@@ -12,6 +12,15 @@ export function isPublicPrototype(p: Prototype): boolean {
   return !!p.public && !p.archived;
 }
 
+/**
+ * Thrown before anything is uploaded when a save would clash with another
+ * prototype. Ids are slugged from the title, so "Add prototype" with an
+ * existing title used to create a second entry with the same id and folder —
+ * and since edits, archive and restore all match by id, the two could never
+ * be told apart again (that happened to Design Notes on 2026-11-13).
+ */
+export class DuplicatePrototypeError extends Error {}
+
 @Injectable({ providedIn: 'root' })
 export class PrototypeService {
   private github = inject(GithubService);
@@ -138,12 +147,32 @@ export class PrototypeService {
     this._activeAccess.set(null);
   }
 
+  // Archived prototypes count: their ids and folders are still taken.
+  private assertUnique(p: Prototype, isNew: boolean) {
+    const others = this._prototypes().filter((o) => isNew || o.id !== p.id);
+    const sameId = isNew ? others.find((o) => o.id === p.id) : undefined;
+    if (sameId) {
+      throw new DuplicatePrototypeError(
+        `A prototype called "${sameId.title}" already exists${sameId.archived ? ' (archived)' : ''}. ` +
+          'Edit that one instead, or choose a different title.'
+      );
+    }
+    const sameFolder = others.find((o) => o.folder === p.folder);
+    if (sameFolder) {
+      throw new DuplicatePrototypeError(
+        `The folder ${p.folder} already belongs to "${sameFolder.title}". ` +
+          'Choose a different folder, or its files would be overwritten.'
+      );
+    }
+  }
+
   async addPrototype(
     prototype: Prototype,
     pat: string,
     files?: { name: string; content: string }[],
     onProgress?: (done: number, total: number) => void
   ) {
+    this.assertUnique(prototype, true);
     const list = [prototype, ...this._prototypes()];
     if (!files?.length) {
       const res: any = await firstValueFrom(this.github.savePrototypes(list, this._sha(), pat));
@@ -161,6 +190,7 @@ export class PrototypeService {
     files: { name: string; content: string }[],
     onProgress?: (done: number, total: number) => void
   ) {
+    this.assertUnique(updated, false);
     const list = this._prototypes().map((p) => (p.id === updated.id ? updated : p));
     return this.commitWithFiles(list, updated, pat, files, `Update prototype ${updated.folder}`, onProgress);
   }
@@ -193,6 +223,7 @@ export class PrototypeService {
   }
 
   updatePrototype(updated: Prototype, pat: string) {
+    this.assertUnique(updated, false);
     const list = this._prototypes().map((p) => (p.id === updated.id ? updated : p));
     return new Promise<void>((resolve, reject) => {
       this.github.savePrototypes(list, this._sha(), pat).subscribe({

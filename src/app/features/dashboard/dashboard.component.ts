@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrototypeService, ACCESS_OPTIONS } from '../../core/services/prototype.service';
+import { PrototypeService, ACCESS_OPTIONS, DuplicatePrototypeError } from '../../core/services/prototype.service';
 import { environment } from '../../../environments/environment';
 import { UiStateService } from '../../core/services/ui-state.service';
 import { PrototypeCardComponent } from '../prototype-card/prototype-card.component';
@@ -210,6 +210,11 @@ export class DashboardComponent implements OnInit {
     } catch (err: unknown) {
       this.uploadProgress.set(null);
       console.error('Save failed', err);
+      if (err instanceof DuplicatePrototypeError) {
+        // Caught before any upload, so nothing was written.
+        this.modalError.set(err.message);
+        return;
+      }
       const status = (err as any)?.status;
       const msg = (err as any)?.error?.message ?? (err as any)?.message ?? 'Unknown error';
       if (status === 401 || status === 403 || status === 404) {
