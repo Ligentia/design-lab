@@ -115,18 +115,6 @@
     "archived": true
   },
   {
-    "id": "design-notes",
-    "title": "Design Notes",
-    "description": "",
-    "creator": "Chuka",
-    "date": "2026-11-13",
-    "tags": [
-      "prototype"
-    ],
-    "folder": "prototypes/design-notes",
-    "updatedAt": "2026-11-27"
-  },
-  {
     "id": "swift-v2-playground",
     "title": "Swift V2 playground",
     "description": "A playground for exploring Swift V2 styles.",
