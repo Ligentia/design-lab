@@ -62,34 +62,6 @@
     "updatedAt": "2026-11-27"
   },
   {
-    "id": "views-b-v2",
-    "title": "Views B (v2)",
-    "description": "",
-    "creator": "Adrian",
-    "date": "2026-11-18",
-    "tags": [
-      "prototype"
-    ],
-    "folder": "prototypes/views-b-v2",
-    "public": true,
-    "updatedAt": "2026-11-18",
-    "archived": true
-  },
-  {
-    "id": "views-b-v2",
-    "title": "Views B (v2)",
-    "description": "",
-    "creator": "Adrian",
-    "date": "2026-11-18",
-    "tags": [
-      "prototype"
-    ],
-    "folder": "prototypes/views-b-v2",
-    "public": true,
-    "updatedAt": "2026-11-18",
-    "archived": true
-  },
-  {
     "id": "views-a-v2",
     "title": "Views A (v2)",
     "description": "",

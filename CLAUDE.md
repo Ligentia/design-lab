@@ -88,7 +88,7 @@ Collection { id, name, description?, creator, date, updatedAt?, prototypeIds[] }
 ## Prototype ids must be unique
 - `id` is slugged from the title at creation and never changes; edits, archive and restore all match by id (`map(p => p.id === updated.id ? updated : p)`). So two entries with one id can never be told apart again — every edit rewrites both, and archiving one archives both.
 - `PrototypeService.assertUnique()` runs before any upload: **add** refuses an existing id (archived count) or folder; **edit** refuses moving into another prototype's folder (its files would be overwritten). It throws `DuplicatePrototypeError`, which the dashboard shows verbatim. Tests: `prototype.service.spec.ts`.
-- History: Design Notes was duplicated on 2026-11-13 (removed 2026-11-27). `views-b-v2` still has **three identical archived copies** from the same bug — safe to dedupe (they're identical; "Views C (v2)" has its own id and folder), left pending the owner's OK.
+- History: the same bug duplicated Design Notes (2026-11-13) and triplicated Views B (v2) — which is why renaming it once renamed all three copies to "Views C" and back. "Views C (v2)" was later created under its own id and folder and is unaffected. All extra copies removed 2026-11-27; `prototypes.json` has no duplicate ids.
 
 ## Folders (collections)
 - **UI term is "Folders"; code entity is `Collection`** — because `Prototype.folder` already means a GitHub storage path. Model in `collection.model.ts`; persisted as `collections.json` at the repo root.
